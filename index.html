@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NCC NIT Arunachal Pradesh | Official Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+    /* === [COPY THIS PART TO REPLACE YOUR OLD GALLERY CSS] === */
+
+/* NEW FONTS FOR THE HEADER SECTION */
+    .gallery-header-box {
+        text-align: center;
+        margin-bottom: 40px; /* Space before the photos */
+    }
+
+/* BIGGER, OSWALD-STYLE HEADING */
+    .gallery-heading {
+        font-family: 'Oswald', sans-serif; /* Changes the heading font */
+        font-size: 2.5rem; /* Makes it "Bigger" */
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--nit-teal); /* Use your existing dark green color */
+        margin-bottom: 5px;
+    }
+
+/* TECHY-STYLE SUBHEADING BELOW IT */
+    .gallery-subheading {
+        font-family: 'Roboto Mono', monospace; /* Changes the caption below heading font */
+        font-size: 1rem; /* Adjusts the size of the caption below heading */
+        color: #666; /* Medium grey */
+        letter-spacing: 1px;
+        text-transform: uppercase; /* Techy look */
+    }
+
+/* CHANGED TO ROW FORMAT (SIDE-BY-SIDE) */
+    .row-gallery-container {
+        display: flex; /* Uses Flexbox to place items side-by-side */
+        flex-direction: row; /* Horizontal alignment (instead of 'column') */
+        justify-content: center; /* Centers the whole row of photos */
+        flex-wrap: wrap; /* Wraps items to the next line on mobile screens */
+        gap: 30px; /* Space between the side-by-side photos */
+        padding: 20px;
+    }
+
+/* Updated Gallery Item for Row Format */
+    .techy-gallery-item {
+        margin: 0;
+        padding: 15px;
+        background: white;
+        border: 1px solid var(--nit-teal);
+        border-radius: 4px;
+        width: 350px; /* Folds each small photo into this width */
+        max-width: 100%; /* Ensures it shrinks on mobile */
+        box-shadow: 4px 4px 0px var(--army-green);
+        transition: 0.3s;
+    }
+
+    .techy-gallery-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 8px 8px 0px var(--nit-teal);
+    }
+
+    .techy-gallery-item img {
+        width: 100%; 
+        height: auto; 
+        border-radius: 2px;
+        filter: grayscale(20%);
+    }
+
+    .techy-gallery-item figcaption {
+        margin-top: 15px;
+        font-size: 0.9rem;
+        color: var(--army-green);
+        font-family: 'Roboto Mono', monospace; 
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-top: 1px dashed #ccc;
+        padding-top: 10px;
+    }
+/* === [END OF CSS UPDATE] === */
+
+        :root {
+            --army-green: #2d3436;
+            --light-grey: #f0f2f5;
+            --nit-teal: #004d40;
+            --white: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--light-grey);
+            color: #333;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* --- LOADER --- */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+        #loader video { width: 400px; }
+
+        /* --- HEADER & NAVIGATION --- */
+        header {
+            background: var(--white);
+            border-bottom: 4px solid var(--nit-teal);
+            padding: 10px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-tabs {
+            background: var(--army-green);
+            display: flex;
+            justify-content: center;
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .tab-btn {
+            padding: 15px 25px;
+            color: white;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            background: var(--nit-teal);
+        }
+
+        /* --- CONTENT SECTIONS --- */
+        .tab-content {
+            display: none;
+            padding: 50px 10%;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- REMOVE BACKGROUND EFFECT --- */
+        .clean-img {
+            mix-blend-mode: multiply; /* Removes white backgrounds on light themes */
+            filter: contrast(1.1);
+        }
+
+        /* --- HERO STYLE --- */
+        .hero-box {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .main-logo { width: 300px; margin-bottom: 20px; }
+
+        /* --- DESK STYLES --- */
+        .desk-card {
+            display: flex;
+            gap: 30px;
+            background: white;
+            padding: 30px;
+            border-left: 10px solid var(--nit-teal);
+        }
+
+        .rank-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .rank-table th, .rank-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .rank-table th { background: var(--nit-teal); color: white; }
+
+        footer { text-align: center; padding: 30px; color: #777; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <video autoplay muted playsinline><source src="BUFFER VIDEO_WEB.mp4" type="video/mp4"></video>
+    </div>
+
+    <header>
+        <img src="LOGO_NIT.png" height="70" class="clean-img">
+        <div style="text-align: center;">
+            <h2 style="margin:0; font-family:'Oswald';">NATIONAL CADET CORPS</h2>
+            <small>NIT ARUNACHAL PRADESH</small>
+        </div>
+        <img src="LOGO_NCC.png" height="70" class="clean-img">
+    </header>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="openTab('home')">Home</button>
+        <button class="tab-btn" onclick="openTab('about')">About Us</button>
+        <button class="tab-btn" onclick="openTab('ano')">ANO's Desk</button>
+        <button class="tab-btn" onclick="openTab('rank')">Rank Panel</button>
+        <button class="tab-btn" onclick="openTab('gallery')">Gallery</button>
+    </div>
+
+    <div id="home" class="tab-content active">
+        <div class="hero-box">
+            <img src="LOGO_SOCIAL MEDIA.png" class="main-logo clean-img">
+            <h1 style="font-family:'Oswald';">UNITY AND DISCIPLINE</h1>
+            <p>Welcome to the official portal of the NCC Unit, NIT Arunachal Pradesh.</p>
+        </div>
+    </div>
+
+    <div id="about" class="tab-content">
+        <h2>About the Unit</h2>
+        <p>Established in 2010, the NCC unit at NIT Arunachal Pradesh aims to groom students into disciplined and patriotic citizens. We participate in various National Integration Camps, Republic Day Parades, and Social Service activities.</p>
+    </div>
+
+    <div id="ano" class="tab-content">
+        <div class="desk-card">
+            <div style="flex: 1;">
+                <h2>From the ANO's Desk</h2>
+                <p>"Discipline is the bridge between goals and accomplishment. Our cadets are trained not just for the parade ground, but for the challenges of life."</p>
+                <strong>- Associate NCC Officer</strong>
+            </div>
+        </div>
+    </div>
+
+    <div id="rank" class="tab-content">
+        <h2>Current Rank Panel</h2>
+        <table class="rank-table">
+            <tr><th>Rank</th><th>Name of Cadet</th><th>Branch</th></tr>
+            <tr><td>SENIOR UNDER OFFICER (SUO)</td><td>ABHIJEET</td><td>COMPUTER SCIENCE & ENGINEERING</td></tr>
+            <tr><td>UNDER OFFICER (UO)</td><td>AKHAND UPADHYAY</td><td>MECHANICAL ENGINEERING</td></tr>
+            <tr><td>SERGEANT</td><td>ROSHNI YADAV</td><td>ELECTRICAL ENGINEERING</td></tr>
+        </table>
+    </div>
+
+    
+    <div class="gallery-header-box">
+        <h2 class="gallery-heading">Unit Honors & Highlights</h2>
+        <p class="gallery-subheading">A visual tribute to drills, camps, parades, and patriotic celebrations.</p>
+    </div>
+    
+    <div class="row-gallery-container">
+        
+        <figure class="techy-gallery-item">
+            <img src="REPUBLIC DAY.png" alt="Vande Mataram">
+            <figcaption>NIT AR CELEBRATES REPUBLIC DAY 2026</figcaption>
+        </figure>
+
+        <figure class="techy-gallery-item">
+            <img src="PPT_150 Years of VANDE MATRAM.jpg" alt="Cleanliness Drive">
+            <figcaption>NIT AR OBSERVES 150 YEARS OF VANDE MATRAM</figcaption>
+        </figure>
+        <figure class="techy-gallery-item">
+            <img src="IDEA AND INNOVATION.jpeg" alt="Vande Mataram">
+            <figcaption>NIT AR HOSTS & WINS NER NCC IDEA AND INNOVATION CAMP 2025</figcaption>
+        </figure>
+
+        <figure class="techy-gallery-item">
+            <img src="UNNAT BHARAT ABHIYAAN.jpeg" alt="Cleanliness Drive">
+            <figcaption>Swachhta Hi Seva 2025: Clean India Drive by NIT AP Cadets.</figcaption>
+        </figure>
+    </div>
+</div>
+
+    <footer>
+        &copy; 2026 National Institute of Technology, Arunachal Pradesh | NCC Unit
+    </footer>
+
+    <script>
+        // FUNCTION TO SWITCH TABS
+        function openTab(tabName) {
+            // Hide all contents
+            var contents = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < contents.length; i++) {
+                contents[i].classList.remove("active");
+            }
+            
+            // Remove active style from buttons
+            var buttons = document.getElementsByClassName("tab-btn");
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove("active");
+            }
+
+            // Show current tab and add active style to button
+            document.getElementById(tabName).classList.add("active");
+            event.currentTarget.classList.add("active");
+
+            // Optional: Trigger buffer video on tab switch
+            showBuffer();
+        }
+
+        function showBuffer() {
+            var loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+            loader.style.opacity = '1';
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                setTimeout(() => { loader.style.display = 'none'; }, 500);
+            }, 1000);
+        }
+
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500);
+            }, 2500);
+        });
+    </script>
+</body>
+</html>
