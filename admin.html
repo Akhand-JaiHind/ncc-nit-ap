@@ -27,83 +27,173 @@ body { font-family:'Roboto',sans-serif; background:var(--bg); color:var(--text);
 
 /* ═══════════════ LOGIN SCREEN ═══════════════ */
 #login-screen {
-  position:fixed; inset:0; background:var(--army);
+  position:fixed; inset:0;
+  background: radial-gradient(ellipse at 20% 50%, #0a2e28 0%, #1a1a2e 40%, #0d1117 100%);
   display:flex; align-items:center; justify-content:center;
   z-index:9999; flex-direction:column; gap:0;
-  transition:opacity .4s ease, transform .4s ease;
+  transition:opacity .5s ease, transform .5s ease;
+  overflow:hidden;
 }
 #login-screen.out { opacity:0; transform:scale(1.04); pointer-events:none; }
 
+/* Animated grid background */
+#login-screen::before {
+  content:'';
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(0,191,165,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,191,165,.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+  animation: gridDrift 20s linear infinite;
+}
+@keyframes gridDrift { from{transform:translateY(0)} to{transform:translateY(44px)} }
+
+/* Floating orbs */
+.login-orb {
+  position:absolute; border-radius:50%;
+  filter:blur(60px); pointer-events:none; opacity:.55;
+  animation: orbFloat linear infinite;
+}
+.login-orb-1 {
+  width:340px; height:340px;
+  background:radial-gradient(circle, rgba(0,191,165,.35), transparent 70%);
+  top:-80px; left:-80px;
+  animation-duration:18s; animation-delay:0s;
+}
+.login-orb-2 {
+  width:280px; height:280px;
+  background:radial-gradient(circle, rgba(0,77,64,.5), transparent 70%);
+  bottom:-60px; right:-60px;
+  animation-duration:22s; animation-delay:-8s;
+}
+.login-orb-3 {
+  width:180px; height:180px;
+  background:radial-gradient(circle, rgba(0,191,165,.2), transparent 70%);
+  top:40%; right:15%;
+  animation-duration:14s; animation-delay:-4s;
+}
+@keyframes orbFloat {
+  0%,100%{ transform:translate(0,0) scale(1); }
+  33%    { transform:translate(30px,-20px) scale(1.08); }
+  66%    { transform:translate(-20px,15px) scale(.94); }
+}
+
+/* Logo above the card */
+.login-logo-above {
+  text-align:center; margin-bottom:28px; position:relative; z-index:2;
+}
+.login-logo-img-wrap {
+  position:relative; display:inline-block;
+}
+.login-logo-img {
+  width:110px; height:110px; object-fit:contain;
+  filter: drop-shadow(0 0 18px rgba(0,191,165,.7)) drop-shadow(0 0 40px rgba(0,191,165,.35));
+  animation: logoPulse 3s ease-in-out infinite;
+  position:relative; z-index:2;
+}
+/* Pulse ring */
+.login-logo-img-wrap::before,
+.login-logo-img-wrap::after {
+  content:'';
+  position:absolute; inset:-10px;
+  border-radius:50%; border:2px solid rgba(0,191,165,.4);
+  animation: ringPulse 3s ease-out infinite;
+  pointer-events:none;
+}
+.login-logo-img-wrap::after {
+  inset:-22px; border-color:rgba(0,191,165,.2);
+  animation-delay:.6s;
+}
+@keyframes ringPulse {
+  0%   { transform:scale(.9); opacity:.8; }
+  100% { transform:scale(1.35); opacity:0; }
+}
+@keyframes logoPulse {
+  0%,100%{ filter:drop-shadow(0 0 14px rgba(0,191,165,.65)) drop-shadow(0 0 36px rgba(0,191,165,.3)); }
+  50%    { filter:drop-shadow(0 0 24px rgba(0,191,165,.9)) drop-shadow(0 0 60px rgba(0,191,165,.5)); }
+}
+
+/* Glassmorphism card */
 .login-box {
-  background:var(--card);
-  border-top:4px solid var(--accent);
-  padding:44px 48px;
-  width:380px;
-  box-shadow:0 20px 60px rgba(0,0,0,.5);
+  background: rgba(255,255,255,.06);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border:1px solid rgba(0,191,165,.25);
+  border-top:3px solid var(--accent);
+  padding:36px 44px 40px;
+  width:400px;
+  box-shadow: 0 24px 60px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.07);
   position:relative;
-  overflow:hidden;
+  z-index:2;
 }
 .login-box::before {
   content:'';
   position:absolute; top:0; right:0;
-  width:100px; height:100px;
-  background:linear-gradient(135deg,transparent 60%,rgba(0,191,165,.07) 100%);
+  width:120px; height:120px;
+  background:linear-gradient(135deg,transparent 55%,rgba(0,191,165,.08) 100%);
+  pointer-events:none;
 }
+
 .login-logo {
-  text-align:center; margin-bottom:32px;
+  text-align:center; margin-bottom:28px;
 }
 .login-logo h1 {
-  font-family:'Oswald',sans-serif; font-size:1.4rem;
-  letter-spacing:5px; color:var(--teal);
+  font-family:'Oswald',sans-serif; font-size:1.3rem;
+  letter-spacing:5px; color:#fff;
+  text-shadow: 0 0 20px rgba(0,191,165,.5);
 }
 .login-logo p {
-  font-family:'Roboto Mono',monospace; font-size:.7rem;
-  color:var(--muted); letter-spacing:2px; margin-top:4px;
+  font-family:'Roboto Mono',monospace; font-size:.68rem;
+  color:rgba(0,191,165,.7); letter-spacing:2px; margin-top:4px;
 }
-.login-separator { width:40px; height:3px; background:var(--accent); margin:12px auto; }
+.login-separator { width:40px; height:2px; background:var(--accent); margin:10px auto; opacity:.7; }
 
-.field-group { margin-bottom:20px; }
+.field-group { margin-bottom:18px; }
 .field-group label {
   display:block; font-family:'Roboto Mono',monospace;
-  font-size:.7rem; letter-spacing:2px; color:var(--muted);
+  font-size:.68rem; letter-spacing:2px; color:rgba(255,255,255,.5);
   text-transform:uppercase; margin-bottom:6px;
 }
 .field-group input {
   width:100%; padding:12px 14px;
-  border:1px solid var(--border); border-radius:2px;
-  font-size:.95rem; font-family:'Roboto',sans-serif;
-  outline:none; transition:border-color .2s, box-shadow .2s;
-  background:#fafafa;
+  border:1px solid rgba(0,191,165,.2); border-radius:2px;
+  font-size:.93rem; font-family:'Roboto',sans-serif;
+  outline:none; transition:border-color .2s, box-shadow .2s, background .2s;
+  background:rgba(255,255,255,.06); color:#fff;
 }
+.field-group input::placeholder { color:rgba(255,255,255,.25); }
 .field-group input:focus {
   border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(0,191,165,.12);
-  background:#fff;
+  box-shadow:0 0 0 3px rgba(0,191,165,.15);
+  background:rgba(255,255,255,.1);
 }
 
 .btn-login {
   width:100%; padding:13px;
-  background:var(--teal); color:#fff;
-  border:none; cursor:pointer;
+  background:linear-gradient(135deg, var(--teal), var(--teal-lt));
+  color:#fff; border:none; cursor:pointer;
   font-family:'Oswald',sans-serif; font-size:1rem;
   letter-spacing:3px; text-transform:uppercase;
-  transition:background .2s, transform .1s;
+  transition:opacity .2s, transform .1s, box-shadow .2s;
+  box-shadow:0 4px 20px rgba(0,191,165,.3);
+  margin-top:4px;
 }
-.btn-login:hover { background:var(--teal-lt); }
+.btn-login:hover { opacity:.88; box-shadow:0 6px 28px rgba(0,191,165,.45); }
 .btn-login:active { transform:scale(.98); }
 
 #login-err {
-  color:var(--danger); font-size:.8rem;
+  color:#ff6b6b; font-size:.78rem;
   font-family:'Roboto Mono',monospace;
-  text-align:center; margin-top:14px;
+  text-align:center; margin-top:12px;
   min-height:18px; letter-spacing:1px;
 }
 
 .login-badge {
-  position:absolute; top:16px; right:16px;
-  background:var(--army); color:#aaa;
-  font-family:'Roboto Mono',monospace; font-size:.65rem;
-  padding:4px 10px; letter-spacing:2px;
+  position:absolute; top:14px; right:14px;
+  background:rgba(0,191,165,.15); color:rgba(0,191,165,.8);
+  border:1px solid rgba(0,191,165,.25);
+  font-family:'Roboto Mono',monospace; font-size:.6rem;
+  padding:3px 10px; letter-spacing:2px;
 }
 
 /* ═══════════════ APP SHELL ═══════════════ */
@@ -402,6 +492,22 @@ body { font-family:'Roboto',sans-serif; background:var(--bg); color:var(--text);
 
 <!-- ═══════════════ LOGIN SCREEN ═══════════════ -->
 <div id="login-screen">
+  <!-- Floating orbs -->
+  <div class="login-orb login-orb-1"></div>
+  <div class="login-orb login-orb-2"></div>
+  <div class="login-orb login-orb-3"></div>
+
+  <!-- Logo above card -->
+  <div class="login-logo-above">
+    <div class="login-logo-img-wrap">
+      <img class="login-logo-img"
+           src="LOGO_SOCIAL MEDIA.png"
+           onerror="this.style.display='none'"
+           alt="NCC NITAR Logo">
+    </div>
+  </div>
+
+  <!-- Glass card -->
   <div class="login-box">
     <div class="login-badge">ADMIN ONLY</div>
     <div class="login-logo">
