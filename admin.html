@@ -560,6 +560,9 @@ body { font-family:'Roboto',sans-serif; background:var(--bg); color:var(--text);
       <div class="nav-item" onclick="gotoPanel('notices',this)">
         <span class="nav-icon">📋</span> Notices
       </div>
+      <div class="nav-item" onclick="gotoPanel('resources',this)">
+        <span class="nav-icon">📁</span> Resources
+      </div>
     </div>
 
     <div class="nav-section">
@@ -810,7 +813,6 @@ body { font-family:'Roboto',sans-serif; background:var(--bg); color:var(--text);
           <h2>Notices</h2>
           <p>// Post and manage unit notices & announcements</p>
         </div>
-
         <div class="card">
           <div class="card-title">+ Post New Notice</div>
           <div class="form-row">
@@ -829,7 +831,7 @@ body { font-family:'Roboto',sans-serif; background:var(--bg); color:var(--text);
           </div>
           <div class="form-row full">
             <div class="form-group">
-              <label>Notice Body</label>
+              <label>Notice Body (text)</label>
               <textarea id="not-body" placeholder="Full notice text…" style="min-height:120px;"></textarea>
             </div>
           </div>
@@ -843,12 +845,67 @@ body { font-family:'Roboto',sans-serif; background:var(--bg); color:var(--text);
               <input type="date" id="not-expiry">
             </div>
           </div>
+          <div class="form-row full">
+            <div class="form-group">
+              <label>Attachment File URL (optional — upload file to repo first, paste path here)</label>
+              <input type="text" id="not-fileurl" placeholder="e.g. RESOURCES/notice_circular.pdf">
+              <small style="font-family:'Roboto Mono',monospace;font-size:.65rem;color:var(--muted);margin-top:4px;">Upload the file to GitHub repo first, then paste the relative path. e.g. <code>RESOURCES/circular.pdf</code></small>
+            </div>
+          </div>
           <button class="btn btn-primary" onclick="addNotice()">⊕ POST NOTICE</button>
         </div>
-
         <div class="card">
           <div class="card-title">📋 Active Notices</div>
           <div id="notices-list"></div>
+        </div>
+      </div>
+
+      <!-- ══ RESOURCES ══ -->
+      <div id="panel-resources" class="panel">
+        <div class="sec-header">
+          <h2>Resources</h2>
+          <p>// Manage downloadable files — PDFs, Word docs, PPTs, images</p>
+        </div>
+        <div class="card">
+          <div class="card-title">+ Add New Resource</div>
+          <div style="background:#fff8e1;border:1px solid #ffe082;padding:12px 16px;margin-bottom:16px;border-left:4px solid var(--warn);font-family:'Roboto Mono',monospace;font-size:.7rem;color:#555;line-height:1.7;">
+            ⚠ Upload your file to GitHub repo first (e.g. a <code>RESOURCES/</code> folder), then paste the relative path below.
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Resource Title</label>
+              <input type="text" id="res-title" placeholder="e.g. NCC Training Schedule 2026">
+            </div>
+            <div class="form-group">
+              <label>Category</label>
+              <select id="res-category">
+                <option value="General">General</option>
+                <option value="Circular">Circular</option>
+                <option value="Form">Form</option>
+                <option value="Schedule">Schedule</option>
+                <option value="Result">Result</option>
+                <option value="Study Material">Study Material</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="form-group">
+              <label>Description (optional)</label>
+              <textarea id="res-desc" placeholder="Brief description of this resource…" style="min-height:70px;"></textarea>
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="form-group">
+              <label>File Path (relative to repo root — supports PDF, DOCX, PPTX, images, etc.)</label>
+              <input type="text" id="res-fileurl" placeholder="e.g. RESOURCES/training_schedule.pdf">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="addResource()">⊕ ADD RESOURCE</button>
+        </div>
+        <div class="card">
+          <div class="card-title">📁 All Resources</div>
+          <div id="resources-list"></div>
         </div>
       </div>
 
@@ -892,6 +949,11 @@ body { font-family:'Roboto',sans-serif; background:var(--bg); color:var(--text);
           <div class="card-title">Notices — notices.json</div>
           <div class="json-output" id="exp-notices"></div>
           <button class="btn btn-ok" style="margin-top:12px;" onclick="downloadJSON('notices')">↓ Download notices.json</button>
+        </div>
+        <div class="card">
+          <div class="card-title">Resources — resources.json</div>
+          <div class="json-output" id="exp-resources"></div>
+          <button class="btn btn-ok" style="margin-top:12px;" onclick="downloadJSON('resources')">↓ Download resources.json</button>
         </div>
 
         <div class="card">
@@ -940,6 +1002,7 @@ body { font-family:'Roboto',sans-serif; background:var(--bg); color:var(--text);
             <button class="btn btn-danger" onclick="clearSection('officers')">Clear Officers Data</button>
             <button class="btn btn-danger" onclick="clearSection('rank')">Clear Rank Data</button>
             <button class="btn btn-danger" onclick="clearSection('notices')">Clear Notices</button>
+            <button class="btn btn-danger" onclick="clearSection('resources')">Clear Resources</button>
           </div>
           <p style="font-size:.78rem;font-family:'Roboto Mono',monospace;color:var(--danger);margin-top:14px;">
             ⚠ This cannot be undone. Export your data first.
@@ -1101,7 +1164,7 @@ function changeCredentials() {
 /* ═══════════════════════════════════════
    DATA STORE  (localStorage)
 ═══════════════════════════════════════ */
-const KEYS = { gallery:'ncc_gallery', officers:'ncc_officers', rank:'ncc_rank', notices:'ncc_notices' };
+const KEYS = { gallery:'ncc_gallery', officers:'ncc_officers', rank:'ncc_rank', notices:'ncc_notices', resources:'ncc_resources' };
 
 function load(key) { try { return JSON.parse(localStorage.getItem(KEYS[key])) || []; } catch { return []; } }
 function save(key, data) { localStorage.setItem(KEYS[key], JSON.stringify(data)); localStorage.setItem('ncc_lastmod', new Date().toISOString()); }
@@ -1132,6 +1195,7 @@ function renderAll() {
   renderOfficers();
   renderRank();
   renderNotices();
+  renderResources();
   renderExport();
   renderSettings();
 }
@@ -1152,6 +1216,7 @@ function gotoPanel(name, el) {
   document.getElementById('topbar-bc').textContent = '// ' + name;
   if (name === 'export') renderExport();
   if (name === 'settings') renderSettings();
+  if (name === 'resources') renderResources();
 }
 
 /* ═══════════════════════════════════════
@@ -1159,11 +1224,13 @@ function gotoPanel(name, el) {
 ═══════════════════════════════════════ */
 function renderDashboard() {
   const g = load('gallery'), o = load('officers'), r = load('rank'), n = load('notices');
+  const res2 = load('resources');
   document.getElementById('stats-grid').innerHTML = [
     { val: g.length, lbl: 'Gallery Events' },
     { val: o.length, lbl: 'Officers' },
     { val: r.length, lbl: 'Ranked Cadets' },
     { val: n.length, lbl: 'Active Notices' },
+    { val: res2.length, lbl: 'Resources' },
   ].map(s => `<div class="stat-box"><div class="val">${s.val}</div><div class="lbl">${s.lbl}</div></div>`).join('');
 
   const nl = document.getElementById('dash-notices');
@@ -1527,13 +1594,53 @@ function addNotice() {
   const body     = v('not-body');
   const by       = v('not-by');
   const expiry   = v('not-expiry');
+  const fileUrl  = v('not-fileurl');
   if (!title) return toast('Notice title is required.', true);
   const data = load('notices');
-  data.push({ id: uid(), title, priority, body, by, expiry, created: new Date().toISOString() });
+  data.push({ id: uid(), title, priority, body, by, expiry, fileUrl, created: new Date().toISOString() });
   save('notices', data);
-  ['not-title','not-body','not-by','not-expiry'].forEach(id => document.getElementById(id).value='');
+  ['not-title','not-body','not-by','not-expiry','not-fileurl'].forEach(id => document.getElementById(id).value='');
   renderNotices(); renderDashboard();
   toast('Notice posted! ✓');
+}
+
+/* ═══════════════════════════════════════
+   RESOURCES
+═══════════════════════════════════════ */
+function addResource() {
+  const title    = v('res-title');
+  const category = v('res-category');
+  const desc     = v('res-desc');
+  const fileUrl  = v('res-fileurl');
+  if (!title) return toast('Resource title is required.', true);
+  const data = load('resources');
+  data.push({ id: uid(), title, category, desc, fileUrl, created: new Date().toISOString() });
+  save('resources', data);
+  ['res-title','res-desc','res-fileurl'].forEach(id => document.getElementById(id).value='');
+  renderResources(); renderDashboard();
+  toast('Resource added! ✓');
+}
+
+function renderResources() {
+  const data = load('resources');
+  const el   = document.getElementById('resources-list');
+  if (!el) return;
+  if (!data.length) { el.innerHTML = '<p style="color:var(--muted);font-size:.85rem;">No resources yet.</p>'; return; }
+  const icons = { pdf:'📄', doc:'📝', docx:'📝', ppt:'📊', pptx:'📊', jpg:'🖼️', jpeg:'🖼️', png:'🖼️', gif:'🖼️', webp:'🖼️' };
+  function getIcon(url) { const e=(url||'').split('.').pop().toLowerCase(); return icons[e]||'📎'; }
+  el.innerHTML = data.map((r,i) => `
+    <div class="gallery-item-row">
+      <div style="font-size:1.8rem;width:44px;text-align:center;flex-shrink:0;">${getIcon(r.fileUrl)}</div>
+      <div class="gallery-item-info">
+        <strong>${esc(r.title)}</strong>
+        <small>${esc(r.category||'General')} · ${new Date(r.created).toLocaleDateString('en-IN')}</small>
+        ${r.desc ? `<div style="font-size:.8rem;color:#555;margin-top:4px;">${esc(r.desc.substring(0,80))}${r.desc.length>80?'…':''}</div>` : ''}
+        ${r.fileUrl ? `<div style="font-family:'Roboto Mono',monospace;font-size:.68rem;color:var(--muted);margin-top:4px;">📎 ${esc(r.fileUrl)}</div>` : ''}
+      </div>
+      <div class="gallery-item-actions">
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('resources',${i})">✕</button>
+      </div>
+    </div>`).join('');
 }
 
 function noticeHTML(item, showDelete=true) {
@@ -1562,11 +1669,12 @@ function renderNotices() {
    EXPORT
 ═══════════════════════════════════════ */
 function renderExport() {
-  const g = load('gallery'), o = load('officers'), r = load('rank'), n = load('notices');
+  const g = load('gallery'), o = load('officers'), r = load('rank'), n = load('notices'), res = load('resources');
   document.getElementById('exp-gallery').textContent  = JSON.stringify(g, null, 2);
   document.getElementById('exp-officers').textContent = JSON.stringify(o, null, 2);
   document.getElementById('exp-rank').textContent     = JSON.stringify(r, null, 2);
   document.getElementById('exp-notices').textContent  = JSON.stringify(n, null, 2);
+  document.getElementById('exp-resources').textContent = JSON.stringify(res, null, 2);
 
   // Per-gallery index.json buttons
   const wrap = document.getElementById('exp-gallery-jsons');
