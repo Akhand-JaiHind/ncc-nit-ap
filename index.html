@@ -358,352 +358,128 @@
     </div>
     <div class="lb-thumbstrip" id="lb-thumbstrip"></div>
 </div>
+<script type="module">
+  // 1. Import Firebase Cloud Modules
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
 
-<script>
-/* ─── LOADER ─── */
-(function(){
-    const loader=document.getElementById('loader'),vid=document.getElementById('bufferVid'),fb=document.getElementById('loaderFallback');
-    function hide(){loader.style.opacity='0';setTimeout(()=>{loader.style.display='none';},500);}
-    const ht=setTimeout(hide,3500);
-    vid.addEventListener('playing',()=>{clearTimeout(ht);setTimeout(hide,2000);});
-    vid.addEventListener('error',()=>{vid.style.display='none';fb.style.display='flex';clearTimeout(ht);setTimeout(hide,1500);});
-    vid.addEventListener('stalled',()=>{vid.style.display='none';fb.style.display='flex';});
-    window.addEventListener('load',()=>{clearTimeout(ht);setTimeout(hide,vid.paused?300:2000);});
-})();
+  // 2. Your Web App Configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBCLCGsYWA-PUhWvgW45cb-X9G1CjrtAcs",
+    authDomain: "ncc-nit-ap.firebaseapp.com",
+    projectId: "ncc-nit-ap",
+    storageBucket: "ncc-nit-ap.firebasestorage.app",
+    databaseURL: "https://ncc-nit-ap-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    appId: "1:311443142169:web:b274a34fb95fedd6465c88"
+  };
 
-/* ─── TABS ─── */
-function openTab(name,btn){
-    document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active'));
-    document.getElementById(name).classList.add('active');
-    if(btn)btn.classList.add('active');
-    else{const b=document.querySelector('[data-tab="'+name+'"]');if(b)b.classList.add('active');}
-    if(name==='ano')setTimeout(revealOfficers,60);
-    setTimeout(initReveal,100);
-}
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
-/* ─── SCROLL REVEAL ─── */
-function initReveal(){
-    const obs=new IntersectionObserver(entries=>{
-        entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);}});
-    },{threshold:0.1});
-    document.querySelectorAll('.reveal:not(.in)').forEach(el=>obs.observe(el));
-}
-window.addEventListener('load',()=>setTimeout(initReveal,300));
-
-/* ══════════════════════════════════════════════
-   DATA LAYER — localStorage first, JSON fallback
-   ══════════════════════════════════════════════ */
-
-// LocalStorage keys — must match admin panel exactly
-const LS_KEYS = {
-    gallery:   'ncc_gallery',
-    officers:  'ncc_officers',
-    rank:      'ncc_rank',
-    notices:   'ncc_notices',
-    resources: 'ncc_resources'
-};
-
-// Fallback JSON files (same as before)
-const JSON_FILES = {
-    gallery:   'gallery.json',
-    officers:  'officers.json',
-    rank:      'rank.json',
-    notices:   'notices.json',
-    resources: 'resources.json'
-};
-
-// Fallback static data (used when both localStorage and JSON files are unavailable)
-const FALLBACKS = {
-    gallery: [
-        {title:'Republic Day 2026',folder:'REPUBLIC DAY',thumb:'REPUBLIC DAY.png',label:'NIT AR CELEBRATES REPUBLIC DAY 2026',files:[]},
-        {title:'150 Years of Vande Mataram',folder:'VANDE MATARAM',thumb:'PPT_150 Years of VANDE MATRAM.jpg',label:'NIT AR OBSERVES 150 YEARS OF VANDE MATRAM',files:[]},
-        {title:'NER NCC Idea & Innovation Camp 2025',folder:'IDEA AND INNOVATION',thumb:'IDEA AND INNOVATION.jpeg',label:'NIT AR HOSTS & WINS NER NCC IDEA AND INNOVATION CAMP 2025',files:[]},
-        {title:'Swachhta Hi Seva 2025',folder:'UNNAT BHARAT ABHIYAAN',thumb:'UNNAT BHARAT ABHIYAAN.jpeg',label:'SWACHHTA HI SEVA 2025: CLEAN INDIA DRIVE',files:[]},
-    ],
-    officers: [
-        {role:'CO',designation:'COMMANDING OFFICER',name:'Col. Samudra Vijay Sarma',photo:'PHOTOS_OFFICIAL/PHOTO_CO_SIR.png',bio:'A decorated officer with decades of distinguished service to the nation.'},
-        {role:'AO',designation:'ADMINISTRATIVE OFFICER',name:'Lt. Col. Surjit Rai',photo:'PHOTOS_OFFICIAL/PHOTO_AO_SIR.png',bio:'Overseeing the administrative backbone of the unit.'},
-        {role:'ANO-SD',designation:'ASSOCIATE NCC OFFICER — SENIOR DIVISION (SD)',name:'Capt. Dr. Achyut Sarkar',photo:'PHOTOS_OFFICIAL/PHOTO_ANO_SIR.png',bio:'"Discipline is the bridge between goals and accomplishment."'},
-        {role:'ANO-SW',designation:'ASSOCIATE NCC OFFICER — SENIOR WING (SW)',name:'Lt. Dr. Preetisudha Meher',photo:'PHOTOS_OFFICIAL/PHOTO_ANO_MAAM.png',bio:'Leading the Senior Wing with dedication and commitment.'},
-    ],
-    rank: [
-        {rank:'SENIOR UNDER OFFICER (SUO)',name:'ABHIJEET',branch:'COMPUTER SCIENCE & ENGINEERING'},
-        {rank:'UNDER OFFICER (UO)',name:'AKHAND UPADHYAY',branch:'MECHANICAL ENGINEERING'},
-        {rank:'SERGEANT',name:'ROSHNI YADAV',branch:'ELECTRICAL ENGINEERING'},
-    ],
-    notices: [],
-    resources: []
-};
-
-let usingLiveData = false; // tracks if localStorage is supplying data
-
-/**
- * Smart data loader:
- * 1. Check localStorage (admin-written data) — instant, no network
- * 2. Try fetching the JSON file from the server
- * 3. Fall back to hardcoded defaults
- */
-async function getData(section) {
-    // 1. Try localStorage first
-    try {
-        const raw = localStorage.getItem(LS_KEYS[section]);
-        if (raw) {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-                usingLiveData = true;
-                return parsed;
-            }
-        }
-    } catch(e) {}
-
-    // 2. Try JSON file fetch
-    try {
-        const r = await fetch(JSON_FILES[section] + '?v=' + Date.now());
-        if (r.ok) {
-            const data = await r.json();
-            if (Array.isArray(data)) return data;
-        }
-    } catch(e) {}
-
-    // 3. Use hardcoded fallback
-    return FALLBACKS[section] || [];
-}
-
-// Show LIVE badge if any data came from localStorage
-function checkLiveBadge() {
-    if (usingLiveData) {
-        document.getElementById('live-badge').classList.add('show');
+  /* ═══════════════ LIVE GLOBAL LISTENER ═══════════════ */
+  // This is the "Brain" — it watches the Singapore cloud 24/7
+  onValue(ref(db, 'ncc_unit'), (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      // Show the "LIVE" badge because we are connected to the cloud
+      document.getElementById('live-badge').classList.add('show');
+      
+      // Update every section of your site instantly
+      if(data.gallery)   renderGalleryUI(data.gallery);
+      if(data.officers)  renderOfficersUI(data.officers);
+      if(data.rank)      renderRankUI(data.rank);
+      if(data.notices)   renderNoticesUI(data.notices);
+      if(data.resources) renderResourcesUI(data.resources);
+      
+      console.log("Global Data Synced ✓");
     }
-}
+  });
 
-/* ─── GALLERY ─── */
-async function loadGallery(){
-    const ev = await getData('gallery');
+  /* ═══════════════ RENDERING LOGIC ═══════════════ */
+  // These functions take the Cloud data and put it on the screen
+
+  function renderGalleryUI(ev) {
     const c = document.getElementById('gallery-cards');
-    if(!ev.length){c.innerHTML='<div class="empty-state">No gallery events yet.</div>';return;}
-    c.innerHTML=ev.map((e,i)=>`
-        <figure class="techy-gallery-item" style="animation-delay:${i*0.08}s"
-                tabindex="0" role="button" data-folder="${he(e.folder)}" data-title="${he(e.title)}"
-                data-files="${he(JSON.stringify(e.files||[]))}"
-                onclick="openGallery(this)" onkeydown="if(event.key==='Enter'||event.key===' ')openGallery(this)">
+    c.innerHTML = ev.map((e, i) => `
+        <figure class="techy-gallery-item" tabindex="0" onclick="openGallery(this)" 
+                data-folder="${he(e.folder)}" data-title="${he(e.title)}" data-files='${JSON.stringify(e.files||[])}'>
             <div class="card-overlay"><span class="card-overlay-icon">▶ View Gallery</span></div>
-            <img src="${he(e.thumb)}" alt="${he(e.title)}" onerror="this.src='LOGO_SOCIAL MEDIA.png'">
-            <figcaption>${he(e.label||e.title)}</figcaption>
+            <img src="${he(e.thumb)}" onerror="this.src='LOGO_SOCIAL MEDIA.png'">
+            <figcaption>${he(e.label || e.title)}</figcaption>
         </figure>`).join('');
-    document.getElementById('stat-events').textContent=ev.length;
-    checkLiveBadge();
-}
+    document.getElementById('stat-events').textContent = ev.length;
+  }
 
-/* ─── OFFICERS ─── */
-function roleBadge(r){return r==='CO'?'CO':r==='AO'?'AO':'ANO';}
-async function loadOfficers(){
-    const off = await getData('officers');
-    const stack=document.getElementById('officers-stack');
-    if(!off.length){stack.innerHTML='<div class="empty-state">No officer data.</div>';return;}
-    stack.innerHTML=off.map(o=>`
-        <div class="officer-card">
-            <div class="officer-rank-badge">${he(roleBadge(o.role))}</div>
+  function renderOfficersUI(off) {
+    const stack = document.getElementById('officers-stack');
+    stack.innerHTML = off.map(o => `
+        <div class="officer-card visible">
+            <div class="officer-rank-badge">${he(o.role)}</div>
             <div class="officer-photo-wrap">
-                <img src="${he(o.photo||'')}" alt="${he(o.name)}" class="officer-photo clean-img"
-                     onerror="this.src='';this.parentElement.classList.add('no-photo');">
-                <div class="officer-photo-frame"></div>
+                <img src="${he(o.photo)}" class="officer-photo" onerror="this.parentElement.classList.add('no-photo')">
             </div>
             <div class="officer-info">
                 <p class="officer-designation">${he(o.designation)}</p>
                 <h3 class="officer-name">${he(o.name)}</h3>
                 <div class="officer-divider"></div>
-                <p class="officer-bio">${he(o.bio||'')}</p>
+                <p class="officer-bio">${he(o.bio)}</p>
             </div>
         </div>`).join('');
-    revealOfficers();
-    checkLiveBadge();
-}
-function revealOfficers(){document.querySelectorAll('.officer-card:not(.visible)').forEach((c,i)=>{setTimeout(()=>c.classList.add('visible'),i*140);});}
+  }
 
-/* ─── RANK ─── */
-async function loadRank(){
-    const cadets = await getData('rank');
-    const c=document.getElementById('rank-container');
-    if(!cadets.length){c.innerHTML='<div class="empty-state">No rank data.</div>';return;}
-    c.innerHTML=`<table class="rank-table">
+  function renderRankUI(cadets) {
+    const c = document.getElementById('rank-container');
+    c.innerHTML = `<table class="rank-table">
         <thead><tr><th>Rank</th><th>Name of Cadet</th><th>Branch</th></tr></thead>
-        <tbody>${cadets.map(r=>`<tr>
-            <td><strong style="font-family:'Oswald',sans-serif;letter-spacing:1px;">${he(r.rank)}</strong></td>
-            <td>${he(r.name)}${r.batch?` <span style="font-family:'Roboto Mono',monospace;font-size:.75rem;color:#aaa;">(${he(r.batch)})</span>`:''}</td>
+        <tbody>${cadets.map(r => `<tr>
+            <td><strong>${he(r.rank)}</strong></td>
+            <td>${he(r.name)}</td>
             <td>${he(r.branch)}</td>
         </tr>`).join('')}</tbody></table>`;
-    document.getElementById('stat-cadets').textContent=cadets.length;
-    checkLiveBadge();
-}
+    document.getElementById('stat-cadets').textContent = cadets.length;
+  }
 
-/* ─── NOTICES ─── */
-let allNotices=[];
-function isActive(n){if(!n.expiry)return true;return new Date(n.expiry)>=new Date();}
-function priClass(p){return p==='high'?'priority-high':p==='low'?'priority-low':'priority-med';}
-function bClass(p){return p==='high'?'badge-high':p==='low'?'badge-low':'badge-med';}
-function priLabel(p){return p==='high'?'🔴 URGENT':p==='low'?'🟢 GENERAL':'🟡 IMPORTANT';}
-function attachIcon(url){if(!url)return '📎';const e=(url.split('.').pop()||'').toLowerCase();if(e==='pdf')return'📄';if(['doc','docx'].includes(e))return'📝';if(['ppt','pptx'].includes(e))return'📊';if(['jpg','jpeg','png','gif','webp'].includes(e))return'🖼️';return'📎';}
+  function renderNoticesUI(notices) {
+    const active = notices.filter(n => !n.expiry || new Date(n.expiry) >= new Date());
+    document.getElementById('stat-notices').textContent = active.length;
+    
+    // Update Ticker
+    const ticker = document.getElementById('notices-ticker');
+    ticker.innerHTML = active.map(n => `<span class="notice-tick-item"><span class="notice-tick-dot"></span>${he(n.title)}</span>`).join('');
+    document.getElementById('notices-bar').style.display = active.length ? 'flex' : 'none';
 
-async function loadNotices(){
-    allNotices = await getData('notices');
-    const active=allNotices.filter(isActive);
-    document.getElementById('stat-notices').textContent=active.length;
-    if(active.length){
-        const bar=document.getElementById('notices-bar'),ticker=document.getElementById('notices-ticker');
-        ticker.innerHTML=[...active,...active].map(n=>`<span class="notice-tick-item"><span class="notice-tick-dot"></span>${he(n.title)}${n.by?' — '+he(n.by):''}</span>`).join('');
-        bar.style.display='flex';
-    }
-    renderNoticesPage(active);
-    checkLiveBadge();
-}
-function renderNoticesPage(list){
-    const el=document.getElementById('notices-list');
-    if(!list.length){el.innerHTML='<div class="empty-state">No notices at this time.</div>';return;}
-    el.innerHTML=[...list].reverse().map((n,i)=>`
-        <div class="notice-card ${priClass(n.priority||'med')}" style="animation-delay:${i*0.06}s">
+    // Update Notices Page
+    const el = document.getElementById('notices-list');
+    el.innerHTML = [...active].reverse().map(n => `
+        <div class="notice-card priority-med">
             <div class="notice-priority-bar"></div>
             <div class="notice-card-body">
-                <div class="notice-card-meta">
-                    <span class="notice-badge ${bClass(n.priority||'med')}">${priLabel(n.priority||'med')}</span>
-                    <span>${new Date(n.created).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</span>
-                    ${n.by?`<span>by ${he(n.by)}</span>`:''}
-                </div>
                 <div class="notice-card-title">${he(n.title)}</div>
-                ${n.body?`<p class="notice-card-text">${he(n.body)}</p>`:''}
-                ${n.fileUrl?`<a class="notice-attachment" href="${he(n.fileUrl)}" target="_blank" rel="noopener">${attachIcon(n.fileUrl)} Download Attachment</a>`:''}
-                ${n.expiry?`<div class="notice-expiry">⏳ Expires: ${n.expiry}</div>`:''}
+                <p class="notice-card-text">${he(n.body)}</p>
+                <small>Posted by: ${he(n.by || 'Admin')}</small>
             </div>
         </div>`).join('');
-}
+  }
 
-/* ─── RESOURCES ─── */
-let allResources=[];
-function resType(url){if(!url)return'other';const e=(url.split('.').pop()||'').toLowerCase();if(e==='pdf')return'pdf';if(['doc','docx'].includes(e))return'doc';if(['ppt','pptx'].includes(e))return'ppt';if(['jpg','jpeg','png','gif','webp','svg'].includes(e))return'image';return'other';}
-function resIcon(url){const t=resType(url);return t==='pdf'?'📄':t==='doc'?'📝':t==='ppt'?'📊':t==='image'?'🖼️':'📎';}
-
-async function loadResources(){
-    allResources = await getData('resources');
-    document.getElementById('stat-resources').textContent=allResources.length;
-    renderResources(allResources);
-    checkLiveBadge();
-}
-function filterResources(type,btn){
-    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
-    renderResources(type==='all'?allResources:allResources.filter(r=>resType(r.fileUrl)===type));
-}
-function renderResources(list){
-    const g=document.getElementById('resources-grid');
-    if(!list.length){g.innerHTML='<div class="empty-state" style="grid-column:1/-1">No resources found.</div>';return;}
-    g.innerHTML=list.map((r,i)=>`
-        <div class="resource-card" style="animation-delay:${i*0.05}s">
-            <div class="resource-icon">${resIcon(r.fileUrl)}</div>
+  function renderResourcesUI(res) {
+    const g = document.getElementById('resources-grid');
+    g.innerHTML = res.map(r => `
+        <div class="resource-card">
+            <div class="resource-icon">📄</div>
             <div class="resource-info">
                 <div class="resource-title">${he(r.title)}</div>
-                ${r.desc?`<div class="resource-desc">${he(r.desc)}</div>`:''}
-                <div class="resource-meta">${new Date(r.created||Date.now()).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}${r.category?` · <span class="resource-tag">${he(r.category)}</span>`:''}</div>
-                ${r.fileUrl?`<a class="resource-dl" href="${he(r.fileUrl)}" target="_blank" rel="noopener">↓ Download</a>`:''}
+                <a class="resource-dl" href="${he(r.fileUrl)}" target="_blank">↓ Download</a>
             </div>
         </div>`).join('');
-}
+    document.getElementById('stat-resources').textContent = res.length;
+  }
 
-/* ─── INIT ─── */
-async function loadAll() {
-    await Promise.all([
-        loadGallery(),
-        loadOfficers(),
-        loadRank(),
-        loadNotices(),
-        loadResources()
-    ]);
-    setTimeout(initReveal, 400);
-}
-window.addEventListener('load', loadAll);
-
-/* ─── LIVE SYNC: auto-refresh when admin panel updates data ─── */
-window.addEventListener('storage', function(e) {
-    const watched = Object.values(LS_KEYS);
-    if (!watched.includes(e.key)) return;
-
-    // Determine which section changed and reload just that section
-    if (e.key === LS_KEYS.gallery)   loadGallery();
-    if (e.key === LS_KEYS.officers)  loadOfficers();
-    if (e.key === LS_KEYS.rank)      loadRank();
-    if (e.key === LS_KEYS.notices)   loadNotices();
-    if (e.key === LS_KEYS.resources) loadResources();
-});
-
-/* ─── LIGHTBOX ─── */
-let mediaList=[],currentIdx=0;
-const IE=['jpg','jpeg','png','gif','webp','bmp','svg'],VE=['mp4','webm','ogg','mov'];
-function gType(f){const e=f.split('.').pop().toLowerCase();return IE.includes(e)?'image':VE.includes(e)?'video':'unknown';}
-
-async function openGallery(card){
-    const folder = card.dataset.folder;
-    const title  = card.dataset.title || folder;
-    const cachedFilesRaw = card.dataset.files;
-
-    document.getElementById('lb-title-text').textContent = title;
-    document.getElementById('lb-counter').textContent    = '';
-    document.getElementById('lb-media-wrap').innerHTML   = '<span class="lb-loading">LOADING MEDIA...</span>';
-    document.getElementById('lb-thumbstrip').innerHTML   = '';
-    document.getElementById('lightbox').classList.add('open');
-    document.body.style.overflow = 'hidden';
-
-    let files = [];
-
-    // 1. Try cached files from localStorage (admin-stored)
-    try {
-        if (cachedFilesRaw) {
-            const cached = JSON.parse(cachedFilesRaw);
-            if (Array.isArray(cached) && cached.length > 0) {
-                files = cached;
-            }
-        }
-    } catch(e) {}
-
-    // 2. If no cached files, try fetching index.json from the folder
-    if (!files.length) {
-        try {
-            const r = await fetch(`${encodeURIComponent(folder)}/index.json`);
-            if (!r.ok) throw new Error('HTTP '+r.status);
-            files = await r.json();
-        } catch(e) {
-            document.getElementById('lb-media-wrap').innerHTML =
-                `<div class="lb-empty"><p>📂 No media found.</p>
-                 <p style="font-size:.75rem;margin-top:10px;">Add <strong>index.json</strong> inside <strong>${folder}</strong> folder.</p></div>`;
-            return;
-        }
-    }
-
-    mediaList = files.map(f=>({src:`${folder}/${f}`,type:gType(f),name:f})).filter(m=>m.type!=='unknown');
-    if(!mediaList.length){document.getElementById('lb-media-wrap').innerHTML='<div class="lb-empty">No supported media.</div>';return;}
-    buildThumbs();showMedia(0);
-}
-
-function buildThumbs(){
-    const strip=document.getElementById('lb-thumbstrip');strip.innerHTML='';
-    mediaList.forEach((m,i)=>{
-        if(m.type==='image'){const img=document.createElement('img');img.src=m.src;img.className='lb-thumb'+(i===0?' active':'');img.title=m.name;img.onclick=()=>showMedia(i);strip.appendChild(img);}
-        else{const d=document.createElement('div');d.className='lb-thumb-video'+(i===0?' active':'');d.innerHTML='▶';d.onclick=()=>showMedia(i);strip.appendChild(d);}
-    });
-}
-function showMedia(idx){
-    currentIdx=idx;const m=mediaList[idx],wrap=document.getElementById('lb-media-wrap');
-    const v=wrap.querySelector('video');if(v)v.pause();
-    wrap.innerHTML=m.type==='image'?`<img src="${m.src}" alt="${m.name}" loading="lazy">`:`<video controls autoplay><source src="${m.src}">Unsupported.</video>`;
-    document.getElementById('lb-counter').textContent=`${idx+1} / ${mediaList.length}`;
-    document.getElementById('lb-prev').disabled=(idx===0);document.getElementById('lb-next').disabled=(idx===mediaList.length-1);
-    document.querySelectorAll('#lb-thumbstrip .lb-thumb,#lb-thumbstrip .lb-thumb-video').forEach((t,i)=>t.classList.toggle('active',i===idx));
-    const th=document.querySelectorAll('#lb-thumbstrip .lb-thumb,#lb-thumbstrip .lb-thumb-video');
-    if(th[idx])th[idx].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
-}
-function navigate(dir){const n=currentIdx+dir;if(n>=0&&n<mediaList.length)showMedia(n);}
-function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';const v=document.getElementById('lightbox').querySelector('video');if(v)v.pause();}
-document.addEventListener('keydown',e=>{if(!document.getElementById('lightbox').classList.contains('open'))return;if(e.key==='Escape')closeLightbox();if(e.key==='ArrowRight')navigate(1);if(e.key==='ArrowLeft')navigate(-1);});
-document.getElementById('lightbox').addEventListener('click',e=>{if(e.target===document.getElementById('lightbox'))closeLightbox();});
-
-function he(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  /* ─── UTILITIES ─── */
+  function he(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  
+  // Attach Lightbox functions to window so they still work
+  window.openGallery = openGallery;
 </script>
 </body>
 </html>
