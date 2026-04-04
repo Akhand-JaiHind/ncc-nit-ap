@@ -377,28 +377,30 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
+  /* ═══════════════ GLOBAL STATE ═══════════════ */
+  let allResources = [];
+  let mediaList = [];
+  let currentIdx = 0;
+
   /* ═══════════════ LIVE GLOBAL LISTENER ═══════════════ */
-  // This is the "Brain" — it watches the Singapore cloud 24/7
   onValue(ref(db, 'ncc_unit'), (snapshot) => {
     const data = snapshot.val();
     if (data) {
-      // Show the "LIVE" badge because we are connected to the cloud
       document.getElementById('live-badge').classList.add('show');
       
-      // Update every section of your site instantly
       if(data.gallery)   renderGalleryUI(data.gallery);
       if(data.officers)  renderOfficersUI(data.officers);
       if(data.rank)      renderRankUI(data.rank);
       if(data.notices)   renderNoticesUI(data.notices);
-      if(data.resources) renderResourcesUI(data.resources);
-      
+      if(data.resources) {
+        allResources = data.resources; // update local cache
+        renderResourcesUI(data.resources);
+      }
       console.log("Global Data Synced ✓");
     }
   });
 
   /* ═══════════════ RENDERING LOGIC ═══════════════ */
-  // These functions take the Cloud data and put it on the screen
-
   function renderGalleryUI(ev) {
     const c = document.getElementById('gallery-cards');
     c.innerHTML = ev.map((e, i) => `
@@ -443,13 +445,10 @@
   function renderNoticesUI(notices) {
     const active = notices.filter(n => !n.expiry || new Date(n.expiry) >= new Date());
     document.getElementById('stat-notices').textContent = active.length;
-    
-    // Update Ticker
     const ticker = document.getElementById('notices-ticker');
     ticker.innerHTML = active.map(n => `<span class="notice-tick-item"><span class="notice-tick-dot"></span>${he(n.title)}</span>`).join('');
     document.getElementById('notices-bar').style.display = active.length ? 'flex' : 'none';
 
-    // Update Notices Page
     const el = document.getElementById('notices-list');
     el.innerHTML = [...active].reverse().map(n => `
         <div class="notice-card priority-med">
@@ -462,9 +461,10 @@
         </div>`).join('');
   }
 
-  function renderResourcesUI(res) {
+  function renderResourcesUI(list) {
     const g = document.getElementById('resources-grid');
-    g.innerHTML = res.map(r => `
+    if(!list.length){ g.innerHTML='<div class="empty-state">No resources.</div>'; return; }
+    g.innerHTML = list.map(r => `
         <div class="resource-card">
             <div class="resource-icon">📄</div>
             <div class="resource-info">
@@ -472,20 +472,56 @@
                 <a class="resource-dl" href="${he(r.fileUrl)}" target="_blank">↓ Download</a>
             </div>
         </div>`).join('');
-    document.getElementById('stat-resources').textContent = res.length;
+    document.getElementById('stat-resources').textContent = list.length;
   }
+
+  /* ═══════════════ NAVIGATION & UI INTERACTION ═══════════════ */
+  window.openTab = function(name, btn) {
+    document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+    document.getElementById(name).classList.add('active');
+    if (btn) btn.classList.add('active');
+  };
+
+  window.filterResources = function(type, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // Simple filter logic - checking file extension in URL
+    const filtered = type === 'all' ? allResources : allResources.filter(r => r.fileUrl.toLowerCase().includes(type));
+    renderResourcesUI(filtered);
+  };
+
+  /* ═══════════════ LIGHTBOX LOGIC ═══════════════ */
+  window.openGallery = function(card) {
+    const folder = card.dataset.folder;
+    const files = JSON.parse(card.dataset.files || '[]');
+    if(!files.length) return alert("No files found in this folder.");
+    
+    mediaList = files.map(f => ({ src: `${folder}/${f}`, name: f }));
+    document.getElementById('lb-title-text').textContent = card.dataset.title;
+    document.getElementById('lightbox').classList.add('open');
+    showMedia(0);
+  };
+
+  function showMedia(idx) {
+    currentIdx = idx;
+    const m = mediaList[idx];
+    const wrap = document.getElementById('lb-media-wrap');
+    wrap.innerHTML = `<img src="${m.src}" style="max-width:100%; max-height:80vh;">`;
+    document.getElementById('lb-counter').textContent = `${idx + 1} / ${mediaList.length}`;
+  }
+
+  window.navigate = function(dir) {
+    let next = currentIdx + dir;
+    if (next >= 0 && next < mediaList.length) showMedia(next);
+  };
+
+  window.closeLightbox = function() {
+    document.getElementById('lightbox').classList.remove('open');
+  };
 
   /* ─── UTILITIES ─── */
   function he(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  
-  // Attach Lightbox functions to window so they still work
-  window.openGallery = openGallery;
-    // Add these so your HTML buttons can find the functions
-window.openTab = openTab;
-window.filterResources = filterResources;
-window.openGallery = openGallery;
-window.closeLightbox = closeLightbox;
-window.navigate = navigate;
 </script>
 </body>
 </html>
