@@ -787,8 +787,10 @@ body { font-family:'Roboto',sans-serif; background:var(--bg); color:var(--text);
     renderNotices();
     renderRank();
     renderOfficers();
-    // Add other renderers as needed
-  };
+    renderGallery(); // <--- ADD THIS LINE
+};
+
+
 
   window.addNotice = function() {
     const title = v('not-title'), body = v('not-body'), by = v('not-by'), priority = v('not-priority');
@@ -897,6 +899,17 @@ function renderOfficers() {
   const data = JSON.parse(localStorage.getItem('ncc_officers') || '[]');
   const el = document.getElementById('officers-list');
   el.innerHTML = data.map((o, i) => `<div class="officer-admin-card"><strong>${esc(o.name)}</strong></div>`).join('');
+}
+  /* --- AND ADD THIS RENDERGALLERY FUNCTION BELOW RENDEROFFICERS --- */
+function renderGallery() {
+    const data = JSON.parse(localStorage.getItem('ncc_gallery') || '[]');
+    const el = document.getElementById('gallery-list');
+    if(!el) return;
+    el.innerHTML = data.map((g, i) => `
+      <div class="gallery-item-row">
+        <strong>${esc(g.title)}</strong> (📂 ${esc(g.folder)})
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('gallery', ${i})">✕</button>
+      </div>`).join('');
 }
 </script>
 </body>
