@@ -520,8 +520,48 @@
     document.getElementById('lightbox').classList.remove('open');
   };
 
+
   /* ─── UTILITIES ─── */
   function he(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  /* ═══════════════ COMPLETE LIGHTBOX LOGIC ═══════════════ */
+window.openGallery = function(card) {
+    const folder = card.dataset.folder;
+    const title = card.dataset.title;
+    const files = JSON.parse(card.dataset.files || '[]');
+    
+    if(!files.length) return alert("No media in this folder.");
+
+    // Setup the list for navigation
+    mediaList = files.map(f => ({
+        src: `https://akhand-jaihind.github.io/ncc-nit-ap/${folder}/${f}`,
+        name: f
+    }));
+    
+    document.getElementById('lb-title-text').textContent = title;
+    document.getElementById('lightbox').classList.add('open');
+    document.body.style.overflow = 'hidden'; // Stop scrolling
+    showMedia(0);
+};
+
+window.showMedia = function(idx) {
+    currentIdx = idx;
+    const m = mediaList[idx];
+    const wrap = document.getElementById('lb-media-wrap');
+    
+    // Support for both Images and Videos
+    const isVideo = m.src.toLowerCase().endsWith('.mp4');
+    wrap.innerHTML = isVideo ? 
+        `<video controls autoplay style="max-width:100%; max-height:75vh;"><source src="${m.src}"></video>` :
+        `<img src="${m.src}" style="max-width:100%; max-height:75vh; object-fit:contain;">`;
+    
+    document.getElementById('lb-counter').textContent = `${idx + 1} / ${mediaList.length}`;
+};
+
+window.closeLightbox = function() {
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = ''; // Resume scrolling
+    document.getElementById('lb-media-wrap').innerHTML = ''; // Stop video audio
+};
 </script>
 </body>
 </html>
