@@ -716,11 +716,9 @@ body { font-family:'Roboto',sans-serif; background:var(--bg); color:var(--text);
   </div>
 </div>
 <script type="module">
-  // 1. Import Firebase Cloud Modules
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
   import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
 
-  // 2. Your Web App Configuration
   const firebaseConfig = {
     apiKey: "AIzaSyBCLCGsYWA-PUhWvgW45cb-X9G1CjrtAcs",
     authDomain: "ncc-nit-ap.firebaseapp.com",
@@ -731,25 +729,10 @@ body { font-family:'Roboto',sans-serif; background:var(--bg); color:var(--text);
     appId: "1:311443142169:web:b274a34fb95fedd6465c88"
   };
 
-  // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  /* ═══════════════ GLOBAL DATA STORE ═══════════════ */
-  const KEYS = { gallery:'gallery', officers:'officers', rank:'rank', notices:'notices', resources:'resources' };
-
-  // This replaces your local 'load' with a Cloud fetch
-  window.load = async function(key) {
-    try {
-      const snapshot = await get(ref(db, 'ncc_unit/' + key));
-      return snapshot.exists() ? snapshot.val() : [];
-    } catch (e) {
-      console.error("Cloud load error:", e);
-      return [];
-    }
-  };
-
-  // This replaces your local 'save' with a Global Cloud Push
+  /* ═══════════════ GLOBAL DATA SAVING ═══════════════ */
   window.save = async function(key, data) {
     try {
       await set(ref(db, 'ncc_unit/' + key), data);
@@ -761,12 +744,11 @@ body { font-family:'Roboto',sans-serif; background:var(--bg); color:var(--text);
     }
   };
 
-  /* ═══════════════ LIVE CLOUD LISTENER ═══════════════ */
-  // This ensures your dashboard stays in sync if you edit from another device
+  /* ═══════════════ LIVE SYNC ═══════════════ */
   onValue(ref(db, 'ncc_unit'), (snapshot) => {
     if (snapshot.exists()) {
       const cloudData = snapshot.val();
-      // Sync to local memory so your existing UI functions continue to work
+      // Keep local storage synced so existing code works
       localStorage.setItem('ncc_gallery', JSON.stringify(cloudData.gallery || []));
       localStorage.setItem('ncc_officers', JSON.stringify(cloudData.officers || []));
       localStorage.setItem('ncc_rank', JSON.stringify(cloudData.rank || []));
@@ -776,8 +758,8 @@ body { font-family:'Roboto',sans-serif; background:var(--bg); color:var(--text);
     }
   });
 
-  /* ═══════════════ ORIGINAL UI LOGIC (CONNECTED TO CLOUD) ═══════════════ */
-  // I have attached your original functions to the 'window' so they remain clickable
+  /* ═══════════════ UI LOGIC (ATTACHED TO WINDOW) ═══════════════ */
+  
   window.doLogin = function() {
     const id=document.getElementById('inp-id').value.trim(), pwd=document.getElementById('inp-pwd').value;
     if(id==='nccaradmin' && pwd==='NITAR@NCC2026'){
@@ -792,82 +774,89 @@ body { font-family:'Roboto',sans-serif; background:var(--bg); color:var(--text);
     }
   };
 
-  window.doLogout = function() {
-    location.reload(); // Simplest way to clear session and re-lock
-  };
-
   window.initApp = function(user){
     document.getElementById('sidebar-user').textContent='▸ '+user;
-    document.getElementById('sys-adminid').textContent=user;
-    renderAll(); updateTime(); setInterval(updateTime,1000);
-  };
-
-  window.updateTime = function(){ 
-    document.getElementById('topbar-time').textContent=new Date().toLocaleTimeString('en-IN')+' IST'; 
+    renderAll();
+    setInterval(() => {
+        document.getElementById('topbar-time').textContent = new Date().toLocaleTimeString('en-IN') + ' IST';
+    }, 1000);
   };
 
   window.renderAll = function(){ 
-    renderDashboard(); renderGallery(); renderOfficers(); renderRank(); renderNotices(); renderResources(); renderExport(); renderSettings(); 
+    renderDashboard();
+    renderNotices();
+    renderRank();
+    renderOfficers();
+    // Add other renderers as needed
   };
 
-  window.gotoPanel = function(name,el){
-    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-    document.getElementById('panel-'+name).classList.add('active');
-    if(el) el.classList.add('active');
-    document.getElementById('topbar-bc').textContent='// '+name;
-  };
-
-  /* --- ALL ORIGINAL ADD/DELETE FUNCTIONS NOW USE THE NEW GLOBAL 'save' --- */
   window.addNotice = function() {
-    const title=v('not-title'), body=v('not-body'), by=v('not-by');
-    if(!title) return toast('Title required.',true);
+    const title = v('not-title'), body = v('not-body'), by = v('not-by'), priority = v('not-priority');
+    if(!title) return toast('Title required', true);
     const data = JSON.parse(localStorage.getItem('ncc_notices') || '[]');
-    data.push({id:Date.now(), title, body, by, created:new Date().toISOString()});
-    save('notices', data); // This now pushes to cloud
-    ['not-title','not-body','not-by'].forEach(id=>document.getElementById(id).value='');
+    data.push({ id: Date.now(), title, body, by, priority, created: new Date().toISOString() });
+    save('notices', data);
+    ['not-title','not-body','not-by'].forEach(id => document.getElementById(id).value = '');
   };
 
   window.addRankEntry = function() {
-    const rank=v('rank-rank'), name=v('rank-name'), branch=v('rank-branch');
-    if(!name) return toast('Name required.',true);
+    const rank = v('rank-rank'), name = v('rank-name'), branch = v('rank-branch'), batch = v('rank-batch');
+    if(!name) return toast('Name required', true);
     const data = JSON.parse(localStorage.getItem('ncc_rank') || '[]');
-    data.push({id:Date.now(), rank, name, branch, created:new Date().toISOString()});
+    data.push({ id: Date.now(), rank, name, branch, batch });
     save('rank', data);
-    ['rank-name','rank-branch'].forEach(id=>document.getElementById(id).value='');
+    ['rank-name','rank-branch','rank-batch'].forEach(id => document.getElementById(id).value = '');
   };
 
-  window.addOfficer = function() {
-    const name=v('off-name'), role=v('off-role'), desig=v('off-designation');
-    if(!name) return toast('Name required.',true);
-    const data = JSON.parse(localStorage.getItem('ncc_officers') || '[]');
-    data.push({id:Date.now(), name, role, designation:desig, created:new Date().toISOString()});
-    save('officers', data);
-    ['off-name','off-designation'].forEach(id=>document.getElementById(id).value='');
+  /* ═══════════════ RENDERERS (DOM UPDATERS) ═══════════════ */
+
+  function renderDashboard() {
+    const n = JSON.parse(localStorage.getItem('ncc_notices') || '[]');
+    const r = JSON.parse(localStorage.getItem('ncc_rank') || '[]');
+    document.getElementById('stats-grid').innerHTML = `
+      <div class="stat-box"><div class="val">${n.length}</div><div class="lbl">Notices</div></div>
+      <div class="stat-box"><div class="val">${r.length}</div><div class="lbl">Cadets</div></div>
+    `;
+  }
+
+  function renderNotices() {
+    const data = JSON.parse(localStorage.getItem('ncc_notices') || '[]');
+    const el = document.getElementById('notices-list');
+    el.innerHTML = data.reverse().map((n, i) => `
+      <div class="notice-item">
+        <div class="notice-item-body"><strong>${esc(n.title)}</strong><p>${esc(n.body)}</p></div>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('notices', ${data.length-1-i})">✕</button>
+      </div>`).join('');
+  }
+
+  function renderRank() {
+    const data = JSON.parse(localStorage.getItem('ncc_rank') || '[]');
+    const tbody = document.getElementById('rank-tbody');
+    tbody.innerHTML = data.map((r, i) => `
+      <tr><td>${esc(r.rank)}</td><td>${esc(r.name)}</td><td>${esc(r.branch)}</td><td>${esc(r.batch)}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteItem('rank', ${i})">✕</button></td></tr>`).join('');
+  }
+
+  /* ═══════════════ UTILS ═══════════════ */
+  window.gotoPanel = function(name, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-'+name).classList.add('active');
+    document.getElementById('topbar-bc').textContent = '// ' + name;
   };
 
   window.deleteItem = function(key, idx) {
-    if(!confirm('Delete this entry?')) return;
+    if(!confirm('Delete?')) return;
     const data = JSON.parse(localStorage.getItem('ncc_'+key) || '[]');
     data.splice(idx, 1);
     save(key, data);
   };
 
-  /* --- UTILITIES --- */
   const v = (id) => document.getElementById(id).value.trim();
-  const esc = (s) => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const esc = (s) => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
   window.toast = function(msg, isErr=false) {
     const t=document.getElementById('toast'); t.textContent=msg;
     t.className='show'+(isErr?' err':'');
     setTimeout(()=>t.className='', 3000);
-  };
-
-  // Initial Load Trigger
-  window.renderDashboard = function(){
-    const n = JSON.parse(localStorage.getItem('ncc_notices') || '[]');
-    document.getElementById('stats-grid').innerHTML = `
-      <div class="stat-box"><div class="val">${n.length}</div><div class="lbl">Active Notices</div></div>
-    `;
   };
 </script>
 </body>
