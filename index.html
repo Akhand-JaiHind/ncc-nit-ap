@@ -1,153 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NCC NIT Arunachal Pradesh | Official Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto:wght@400;700&family=Roboto+Mono&display=swap" rel="stylesheet">
-    <style>
-        :root { --army-green: #2d3436; --light-grey: #f0f2f5; --nit-teal: #004d40; --teal-lt: #00695c; --accent: #00bfa5; --white: #ffffff; }
-        *, *::before, *::after { box-sizing: border-box; }
-        body { margin: 0; background-color: var(--light-grey); color: #333; font-family: 'Roboto', sans-serif; overflow-x: hidden; }
-
-        /* Restored Elite Loader */
-        #loader { position: fixed; inset: 0; background: var(--light-grey); display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease-out; }
-        #loader video { width: 500px; mix-blend-mode: multiply; filter: contrast(1.2); outline: none; }
-
-        /* Header & Live Badge */
-        header { background: var(--white); border-bottom: 4px solid var(--nit-teal); padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: relative; z-index: 10; }
-        #live-badge { position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; font-family: 'Roboto Mono', monospace; font-size: 0.6rem; letter-spacing: 2px; padding: 2px 10px; display: none; border-radius: 0 0 4px 4px; z-index: 5; }
-        #live-badge.show { display: flex; align-items: center; gap: 5px; }
-        .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: livePulse 1.4s ease-in-out infinite; }
-        @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
-
-        /* Restored Dynamics: Notices Ticker */
-        .notices-bar { background: var(--nit-teal); color: white; padding: 9px 5%; display: none; align-items: center; gap: 16px; font-family: 'Roboto Mono', monospace; font-size: 0.8rem; overflow: hidden; }
-        .notices-bar-label { background: white; color: var(--nit-teal); font-weight: 700; padding: 3px 10px; font-size: 0.7rem; letter-spacing: 2px; white-space: nowrap; }
-        .notices-ticker-wrap { overflow: hidden; flex: 1; cursor: pointer; }
-        .notices-ticker { display: flex; gap: 60px; animation: ticker 35s linear infinite; white-space: nowrap; }
-        @keyframes ticker { from { transform: translateX(100%); } to { transform: translateX(-200%); } }
-
-        /* Nav & Tabs */
-        .nav-tabs { background: var(--army-green); display: flex; justify-content: center; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
-        .tab-btn { padding: 15px 20px; color: rgba(255,255,255,.8); cursor: pointer; border: none; background: none; font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 0.88rem; transition: 0.25s; position: relative; }
-        .tab-btn.active { color: #fff; background: var(--nit-teal); }
-        .tab-btn.active::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:var(--accent); }
-
-        /* Restored Animations: Scroll Reveal */
-        .tab-content { display: none; padding: 50px 10%; }
-        .tab-content.active { display: block; }
-        .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
-        .reveal.in { opacity: 1; transform: none; }
-
-        /* Restored Cards UI */
-        .hero-box { text-align: center; background: white; padding: 60px 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
-        .hero-stats { display: flex; justify-content: center; gap: 40px; margin-top: 30px; border-top: 1px dashed #d0ddd8; padding-top: 25px; }
-        .stat-val { font-family: 'Oswald', sans-serif; font-size: 2.2rem; color: var(--nit-teal); }
-
-        .officers-stack { display: flex; flex-direction: column; gap: 30px; max-width: 900px; margin: 0 auto; }
-        .officer-card { background: white; display: flex; border: 1px solid #d0ddd8; box-shadow: 6px 6px 0 var(--army-green); transition: 0.3s; }
-        .officer-card:hover { transform: translateY(-5px); box-shadow: 8px 10px 0 var(--nit-teal); }
-        .officer-photo { width: 200px; height: 240px; object-fit: cover; background: #e8efec; }
-        .officer-info { padding: 30px; flex: 1; }
-
-        .rank-table { width: 100%; border-collapse: collapse; background: white; box-shadow: 5px 5px 0 var(--army-green); }
-        .rank-table th { background: var(--nit-teal); color: white; padding: 15px; text-align: left; font-family: 'Oswald'; }
-        .rank-table td { padding: 15px; border: 1px solid #eee; }
-
-        .row-gallery-container { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; }
-        .techy-gallery-item { background: white; padding: 15px; border: 1px solid var(--nit-teal); width: 340px; cursor: pointer; box-shadow: 4px 4px 0 var(--army-green); transition: 0.3s; }
-        .techy-gallery-item:hover { transform: scale(1.02); box-shadow: 8px 8px 0 var(--nit-teal); }
-        .techy-gallery-item img { width: 100%; height: 200px; object-fit: cover; }
-
-        /* Notice & Resource Design */
-        .notice-card { background: white; border: 1px solid #d0ddd8; padding: 25px; margin-bottom: 20px; border-left: 5px solid var(--nit-teal); box-shadow: 4px 4px 0 var(--army-green); }
-        .resource-card { background: white; padding: 20px; border: 1px solid #ddd; display: flex; align-items: center; gap: 20px; box-shadow: 3px 3px 0 var(--army-green); }
-
-        /* Lightbox */
-        #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 5000; flex-direction: column; }
-        #lightbox.open { display: flex; }
-        .lb-topbar { display: flex; justify-content: space-between; padding: 20px 40px; background: var(--army-green); color: white; border-bottom: 2px solid var(--nit-teal); }
-        .lb-viewer { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
-        .lb-media { max-height: 80vh; max-width: 90vw; border: 2px solid var(--nit-teal); box-shadow: 0 0 30px rgba(0,191,165,0.3); }
-        .lb-arrow { position: absolute; top: 50%; transform: translateY(-50%); color: white; background: rgba(0,0,0,0.6); border: none; padding: 30px 15px; cursor: pointer; font-size: 2.5rem; }
-    </style>
-</head>
-<body>
-
-<div id="loader">
-    <video autoplay muted playsinline id="bufferVid">
-        <source src="BUFFER VIDEO_WEB.mp4" type="video/mp4">
-    </video>
-</div>
-
-<header>
-    <img src="LOGO_NIT.png" height="70" class="reveal">
-    <div style="text-align:center;">
-        <h2 style="margin:0; font-family:'Oswald'; letter-spacing: 2px;">NATIONAL CADET CORPS</h2>
-        <small style="letter-spacing: 3px;">NIT ARUNACHAL PRADESH</small>
-        <div id="live-badge"><span class="live-dot"></span> LIVE CLOUD DATA</div>
-    </div>
-    <img src="LOGO_NCC.png" height="70" class="reveal">
-</header>
-
-<div class="notices-bar" id="notices-bar">
-    <span class="notices-bar-label">📋 NOTICES</span>
-    <div class="notices-ticker-wrap"><div class="notices-ticker" id="notices-ticker"></div></div>
-</div>
-
-<div class="nav-tabs">
-    <button class="tab-btn active" onclick="openTab('home',this)">Home</button>
-    <button class="tab-btn" onclick="openTab('about',this)">About Us</button>
-    <button class="tab-btn" onclick="openTab('ano',this)">Officers</button>
-    <button class="tab-btn" onclick="openTab('rank',this)">Rank Panel</button>
-    <button class="tab-btn" onclick="openTab('gallery',this)">Gallery</button>
-    <button class="tab-btn" onclick="openTab('notices',this)">Notices</button>
-    <button class="tab-btn" onclick="openTab('resources',this)">Resources</button>
-</div>
-
-<div id="home" class="tab-content active">
-    <div class="hero-box reveal">
-        <img src="LOGO_SOCIAL MEDIA.png" style="width: 250px; margin-bottom: 20px;">
-        <h1 style="font-family:'Oswald'; font-size: 2.5rem; letter-spacing: 4px; color: var(--nit-teal);">UNITY AND DISCIPLINE</h1>
-        <div class="hero-stats">
-            <div class="hero-stat"><span id="stat-cadets" class="stat-val">0</span><br><small>RANKED CADETS</small></div>
-            <div class="hero-stat"><span id="stat-notices" class="stat-val">0</span><br><small>ACTIVE NOTICES</small></div>
-        </div>
-    </div>
-</div>
-
-<div id="about" class="tab-content">
-    <div class="about-grid">
-        <div class="about-card reveal"><h3>🎯 MISSION</h3><p>To develop character, comradeship, discipline, and a secular outlook among the youth.</p></div>
-        <div class="about-card reveal"><h3>🏆 VISION</h3><p>To produce motivated future leaders for our nation through rigorous technical and mental training.</p></div>
-    </div>
-</div>
-
-<div id="ano" class="tab-content"><div class="officers-stack" id="officers-stack"></div></div>
-<div id="rank" class="tab-content"><div id="rank-container" class="reveal"></div></div>
-<div id="gallery" class="tab-content"><div class="row-gallery-container" id="gallery-cards"></div></div>
-<div id="notices" class="tab-content"><div id="notices-list"></div></div>
-<div id="resources" class="tab-content"><div class="resources-grid" id="resources-grid"></div></div>
-
-<div id="lightbox">
-    <div class="lb-topbar"><span id="lb-title-text" style="font-family:'Oswald'; letter-spacing:2px;">Gallery</span><button onclick="closeLightbox()" style="background:none; border:1px solid white; color:white; cursor:pointer; padding:5px 15px;">✕ CLOSE</button></div>
-    <div class="lb-viewer">
-        <button class="lb-arrow" style="left:20px;" onclick="navigate(-1)">❮</button>
-        <div id="lb-media-wrap"></div>
-        <button class="lb-arrow" style="right:20px;" onclick="navigate(1)">❯</button>
-    </div>
-    <div id="lb-counter" style="text-align:center; color:#888; padding:20px; font-family:monospace;"></div>
-</div>
-
 <script type="module">
+    // 1. Import Global Firebase Cloud Modules
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
 
+    // 2. Global Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyBCLCGsYWA-PUhWvgW45cb-X9G1CjrtAcs",
         authDomain: "ncc-nit-ap.firebaseapp.com",
         projectId: "ncc-nit-ap",
+        storageBucket: "ncc-nit-ap.firebasestorage.app",
         databaseURL: "https://ncc-nit-ap-default-rtdb.asia-southeast1.firebasedatabase.app/",
         appId: "1:311443142169:web:b274a34fb95fedd6465c88"
     };
@@ -155,96 +16,111 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    let mediaList = [];
-    let currentIdx = 0;
-
-    // RESTORED: Scroll Reveal Logic
-    function initReveal() {
-        const obs = new IntersectionObserver(entries => {
-            entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('in'); } });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-    }
-
+    /* ═══════════════ GLOBAL LISTENER ═══════════════ */
+    // This watches the Singapore Cloud 24/7 and updates the site instantly
     onValue(ref(db, 'ncc_unit'), (snapshot) => {
         const data = snapshot.val();
         if (data) {
             document.getElementById('live-badge').classList.add('show');
-            if(data.gallery) renderGalleryUI(data.gallery);
-            if(data.officers) renderOfficersUI(data.officers);
-            if(data.rank) renderRankUI(data.rank);
-            if(data.notices) renderNoticesUI(data.notices);
+            
+            // Dynamics: Update sections using your original UI rendering logic
+            if(data.gallery)   renderGalleryUI(data.gallery);
+            if(data.officers)  renderOfficersUI(data.officers);
+            if(data.rank)      renderRankUI(data.rank);
+            if(data.notices)   renderNoticesUI(data.notices);
             if(data.resources) renderResourcesUI(data.resources);
-            setTimeout(initReveal, 100);
+            
+            // Restore Animations: Re-trigger ScrollReveal on new elements
+            setTimeout(initReveal, 200);
         }
     });
 
+    /* ═══════════════ RENDERING LOGIC ═══════════════ */
     function renderGalleryUI(ev) {
-        document.getElementById('gallery-cards').innerHTML = ev.map(e => `
-            <div class="techy-gallery-item reveal" onclick="openGallery(this)" data-folder="${e.folder}" data-title="${e.title}" data-files='${JSON.stringify(e.files||[])}'>
-                <img src="${e.thumb}">
-                <div style="margin-top:15px; font-family:'Oswald'; border-top: 1px dashed #ccc; padding-top: 10px;">${e.title}</div>
-            </div>`).join('');
+        const c = document.getElementById('gallery-cards');
+        c.innerHTML = ev.map((e, i) => `
+            <figure class="techy-gallery-item reveal" style="animation-delay:${i*0.08}s"
+                    onclick="openGallery(this)" data-folder="${he(e.folder)}" data-title="${he(e.title)}"
+                    data-files='${JSON.stringify(e.files||[])}'>
+                <div class="card-overlay"><span class="card-overlay-icon">▶ View Gallery</span></div>
+                <img src="${he(e.thumb)}" onerror="this.src='LOGO_SOCIAL MEDIA.png'">
+                <figcaption>${he(e.label||e.title)}</figcaption>
+            </figure>`).join('');
+        document.getElementById('stat-events').textContent = ev.length;
     }
 
     function renderOfficersUI(off) {
-        document.getElementById('officers-stack').innerHTML = off.map(o => `
+        const stack = document.getElementById('officers-stack');
+        stack.innerHTML = off.map(o => `
             <div class="officer-card reveal">
-                <img src="${o.photo}" class="officer-photo">
+                <div class="officer-rank-badge">${he(o.role)}</div>
+                <div class="officer-photo-wrap">
+                    <img src="${he(o.photo)}" class="officer-photo" onerror="this.parentElement.classList.add('no-photo')">
+                    <div class="officer-photo-frame"></div>
+                </div>
                 <div class="officer-info">
-                    <div style="color:var(--nit-teal); font-family:'Roboto Mono'; font-size:0.8rem;">${o.designation}</div>
-                    <h3 style="margin:8px 0; font-family:'Oswald'; font-size:1.8rem;">${o.name}</h3>
-                    <div style="width:40px; height:3px; background:var(--nit-teal); margin-bottom:15px;"></div>
-                    <p style="font-style:italic; line-height:1.6; color:#555;">${o.bio}</p>
+                    <p class="officer-designation">${he(o.designation)}</p>
+                    <h3 class="officer-name">${he(o.name)}</h3>
+                    <div class="officer-divider"></div>
+                    <p class="officer-bio">${he(o.bio)}</p>
                 </div>
             </div>`).join('');
     }
 
     function renderRankUI(cadets) {
-        document.getElementById('rank-container').innerHTML = `<table class="rank-table">
-            <thead><tr><th>RANK / POSITION</th><th>NAME OF CADET</th><th>BRANCH</th></tr></thead>
-            <tbody>${cadets.map(r => `<tr><td><b>${r.rank}</b></td><td>${r.name}</td><td>${r.branch}</td></tr>`).join('')}</tbody></table>`;
+        const c = document.getElementById('rank-container');
+        c.innerHTML = `<table class="rank-table reveal">
+            <thead><tr><th>Rank</th><th>Name of Cadet</th><th>Branch</th></tr></thead>
+            <tbody>${cadets.map(r => `<tr>
+                <td><strong style="font-family:'Oswald';">${he(r.rank)}</strong></td>
+                <td>${he(r.name)}</td>
+                <td>${he(r.branch)}</td>
+            </tr>`).join('')}</tbody></table>`;
         document.getElementById('stat-cadets').textContent = cadets.length;
     }
 
     function renderNoticesUI(notices) {
         const active = notices.filter(n => !n.expiry || new Date(n.expiry) >= new Date());
-        document.getElementById('notices-ticker').innerHTML = active.map(n => `<span style="display:inline-flex; align-items:center; gap:10px;">● ${n.title}</span>`).join('');
+        document.getElementById('stat-notices').textContent = active.length;
+        document.getElementById('notices-ticker').innerHTML = active.map(n => `<span class="notice-tick-item">● ${he(n.title)}</span>`).join('');
         document.getElementById('notices-bar').style.display = active.length ? 'flex' : 'none';
+
         document.getElementById('notices-list').innerHTML = [...active].reverse().map(n => `
             <div class="notice-card reveal">
-                <div style="font-family:'Oswald'; font-size:1.4rem; color:var(--army-green);">${n.title}</div>
-                <p style="line-height:1.7; color:#555;">${n.body}</p>
-                <div style="font-family:'Roboto Mono'; font-size:0.75rem; color:#999;">Posted by: ${n.by || 'Admin Office'}</div>
+                <div class="notice-card-title">${he(n.title)}</div>
+                <p class="notice-card-text">${he(n.body)}</p>
+                <small>By: ${he(n.by || 'Admin')}</small>
             </div>`).join('');
-        document.getElementById('stat-notices').textContent = active.length;
     }
 
     function renderResourcesUI(res) {
         document.getElementById('resources-grid').innerHTML = res.map(r => `
             <div class="resource-card reveal">
-                <div style="font-size:2rem;">📁</div>
-                <div>
-                    <div style="font-weight:bold; font-family:'Oswald';">${r.title}</div>
-                    <a href="${r.fileUrl}" target="_blank" style="color:var(--nit-teal); font-family:'Roboto Mono'; text-decoration:none; font-size:0.8rem;">↓ DOWNLOAD FILE</a>
+                <div class="resource-icon">📄</div>
+                <div class="resource-info">
+                    <div class="resource-title">${he(r.title)}</div>
+                    <a class="resource-dl" href="${he(r.fileUrl)}" target="_blank">↓ Download</a>
                 </div>
             </div>`).join('');
+        document.getElementById('stat-resources').textContent = res.length;
     }
 
+    /* ═══════════════ RE-ATTACH DYNAMICS ═══════════════ */
+    // Functions must be attached to 'window' to work with HTML 'onclick' buttons
     window.openTab = function(name, btn) {
         document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
         document.getElementById(name).classList.add('active');
-        btn.classList.add('active');
-        window.scrollTo({top: 0, behavior: 'smooth'});
+        if (btn) btn.classList.add('active');
+        setTimeout(initReveal, 100);
     };
 
+    let mediaList = []; let currentIdx = 0;
     window.openGallery = function(card) {
-        const folder = card.dataset.folder;
-        const title = card.dataset.title;
         const files = JSON.parse(card.dataset.files || '[]');
-        mediaList = files.map(f => ({ src: `https://akhand-jaihind.github.io/ncc-nit-ap/${folder}/${f}` }));
-        document.getElementById('lb-title-text').textContent = title;
+        const folder = card.dataset.folder;
+        mediaList = files.map(f => ({ src: `${folder}/${f}`, name: f }));
+        document.getElementById('lb-title-text').textContent = card.dataset.title;
         document.getElementById('lightbox').classList.add('open');
         document.body.style.overflow = 'hidden';
         showMedia(0);
@@ -253,31 +129,30 @@
     function showMedia(idx) {
         currentIdx = idx;
         const m = mediaList[idx];
-        const isVideo = m.src.toLowerCase().endsWith('.mp4');
-        document.getElementById('lb-media-wrap').innerHTML = isVideo ? 
-            `<video controls autoplay class="lb-media"><source src="${m.src}"></video>` :
-            `<img src="${m.src}" class="lb-media">`;
-        document.getElementById('lb-counter').textContent = `IMAGE ${idx + 1} OF ${mediaList.length}`;
+        const wrap = document.getElementById('lb-media-wrap');
+        const isVid = m.src.toLowerCase().endsWith('.mp4');
+        wrap.innerHTML = isVid ? `<video controls autoplay><source src="${m.src}"></video>` : `<img src="${m.src}" loading="lazy">`;
+        document.getElementById('lb-counter').textContent = `${idx + 1} / ${mediaList.length}`;
     }
 
-    window.navigate = function(dir) {
-        let n = currentIdx + dir;
-        if(n >= 0 && n < mediaList.length) showMedia(n);
-    };
+    window.navigate = (dir) => { let n = currentIdx + dir; if (n >= 0 && n < mediaList.length) showMedia(n); };
+    window.closeLightbox = () => { document.getElementById('lightbox').classList.remove('open'); document.body.style.overflow = ''; };
 
-    window.closeLightbox = function() { 
-        document.getElementById('lightbox').classList.remove('open');
-        document.body.style.overflow = '';
-        document.getElementById('lb-media-wrap').innerHTML = '';
-    };
+    /* ═══════════════ RESTORE ANIMATIONS ═══════════════ */
+    function initReveal() {
+        const obs = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal:not(.in)').forEach(el => obs.observe(el));
+    }
 
     // Loader logic
     window.addEventListener('load', () => {
         setTimeout(() => {
-            document.getElementById('loader').style.opacity='0';
-            setTimeout(()=>document.getElementById('loader').style.display='none',500);
-        }, 2500);
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
+        }, 2000);
     });
+
+    function he(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 </script>
-</body>
-</html>
