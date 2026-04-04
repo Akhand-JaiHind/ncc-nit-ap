@@ -378,25 +378,25 @@
     const db = getDatabase(app);
 
     /* ═══════════════ GLOBAL LISTENER ═══════════════ */
-    // This watches the Singapore Cloud 24/7 and updates the site instantly
+    // This watches the Singapore Cloud and updates the site instantly
     onValue(ref(db, 'ncc_unit'), (snapshot) => {
         const data = snapshot.val();
         if (data) {
             document.getElementById('live-badge').classList.add('show');
             
-            // Dynamics: Update sections using your original UI rendering logic
+            // Update UI sections using cloud data
             if(data.gallery)   renderGalleryUI(data.gallery);
             if(data.officers)  renderOfficersUI(data.officers);
             if(data.rank)      renderRankUI(data.rank);
             if(data.notices)   renderNoticesUI(data.notices);
             if(data.resources) renderResourcesUI(data.resources);
             
-            // Restore Animations: Re-trigger ScrollReveal on new elements
+            // Re-trigger ScrollReveal on new elements
             setTimeout(initReveal, 200);
         }
     });
 
-    /* ═══════════════ RENDERING LOGIC ═══════════════ */
+    /* ═══════════════ RENDERING UI LOGIC ═══════════════ */
     function renderGalleryUI(ev) {
         const c = document.getElementById('gallery-cards');
         c.innerHTML = ev.map((e, i) => `
@@ -466,8 +466,7 @@
         document.getElementById('stat-resources').textContent = res.length;
     }
 
-    /* ═══════════════ RE-ATTACH DYNAMICS ═══════════════ */
-    // Functions must be attached to 'window' to work with HTML 'onclick' buttons
+    /* ═══════════════ RE-ATTACH ORIGINAL DYNAMICS ═══════════════ */
     window.openTab = function(name, btn) {
         document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
@@ -494,6 +493,7 @@
         const isVid = m.src.toLowerCase().endsWith('.mp4');
         wrap.innerHTML = isVid ? `<video controls autoplay><source src="${m.src}"></video>` : `<img src="${m.src}" loading="lazy">`;
         document.getElementById('lb-counter').textContent = `${idx + 1} / ${mediaList.length}`;
+        document.querySelectorAll('#lb-thumbstrip .lb-thumb').forEach((t,i)=>t.classList.toggle('active',i===idx));
     }
 
     window.navigate = (dir) => { let n = currentIdx + dir; if (n >= 0 && n < mediaList.length) showMedia(n); };
@@ -507,13 +507,12 @@
         document.querySelectorAll('.reveal:not(.in)').forEach(el => obs.observe(el));
     }
 
-    // Original Loader logic
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            document.getElementById('loader').style.opacity = '0';
-            setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
-        }, 2000);
-    });
+    /* ─── LOADER LOGIC ─── */
+    (function(){
+        const loader=document.getElementById('loader');
+        function hide(){ loader.style.opacity='0'; setTimeout(()=>{loader.style.display='none';},500); }
+        window.addEventListener('load', () => setTimeout(hide, 2000));
+    })();
 
     function he(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 </script>
