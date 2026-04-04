@@ -3,914 +3,212 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NCC NITAR — Admin Command Centre</title>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Roboto+Mono:wght@400;500&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+<title>NCC NITAR — Global Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Mono&display=swap" rel="stylesheet">
 <style>
-:root {
-  --teal:    #004d40;
-  --teal-lt: #00695c;
-  --army:    #2d3436;
-  --accent:  #00bfa5;
-  --danger:  #c0392b;
-  --warn:    #e67e22;
-  --ok:      #27ae60;
-  --bg:      #f0f2f5;
-  --card:    #ffffff;
-  --border:  #d0ddd8;
-  --text:    #2d3436;
-  --muted:   #7f8c8d;
-  --sidebar: 260px;
-}
-
-*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-body { font-family:'Roboto',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
-
-/* ═══════════════ LOGIN SCREEN ═══════════════ */
-#login-screen {
-  position:fixed; inset:0;
-  background: radial-gradient(ellipse at 20% 50%, #0a2e28 0%, #1a1a2e 40%, #0d1117 100%);
-  display:flex; align-items:center; justify-content:center;
-  z-index:9999; flex-direction:column; gap:0;
-  transition:opacity .5s ease, transform .5s ease;
-  overflow:hidden;
-}
-#login-screen.out { opacity:0; transform:scale(1.04); pointer-events:none; }
-
-#login-screen::before {
-  content:'';
-  position:absolute; inset:0;
-  background-image:
-    linear-gradient(rgba(0,191,165,.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,191,165,.04) 1px, transparent 1px);
-  background-size: 44px 44px;
-  animation: gridDrift 20s linear infinite;
-}
-@keyframes gridDrift { from{transform:translateY(0)} to{transform:translateY(44px)} }
-
-.login-orb {
-  position:absolute; border-radius:50%;
-  filter:blur(60px); pointer-events:none; opacity:.55;
-  animation: orbFloat linear infinite;
-}
-.login-orb-1 { width:340px; height:340px; background:radial-gradient(circle, rgba(0,191,165,.35), transparent 70%); top:-80px; left:-80px; animation-duration:18s; }
-.login-orb-2 { width:280px; height:280px; background:radial-gradient(circle, rgba(0,77,64,.5), transparent 70%); bottom:-60px; right:-60px; animation-duration:22s; animation-delay:-8s; }
-.login-orb-3 { width:180px; height:180px; background:radial-gradient(circle, rgba(0,191,165,.2), transparent 70%); top:40%; right:15%; animation-duration:14s; animation-delay:-4s; }
-@keyframes orbFloat { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(30px,-20px) scale(1.08)} 66%{transform:translate(-20px,15px) scale(.94)} }
-
-.login-logo-above { text-align:center; margin-bottom:28px; position:relative; z-index:2; }
-.login-logo-img-wrap { position:relative; display:inline-block; }
-.login-logo-img { width:110px; height:110px; object-fit:contain; filter:drop-shadow(0 0 18px rgba(0,191,165,.7)) drop-shadow(0 0 40px rgba(0,191,165,.35)); animation:logoPulse 3s ease-in-out infinite; position:relative; z-index:2; }
-.login-logo-img-wrap::before,.login-logo-img-wrap::after { content:''; position:absolute; inset:-10px; border-radius:50%; border:2px solid rgba(0,191,165,.4); animation:ringPulse 3s ease-out infinite; pointer-events:none; }
-.login-logo-img-wrap::after { inset:-22px; border-color:rgba(0,191,165,.2); animation-delay:.6s; }
-@keyframes ringPulse { 0%{transform:scale(.9);opacity:.8} 100%{transform:scale(1.35);opacity:0} }
-@keyframes logoPulse { 0%,100%{filter:drop-shadow(0 0 14px rgba(0,191,165,.65)) drop-shadow(0 0 36px rgba(0,191,165,.3))} 50%{filter:drop-shadow(0 0 24px rgba(0,191,165,.9)) drop-shadow(0 0 60px rgba(0,191,165,.5))} }
-
-.login-box {
-  background:rgba(255,255,255,.06); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-  border:1px solid rgba(0,191,165,.25); border-top:3px solid var(--accent);
-  padding:36px 44px 40px; width:400px;
-  box-shadow:0 24px 60px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.07);
-  position:relative; z-index:2;
-}
-.login-box::before { content:''; position:absolute; top:0; right:0; width:120px; height:120px; background:linear-gradient(135deg,transparent 55%,rgba(0,191,165,.08) 100%); pointer-events:none; }
-
-.login-logo { text-align:center; margin-bottom:28px; }
-.login-logo h1 { font-family:'Oswald',sans-serif; font-size:1.3rem; letter-spacing:5px; color:#fff; text-shadow:0 0 20px rgba(0,191,165,.5); }
-.login-logo p { font-family:'Roboto Mono',monospace; font-size:.68rem; color:rgba(0,191,165,.7); letter-spacing:2px; margin-top:4px; }
-.login-separator { width:40px; height:2px; background:var(--accent); margin:10px auto; opacity:.7; }
-
-.field-group { margin-bottom:18px; }
-.field-group label { display:block; font-family:'Roboto Mono',monospace; font-size:.68rem; letter-spacing:2px; color:rgba(255,255,255,.5); text-transform:uppercase; margin-bottom:6px; }
-.field-group input { width:100%; padding:12px 14px; border:1px solid rgba(0,191,165,.2); border-radius:2px; font-size:.93rem; font-family:'Roboto',sans-serif; outline:none; transition:border-color .2s, box-shadow .2s, background .2s; background:rgba(255,255,255,.06); color:#fff; }
-.field-group input::placeholder { color:rgba(255,255,255,.25); }
-.field-group input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(0,191,165,.15); background:rgba(255,255,255,.1); }
-
-.btn-login { width:100%; padding:13px; background:linear-gradient(135deg,var(--teal),var(--teal-lt)); color:#fff; border:none; cursor:pointer; font-family:'Oswald',sans-serif; font-size:1rem; letter-spacing:3px; text-transform:uppercase; transition:opacity .2s, transform .1s, box-shadow .2s; box-shadow:0 4px 20px rgba(0,191,165,.3); margin-top:4px; }
-.btn-login:hover { opacity:.88; box-shadow:0 6px 28px rgba(0,191,165,.45); }
-.btn-login:active { transform:scale(.98); }
-
-#login-err { color:#ff6b6b; font-size:.78rem; font-family:'Roboto Mono',monospace; text-align:center; margin-top:12px; min-height:18px; letter-spacing:1px; }
-.login-badge { position:absolute; top:14px; right:14px; background:rgba(0,191,165,.15); color:rgba(0,191,165,.8); border:1px solid rgba(0,191,165,.25); font-family:'Roboto Mono',monospace; font-size:.6rem; padding:3px 10px; letter-spacing:2px; }
-
-/* ═══════════════ APP SHELL ═══════════════ */
-#app { display:none; min-height:100vh; }
-#app.visible { display:flex; }
-
-.sidebar { width:var(--sidebar); background:var(--army); display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:100; overflow-y:auto; }
-.sidebar-head { padding:24px 20px 20px; border-bottom:1px solid rgba(255,255,255,.08); }
-.sidebar-head h2 { font-family:'Oswald',sans-serif; font-size:.85rem; letter-spacing:4px; color:var(--accent); text-transform:uppercase; }
-.sidebar-head p { font-family:'Roboto Mono',monospace; font-size:.65rem; color:#8a9ba4; margin-top:4px; letter-spacing:1px; }
-
-.nav-section { padding:16px 0 4px; }
-.nav-section-label { padding:0 20px 6px; font-family:'Roboto Mono',monospace; font-size:.6rem; letter-spacing:3px; color:#4a5568; text-transform:uppercase; }
-.nav-item { display:flex; align-items:center; gap:12px; padding:12px 20px; cursor:pointer; color:#b2bec3; font-size:.88rem; font-family:'Roboto',sans-serif; transition:background .15s, color .15s; border-left:3px solid transparent; user-select:none; }
-.nav-item:hover { background:rgba(255,255,255,.05); color:#fff; }
-.nav-item.active { background:rgba(0,191,165,.1); color:var(--accent); border-left-color:var(--accent); }
-.nav-icon { font-size:1rem; width:20px; text-align:center; flex-shrink:0; }
-
-.sidebar-foot { margin-top:auto; padding:16px 20px; border-top:1px solid rgba(255,255,255,.08); }
-.btn-logout { width:100%; padding:10px; background:rgba(192,57,43,.15); color:#e74c3c; border:1px solid rgba(192,57,43,.3); cursor:pointer; font-family:'Roboto Mono',monospace; font-size:.75rem; letter-spacing:2px; text-transform:uppercase; transition:background .2s; }
-.btn-logout:hover { background:rgba(192,57,43,.3); }
-
-.main-area { margin-left:var(--sidebar); flex:1; display:flex; flex-direction:column; min-height:100vh; }
-.topbar { background:var(--card); border-bottom:1px solid var(--border); padding:16px 32px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50; box-shadow:0 2px 8px rgba(0,0,0,.06); }
-.topbar-title { font-family:'Oswald',sans-serif; font-size:1.2rem; letter-spacing:3px; color:var(--teal); }
-.topbar-breadcrumb { font-family:'Roboto Mono',monospace; font-size:.7rem; color:var(--muted); letter-spacing:1px; }
-.topbar-right { display:flex; align-items:center; gap:16px; }
-.topbar-time { font-family:'Roboto Mono',monospace; font-size:.72rem; color:var(--muted); }
-
-/* Preview Site button */
-.btn-preview {
-  display:inline-flex; align-items:center; gap:7px;
-  padding:8px 16px;
-  background:linear-gradient(135deg, var(--teal), var(--teal-lt));
-  color:#fff; border:none; cursor:pointer;
-  font-family:'Roboto Mono',monospace; font-size:.72rem;
-  letter-spacing:1px; text-transform:uppercase;
-  transition:opacity .2s, box-shadow .2s;
-  box-shadow:0 2px 10px rgba(0,191,165,.25);
-  text-decoration:none; border-radius:2px;
-}
-.btn-preview:hover { opacity:.85; box-shadow:0 4px 16px rgba(0,191,165,.4); }
-.preview-dot { width:7px; height:7px; border-radius:50%; background:#80cbc4; animation:previewPulse 1.5s ease-in-out infinite; }
-@keyframes previewPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.6)} }
-
-.content { padding:32px; flex:1; }
-
-/* ═══════════════ PANELS ═══════════════ */
-.panel { display:none; animation:fadeIn .3s ease; }
-.panel.active { display:block; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
-
-.sec-header { margin-bottom:28px; }
-.sec-header h2 { font-family:'Oswald',sans-serif; font-size:1.6rem; color:var(--teal); letter-spacing:3px; text-transform:uppercase; }
-.sec-header p { font-family:'Roboto Mono',monospace; font-size:.75rem; color:var(--muted); margin-top:4px; letter-spacing:1px; }
-
-.card { background:var(--card); border:1px solid var(--border); padding:28px; margin-bottom:24px; box-shadow:4px 4px 0 var(--army); position:relative; }
-.card-title { font-family:'Oswald',sans-serif; font-size:1rem; letter-spacing:2px; color:var(--teal); text-transform:uppercase; margin-bottom:20px; padding-bottom:10px; border-bottom:1px dashed var(--border); }
-
-/* Live sync card */
-.sync-card {
-  background: linear-gradient(135deg, #e8f5e9 0%, #f0f7f5 100%);
-  border:1px solid #a5d6a7; padding:20px 24px; margin-bottom:24px;
-  box-shadow:4px 4px 0 #1b5e20; display:flex; align-items:center; gap:20px;
-  flex-wrap:wrap;
-}
-.sync-icon { font-size:2rem; flex-shrink:0; }
-.sync-info { flex:1; }
-.sync-title { font-family:'Oswald',sans-serif; font-size:1rem; letter-spacing:2px; color:#1b5e20; text-transform:uppercase; margin-bottom:4px; }
-.sync-desc { font-family:'Roboto Mono',monospace; font-size:.72rem; color:#2e7d32; line-height:1.6; }
-.sync-status-row { display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; }
-.sync-pill {
-  display:inline-flex; align-items:center; gap:5px;
-  background:rgba(0,77,64,.08); border:1px solid rgba(0,77,64,.2);
-  padding:3px 10px; border-radius:20px;
-  font-family:'Roboto Mono',monospace; font-size:.65rem; color:#1b5e20; letter-spacing:1px;
-}
-.sync-pill-dot { width:6px; height:6px; border-radius:50%; background:var(--ok); animation:previewPulse 1.5s ease-in-out infinite; }
-
-.form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
-.form-row.full { grid-template-columns:1fr; }
-.form-row.three { grid-template-columns:1fr 1fr 1fr; }
-
-.form-group { display:flex; flex-direction:column; gap:6px; }
-.form-group label { font-family:'Roboto Mono',monospace; font-size:.68rem; letter-spacing:2px; color:var(--muted); text-transform:uppercase; }
-.form-group input,.form-group textarea,.form-group select { padding:10px 12px; border:1px solid var(--border); font-family:'Roboto',sans-serif; font-size:.9rem; outline:none; transition:border-color .2s, box-shadow .2s; background:#fafafa; border-radius:2px; }
-.form-group input:focus,.form-group textarea:focus,.form-group select:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(0,191,165,.1); background:#fff; }
-.form-group textarea { resize:vertical; min-height:90px; }
-
-.btn { padding:10px 22px; border:none; cursor:pointer; font-family:'Oswald',sans-serif; font-size:.9rem; letter-spacing:2px; text-transform:uppercase; transition:.2s; display:inline-flex; align-items:center; gap:8px; }
-.btn-primary { background:var(--teal); color:#fff; }
-.btn-primary:hover { background:var(--teal-lt); }
-.btn-danger { background:transparent; color:var(--danger); border:1px solid var(--danger); }
-.btn-danger:hover { background:var(--danger); color:#fff; }
-.btn-warn { background:var(--warn); color:#fff; }
-.btn-warn:hover { background:#d35400; }
-.btn-sm { padding:6px 14px; font-size:.78rem; }
-.btn-ok { background:var(--ok); color:#fff; }
-.btn-ok:hover { background:#219a52; }
-
-#toast { position:fixed; bottom:32px; right:32px; background:var(--army); color:#fff; font-family:'Roboto Mono',monospace; font-size:.8rem; padding:14px 22px; letter-spacing:1px; border-left:4px solid var(--accent); box-shadow:0 8px 24px rgba(0,0,0,.3); transform:translateY(20px); opacity:0; transition:.3s; z-index:9999; pointer-events:none; max-width:340px; }
-#toast.show { transform:none; opacity:1; }
-#toast.err { border-left-color:var(--danger); }
-
-.data-table { width:100%; border-collapse:collapse; margin-top:16px; }
-.data-table th { background:var(--teal); color:#fff; font-family:'Oswald',sans-serif; letter-spacing:1px; padding:12px 14px; text-align:left; font-size:.88rem; }
-.data-table td { padding:11px 14px; border-bottom:1px solid var(--border); font-size:.88rem; vertical-align:middle; }
-.data-table tr:hover td { background:#f7faf9; }
-.data-table .actions { display:flex; gap:8px; }
-
-.gallery-item-row { display:flex; align-items:center; gap:16px; padding:14px; border:1px solid var(--border); margin-bottom:10px; background:var(--card); transition:box-shadow .2s; }
-.gallery-item-row:hover { box-shadow:3px 3px 0 var(--teal); }
-.gallery-thumb { width:70px; height:55px; object-fit:cover; border:1px solid var(--border); flex-shrink:0; background:#eee; border-radius:2px; }
-.gallery-thumb-placeholder { width:70px; height:55px; background:#e8efec; border:1px dashed var(--border); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:#ccc; }
-.gallery-item-info { flex:1; }
-.gallery-item-info strong { display:block; font-family:'Oswald',sans-serif; font-size:1rem; color:var(--army); }
-.gallery-item-info small { font-family:'Roboto Mono',monospace; font-size:.7rem; color:var(--muted); }
-.gallery-item-actions { display:flex; gap:8px; }
-
-.file-tag { display:inline-flex; align-items:center; gap:6px; background:#f0f7f5; border:1px solid var(--border); padding:4px 10px; font-size:.78rem; font-family:'Roboto Mono',monospace; margin:3px; color:var(--teal); border-radius:2px; }
-.file-tag button { background:none; border:none; cursor:pointer; color:var(--danger); font-size:.9rem; line-height:1; }
-
-.officer-admin-card { display:flex; align-items:center; gap:20px; padding:18px; border:1px solid var(--border); margin-bottom:12px; background:var(--card); transition:box-shadow .2s; }
-.officer-admin-card:hover { box-shadow:3px 3px 0 var(--teal); }
-.officer-admin-photo { width:64px; height:64px; object-fit:cover; border:2px solid var(--border); border-radius:2px; flex-shrink:0; background:#eee; }
-.officer-admin-info { flex:1; }
-.officer-admin-info strong { font-family:'Oswald',sans-serif; font-size:1rem; }
-.officer-admin-info small { font-family:'Roboto Mono',monospace; font-size:.7rem; color:var(--muted); display:block; margin-top:2px; }
-.rank-badge-sm { font-family:'Roboto Mono',monospace; font-size:.65rem; background:var(--army); color:#fff; padding:3px 8px; letter-spacing:1px; margin-left:8px; }
-
-.json-output { background:#1a1a2e; color:#00e5cc; font-family:'Roboto Mono',monospace; font-size:.78rem; padding:16px; overflow-x:auto; white-space:pre; border:1px solid #333; max-height:200px; overflow-y:auto; border-radius:2px; margin-top:12px; }
-
-.stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:28px; }
-.stat-box { background:var(--card); border:1px solid var(--border); padding:20px; border-left:4px solid var(--accent); box-shadow:3px 3px 0 var(--army); }
-.stat-box .val { font-family:'Oswald',sans-serif; font-size:2rem; color:var(--teal); }
-.stat-box .lbl { font-family:'Roboto Mono',monospace; font-size:.68rem; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-top:4px; }
-
-.img-preview-wrap { margin-top:10px; }
-.img-preview { max-width:180px; max-height:120px; border:2px solid var(--border); display:block; border-radius:2px; }
-
-.notice-item { padding:14px; border:1px solid var(--border); margin-bottom:10px; background:var(--card); display:flex; align-items:flex-start; gap:14px; }
-.notice-pin { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:4px; }
-.notice-pin.high { background:var(--danger); }
-.notice-pin.med  { background:var(--warn); }
-.notice-pin.low  { background:var(--ok); }
-.notice-item-body { flex:1; }
-.notice-item-body strong { font-family:'Oswald',sans-serif; font-size:1rem; }
-.notice-item-body small { font-family:'Roboto Mono',monospace; font-size:.7rem; color:var(--muted); display:block; margin-top:2px; }
-.notice-item-body p { font-size:.85rem; margin-top:6px; color:#555; }
-
-.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:8000; display:none; align-items:center; justify-content:center; }
-.modal-overlay.open { display:flex; }
-.modal-box { background:var(--card); border-top:4px solid var(--accent); width:560px; max-width:95vw; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.5); padding:32px; position:relative; }
-.modal-close { position:absolute; top:14px; right:16px; background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--muted); }
-.modal-close:hover { color:var(--danger); }
-.modal-title { font-family:'Oswald',sans-serif; font-size:1.3rem; letter-spacing:3px; color:var(--teal); margin-bottom:20px; }
-
-::-webkit-scrollbar { width:6px; height:6px; }
-::-webkit-scrollbar-thumb { background:var(--accent); border-radius:3px; }
-::-webkit-scrollbar-track { background:transparent; }
+    :root { --teal: #004d40; --army: #2d3436; --accent: #00bfa5; --bg: #f0f2f5; --card: #ffffff; --border: #d0ddd8; }
+    body { font-family: 'Roboto', sans-serif; background: var(--bg); margin: 0; }
+    #login-screen { position: fixed; inset: 0; background: #0d1117; display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    #login-screen.out { display: none; }
+    .login-box { background: white; padding: 40px; border-top: 5px solid var(--accent); width: 350px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    #app { display: none; min-height: 100vh; flex-direction: row; }
+    #app.visible { display: flex; }
+    .sidebar { width: 250px; background: var(--army); color: white; padding: 20px; }
+    .main-area { flex: 1; padding: 30px; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .card { background: white; padding: 25px; border: 1px solid var(--border); margin-bottom: 20px; box-shadow: 4px 4px 0 var(--army); }
+    input, textarea, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; }
+    .btn { padding: 10px 20px; cursor: pointer; border: none; background: var(--teal); color: white; font-family: 'Oswald'; }
+    #toast { position: fixed; bottom: 20px; right: 20px; background: var(--army); color: white; padding: 15px; border-left: 5px solid var(--accent); display: none; z-index: 10000; }
 </style>
 </head>
 <body>
 
-<!-- ═══════════════ LOGIN SCREEN ═══════════════ -->
 <div id="login-screen">
-  <div class="login-orb login-orb-1"></div>
-  <div class="login-orb login-orb-2"></div>
-  <div class="login-orb login-orb-3"></div>
-  <div class="login-logo-above">
-    <div class="login-logo-img-wrap">
-      <img class="login-logo-img" src="LOGO_SOCIAL MEDIA.png" onerror="this.style.display='none'" alt="NCC NITAR Logo">
+    <div class="login-box">
+        <h2 style="font-family:'Oswald';">ADMIN ACCESS</h2>
+        <input type="text" id="inp-id" placeholder="Admin ID">
+        <input type="password" id="inp-pwd" placeholder="Password">
+        <button class="btn" onclick="doLogin()">AUTHENTICATE</button>
+        <p id="login-err" style="color:red; font-size:0.8rem;"></p>
     </div>
-  </div>
-  <div class="login-box">
-    <div class="login-badge">ADMIN ONLY</div>
-    <div class="login-logo">
-      <h1>NCC · NITAR</h1>
-      <div class="login-separator"></div>
-      <p>// COMMAND CENTRE ACCESS</p>
-    </div>
-    <div class="field-group">
-      <label>Admin ID</label>
-      <input type="text" id="inp-id" placeholder="Enter your admin ID" autocomplete="username">
-    </div>
-    <div class="field-group">
-      <label>Password</label>
-      <input type="password" id="inp-pwd" placeholder="••••••••" autocomplete="current-password"
-             onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <button class="btn-login" onclick="doLogin()">AUTHENTICATE →</button>
-    <div id="login-err"></div>
-  </div>
 </div>
 
-<!-- ═══════════════ APP SHELL ═══════════════ -->
 <div id="app">
+    <aside class="sidebar">
+        <h3 style="color:var(--accent);">COMMANDER</h3>
+        <p onclick="gotoPanel('dashboard')" style="cursor:pointer;">📊 Dashboard</p>
+        <p onclick="gotoPanel('notices')" style="cursor:pointer;">📋 Notices</p>
+        <p onclick="gotoPanel('rank')" style="cursor:pointer;">🏅 Rank Panel</p>
+        <p onclick="gotoPanel('gallery')" style="cursor:pointer;">🖼 Gallery</p>
+        <p onclick="gotoPanel('officers')" style="cursor:pointer;">🪖 Officers</p>
+        <br>
+        <button class="btn" onclick="location.reload()" style="background:#c0392b; width:100%;">LOGOUT</button>
+    </aside>
 
-  <aside class="sidebar">
-    <div class="sidebar-head">
-      <h2>Admin Panel</h2>
-      <p>// NCC NITAR Command</p>
-    </div>
-    <div class="nav-section">
-      <div class="nav-section-label">Overview</div>
-      <div class="nav-item active" onclick="gotoPanel('dashboard',this)"><span class="nav-icon">📊</span> Dashboard</div>
-    </div>
-    <div class="nav-section">
-      <div class="nav-section-label">Content</div>
-      <div class="nav-item" onclick="gotoPanel('gallery',this)"><span class="nav-icon">🖼️</span> Gallery Manager</div>
-      <div class="nav-item" onclick="gotoPanel('officers',this)"><span class="nav-icon">🪖</span> Officer's Desk</div>
-      <div class="nav-item" onclick="gotoPanel('rank',this)"><span class="nav-icon">🏅</span> Rank Panel</div>
-      <div class="nav-item" onclick="gotoPanel('notices',this)"><span class="nav-icon">📋</span> Notices</div>
-      <div class="nav-item" onclick="gotoPanel('resources',this)"><span class="nav-icon">📁</span> Resources</div>
-    </div>
-    <div class="nav-section">
-      <div class="nav-section-label">System</div>
-      <div class="nav-item" onclick="gotoPanel('export',this)"><span class="nav-icon">💾</span> Export Data</div>
-      <div class="nav-item" onclick="gotoPanel('settings',this)"><span class="nav-icon">⚙️</span> Settings</div>
-    </div>
-    <div class="sidebar-foot">
-      <div style="font-family:'Roboto Mono',monospace;font-size:.65rem;color:#4a5568;margin-bottom:10px;" id="sidebar-user">—</div>
-      <button class="btn-logout" onclick="doLogout()">⬡ LOGOUT</button>
-    </div>
-  </aside>
-
-  <div class="main-area">
-    <div class="topbar">
-      <div>
-        <div class="topbar-title">NCC NITAR — ADMIN</div>
-        <div class="topbar-breadcrumb" id="topbar-bc">// dashboard</div>
-      </div>
-      <div class="topbar-right">
-        <!-- PREVIEW SITE BUTTON -->
-        <a href="index.html" target="_blank" class="btn-preview">
-          <span class="preview-dot"></span> Preview Site
-        </a>
-        <span class="topbar-time" id="topbar-time">—</span>
-      </div>
-    </div>
-
-    <div class="content">
-
-      <!-- ══ DASHBOARD ══ -->
-      <div id="panel-dashboard" class="panel active">
-        <div class="sec-header">
-          <h2>Dashboard</h2>
-          <p>// Overview of all site data</p>
+    <main class="main-area">
+        <div id="panel-dashboard" class="panel active">
+            <h2 style="font-family:'Oswald';">DASHBOARD</h2>
+            <div id="stats-grid" style="display:flex; gap:20px;"></div>
         </div>
 
-        <!-- LIVE SYNC STATUS CARD -->
-        <div class="sync-card">
-          <div class="sync-icon">⚡</div>
-          <div class="sync-info">
-            <div class="sync-title">Live Sync Active</div>
-            <div class="sync-desc">
-              All changes you make here are instantly available on the main portal (<code>index.html</code>) 
-              when both are open in the same browser. No export needed for same-device preview.
+        <div id="panel-notices" class="panel">
+            <div class="card">
+                <h3>+ Post Notice</h3>
+                <input type="text" id="not-title" placeholder="Notice Title">
+                <textarea id="not-body" placeholder="Notice Content"></textarea>
+                <input type="text" id="not-by" placeholder="Posted By (e.g. SUO)">
+                <button class="btn" onclick="addNotice()">BROADCAST GLOBALLY</button>
             </div>
-            <div class="sync-status-row">
-              <span class="sync-pill"><span class="sync-pill-dot"></span> localStorage bridge</span>
-              <span class="sync-pill" id="sync-last-update">Last update: never</span>
-              <span class="sync-pill" id="sync-entry-count">0 total entries</span>
+            <div id="notices-list"></div>
+        </div>
+
+        <div id="panel-rank" class="panel">
+            <div class="card">
+                <h3>+ Add Cadet</h3>
+                <input type="text" id="rank-rank" placeholder="Rank (e.g. SUO)">
+                <input type="text" id="rank-name" placeholder="Full Name">
+                <input type="text" id="rank-branch" placeholder="Branch">
+                <button class="btn" onclick="addRankEntry()">ADD TO PANEL</button>
             </div>
-          </div>
+            <table style="width:100%; background:white; border-collapse:collapse;" border="1"><tbody id="rank-tbody"></tbody></table>
         </div>
 
-        <div class="stat-grid" id="stats-grid"></div>
-
-        <div class="card">
-          <div class="card-title">⚡ Quick Actions</div>
-          <div style="display:flex;flex-wrap:wrap;gap:12px;">
-            <button class="btn btn-primary" onclick="gotoPanel('gallery',null)">+ Add Gallery Event</button>
-            <button class="btn btn-primary" onclick="gotoPanel('notices',null)">+ Post Notice</button>
-            <button class="btn btn-primary" onclick="gotoPanel('rank',null)">+ Update Rank Panel</button>
-            <button class="btn btn-warn"    onclick="gotoPanel('export',null)">↓ Export All Data</button>
-            <a href="index.html" target="_blank" class="btn btn-ok" style="text-decoration:none;">👁 View Live Site</a>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">📢 Recent Notices</div>
-          <div id="dash-notices"></div>
-        </div>
-      </div>
-
-      <!-- ══ GALLERY MANAGER ══ -->
-      <div id="panel-gallery" class="panel">
-        <div class="sec-header">
-          <h2>Gallery Manager</h2>
-          <p>// Type your folder name — files are fetched live from your GitHub Pages repo</p>
-        </div>
-        <div class="card">
-          <div class="card-title">+ Add New Gallery Event</div>
-          <div style="background:#f7faf9;border:1px solid var(--border);padding:16px 20px;margin-bottom:20px;border-left:4px solid var(--accent);">
-            <div style="font-family:'Roboto Mono',monospace;font-size:.68rem;letter-spacing:2px;color:var(--teal);margin-bottom:10px;">STEP 1 — ENTER FOLDER NAME & FETCH</div>
-            <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
-              <div class="form-group" style="flex:1;min-width:220px;">
-                <label>Folder Name (exact, as it appears on GitHub)</label>
-                <input type="text" id="gal-folder" placeholder="e.g. REPUBLIC DAY" oninput="onFolderInput()">
-                <small style="font-family:'Roboto Mono',monospace;font-size:.65rem;color:var(--muted);margin-top:4px;">Spaces are fine — use the exact folder name from your repo</small>
-              </div>
-              <button class="btn btn-primary" onclick="fetchFolderIndex()" id="btn-fetch" style="white-space:nowrap;height:42px;">🔍 FETCH index.json</button>
+        <div id="panel-gallery" class="panel">
+            <div class="card">
+                <h3>+ Add Gallery Event</h3>
+                <input type="text" id="gal-folder" placeholder="Folder Name (exact)">
+                <button class="btn" style="background:var(--accent);" onclick="fetchFolderIndex()">1. FETCH FILES</button>
+                <input type="hidden" id="gal-files-hidden">
+                <input type="text" id="gal-title" placeholder="Event Title">
+                <input type="text" id="gal-thumb" placeholder="Thumbnail Path (e.g. photo.jpg)">
+                <button class="btn" onclick="addGalleryItem()">2. ADD EVENT</button>
             </div>
-            <div id="fetch-status" style="margin-top:12px;display:none;">
-              <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--border);background:white;">
-                <span id="fetch-icon" style="font-size:1.2rem;">⏳</span>
-                <div>
-                  <div id="fetch-msg" style="font-family:'Roboto Mono',monospace;font-size:.78rem;font-weight:500;"></div>
-                  <div id="fetch-url" style="font-family:'Roboto Mono',monospace;font-size:.65rem;color:var(--muted);margin-top:2px;word-break:break-all;"></div>
-                </div>
-              </div>
-              <div id="fetch-file-list" style="margin-top:10px;display:none;">
-                <div style="font-family:'Roboto Mono',monospace;font-size:.65rem;letter-spacing:2px;color:var(--muted);margin-bottom:6px;">FILES FOUND IN index.json:</div>
-                <div id="fetch-tags" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
-              </div>
+            <div id="gallery-list"></div>
+        </div>
+        
+        <div id="panel-officers" class="panel">
+            <div class="card">
+                <h3>+ Add Officer</h3>
+                <input type="text" id="off-name" placeholder="Full Name">
+                <input type="text" id="off-role" placeholder="Role (CO/AO/ANO)">
+                <input type="text" id="off-designation" placeholder="Full Designation">
+                <input type="text" id="off-photo" placeholder="Photo Path">
+                <textarea id="off-bio" placeholder="Biography"></textarea>
+                <button class="btn" onclick="addOfficer()">SAVE OFFICER</button>
             </div>
-          </div>
-
-          <div style="font-family:'Roboto Mono',monospace;font-size:.68rem;letter-spacing:2px;color:var(--teal);margin-bottom:10px;">STEP 2 — FILL IN CARD DETAILS</div>
-          <div class="form-row">
-            <div class="form-group"><label>Event Title</label><input type="text" id="gal-title" placeholder="e.g. Republic Day 2026"></div>
-            <div class="form-group"><label>Card Display Label</label><input type="text" id="gal-label" placeholder="e.g. NIT AR CELEBRATES REPUBLIC DAY 2026"></div>
-          </div>
-          <div class="form-row full">
-            <div class="form-group"><label>Description / Caption</label><textarea id="gal-desc" placeholder="Brief description…"></textarea></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Thumbnail Image Path</label>
-              <input type="text" id="gal-thumb" placeholder="e.g. REPUBLIC DAY.png" oninput="previewThumb()">
-              <div class="img-preview-wrap" id="gal-thumb-preview"></div>
-            </div>
-            <div class="form-group" style="justify-content:center;">
-              <label>&nbsp;</label>
-              <div id="folder-summary" style="padding:14px;background:#f0f7f5;border:1px dashed var(--accent);font-family:'Roboto Mono',monospace;font-size:.78rem;line-height:1.8;color:#444;display:none;"></div>
-            </div>
-          </div>
-          <input type="hidden" id="gal-files-hidden">
-          <button class="btn btn-primary" onclick="addGalleryItem()" style="margin-top:4px;">⊕ ADD TO GALLERY</button>
-          <span id="gal-add-warn" style="font-family:'Roboto Mono',monospace;font-size:.72rem;color:var(--danger);margin-left:14px;"></span>
+            <div id="officers-list"></div>
         </div>
-        <div class="card">
-          <div class="card-title">📂 Gallery Events</div>
-          <div id="gallery-list"></div>
-        </div>
-      </div>
-
-      <!-- ══ OFFICERS ══ -->
-      <div id="panel-officers" class="panel">
-        <div class="sec-header"><h2>Officer's Desk</h2><p>// Edit officer profiles and photos</p></div>
-        <div class="card">
-          <div class="card-title">+ Add / Edit Officer</div>
-          <div class="form-row three">
-            <div class="form-group">
-              <label>Role Badge</label>
-              <select id="off-role">
-                <option value="CO">CO — Commanding Officer</option>
-                <option value="AO">AO — Administrative Officer</option>
-                <option value="ANO-SD">ANO — Senior Division (SD)</option>
-                <option value="ANO-SW">ANO — Senior Wing (SW)</option>
-              </select>
-            </div>
-            <div class="form-group"><label>Full Rank + Name</label><input type="text" id="off-name" placeholder="e.g. Capt. Dr. Achyut Sarkar"></div>
-            <div class="form-group"><label>Designation Label</label><input type="text" id="off-designation" placeholder="e.g. ASSOCIATE NCC OFFICER — SENIOR DIVISION (SD)"></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Photo File Path</label>
-              <input type="text" id="off-photo" placeholder="e.g. PHOTOS_OFFICIAL/PHOTO_CO_SIR.png" oninput="previewOfficerPhoto()">
-              <div id="off-photo-preview" class="img-preview-wrap"></div>
-            </div>
-            <div class="form-group"><label>Biography / Quote</label><textarea id="off-bio" placeholder="Officer's biography or motivational quote…"></textarea></div>
-          </div>
-          <button class="btn btn-primary" onclick="addOfficer()">⊕ SAVE OFFICER</button>
-        </div>
-        <div class="card">
-          <div class="card-title">🪖 Current Officers</div>
-          <div id="officers-list"></div>
-        </div>
-      </div>
-
-      <!-- ══ RANK PANEL ══ -->
-      <div id="panel-rank" class="panel">
-        <div class="sec-header"><h2>Rank Panel</h2><p>// Manage the Unit Command Panel cadets</p></div>
-        <div class="card">
-          <div class="card-title">+ Add Cadet</div>
-          <div class="form-row three">
-            <div class="form-group">
-              <label>Rank / Position</label>
-              <select id="rank-rank">
-                <option>SENIOR UNDER OFFICER (SUO)</option>
-                <option>UNDER OFFICER (UO)</option>
-                <option>SERGEANT</option>
-                <option>CORPORAL</option>
-                <option>LANCE CORPORAL</option>
-                <option>CADET</option>
-              </select>
-            </div>
-            <div class="form-group"><label>Full Name</label><input type="text" id="rank-name" placeholder="e.g. ABHIJEET KUMAR"></div>
-            <div class="form-group"><label>Branch / Department</label><input type="text" id="rank-branch" placeholder="e.g. COMPUTER SCIENCE & ENGINEERING"></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>Batch / Year (optional)</label><input type="text" id="rank-batch" placeholder="e.g. 2022–2026"></div>
-            <div class="form-group"><label>Roll Number (optional)</label><input type="text" id="rank-roll" placeholder="e.g. 2201001"></div>
-          </div>
-          <button class="btn btn-primary" onclick="addRankEntry()">⊕ ADD CADET</button>
-        </div>
-        <div class="card">
-          <div class="card-title">🏅 Current Rank Panel</div>
-          <table class="data-table">
-            <thead><tr><th>Rank</th><th>Name</th><th>Branch</th><th>Batch</th><th>Actions</th></tr></thead>
-            <tbody id="rank-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- ══ NOTICES ══ -->
-      <div id="panel-notices" class="panel">
-        <div class="sec-header"><h2>Notices</h2><p>// Post and manage unit notices & announcements</p></div>
-        <div class="card">
-          <div class="card-title">+ Post New Notice</div>
-          <div class="form-row">
-            <div class="form-group"><label>Notice Title</label><input type="text" id="not-title" placeholder="e.g. Annual Training Camp Registration Open"></div>
-            <div class="form-group">
-              <label>Priority</label>
-              <select id="not-priority">
-                <option value="high">🔴 High — Urgent</option>
-                <option value="med" selected>🟡 Medium — Important</option>
-                <option value="low">🟢 Low — General</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row full">
-            <div class="form-group"><label>Notice Body</label><textarea id="not-body" placeholder="Full notice text…" style="min-height:120px;"></textarea></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>Posted By</label><input type="text" id="not-by" placeholder="e.g. ANO Office / SUO"></div>
-            <div class="form-group"><label>Expiry Date (optional)</label><input type="date" id="not-expiry"></div>
-          </div>
-          <div class="form-row full">
-            <div class="form-group">
-              <label>Attachment File URL (optional)</label>
-              <input type="text" id="not-fileurl" placeholder="e.g. RESOURCES/notice_circular.pdf">
-            </div>
-          </div>
-          <button class="btn btn-primary" onclick="addNotice()">⊕ POST NOTICE</button>
-        </div>
-        <div class="card">
-          <div class="card-title">📋 Active Notices</div>
-          <div id="notices-list"></div>
-        </div>
-      </div>
-
-      <!-- ══ RESOURCES ══ -->
-      <div id="panel-resources" class="panel">
-        <div class="sec-header"><h2>Resources</h2><p>// Manage downloadable files</p></div>
-        <div class="card">
-          <div class="card-title">+ Add New Resource</div>
-          <div style="background:#fff8e1;border:1px solid #ffe082;padding:12px 16px;margin-bottom:16px;border-left:4px solid var(--warn);font-family:'Roboto Mono',monospace;font-size:.7rem;color:#555;line-height:1.7;">
-            ⚠ Upload your file to GitHub repo first, then paste the relative path below.
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>Resource Title</label><input type="text" id="res-title" placeholder="e.g. NCC Training Schedule 2026"></div>
-            <div class="form-group">
-              <label>Category</label>
-              <select id="res-category">
-                <option value="General">General</option>
-                <option value="Circular">Circular</option>
-                <option value="Form">Form</option>
-                <option value="Schedule">Schedule</option>
-                <option value="Result">Result</option>
-                <option value="Study Material">Study Material</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row full">
-            <div class="form-group"><label>Description (optional)</label><textarea id="res-desc" placeholder="Brief description…" style="min-height:70px;"></textarea></div>
-          </div>
-          <div class="form-row full">
-            <div class="form-group"><label>File Path</label><input type="text" id="res-fileurl" placeholder="e.g. RESOURCES/training_schedule.pdf"></div>
-          </div>
-          <button class="btn btn-primary" onclick="addResource()">⊕ ADD RESOURCE</button>
-        </div>
-        <div class="card">
-          <div class="card-title">📁 All Resources</div>
-          <div id="resources-list"></div>
-        </div>
-      </div>
-
-      <!-- ══ EXPORT ══ -->
-      <div id="panel-export" class="panel">
-        <div class="sec-header"><h2>Export Data</h2><p>// Download all site data as JSON files</p></div>
-
-        <!-- Export info with sync note -->
-        <div class="card" style="border-left:4px solid var(--accent);">
-          <div class="card-title">ℹ How Data Sync Works</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:.88rem;line-height:1.7;color:#555;">
-            <div>
-              <strong style="font-family:'Oswald',sans-serif;color:var(--teal);letter-spacing:1px;">⚡ SAME BROWSER (Instant)</strong><br>
-              When <code>index.html</code> and <code>admin.html</code> are open in the same browser, 
-              data flows instantly via <strong>localStorage</strong>. No download needed.
-            </div>
-            <div>
-              <strong style="font-family:'Oswald',sans-serif;color:var(--teal);letter-spacing:1px;">🌐 GITHUB PAGES (For deployment)</strong><br>
-              Download the JSON files below and commit them to your repo. 
-              The main portal reads localStorage first, then falls back to these JSON files.
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">Gallery Events — gallery.json</div>
-          <div class="json-output" id="exp-gallery"></div>
-          <button class="btn btn-ok" style="margin-top:12px;" onclick="downloadJSON('gallery')">↓ Download gallery.json</button>
-        </div>
-        <div class="card">
-          <div class="card-title">Officers — officers.json</div>
-          <div class="json-output" id="exp-officers"></div>
-          <button class="btn btn-ok" style="margin-top:12px;" onclick="downloadJSON('officers')">↓ Download officers.json</button>
-        </div>
-        <div class="card">
-          <div class="card-title">Rank Panel — rank.json</div>
-          <div class="json-output" id="exp-rank"></div>
-          <button class="btn btn-ok" style="margin-top:12px;" onclick="downloadJSON('rank')">↓ Download rank.json</button>
-        </div>
-        <div class="card">
-          <div class="card-title">Notices — notices.json</div>
-          <div class="json-output" id="exp-notices"></div>
-          <button class="btn btn-ok" style="margin-top:12px;" onclick="downloadJSON('notices')">↓ Download notices.json</button>
-        </div>
-        <div class="card">
-          <div class="card-title">Resources — resources.json</div>
-          <div class="json-output" id="exp-resources"></div>
-          <button class="btn btn-ok" style="margin-top:12px;" onclick="downloadJSON('resources')">↓ Download resources.json</button>
-        </div>
-        <div class="card">
-          <div class="card-title">📁 Gallery index.json Files</div>
-          <p style="font-size:.85rem;margin-bottom:16px;color:#555;">Download a separate <code>index.json</code> for each gallery event folder.</p>
-          <div id="exp-gallery-jsons"></div>
-        </div>
-      </div>
-
-      <!-- ══ SETTINGS ══ -->
-      <div id="panel-settings" class="panel">
-        <div class="sec-header"><h2>Settings</h2><p>// System & account configuration</p></div>
-        <div class="card">
-          <div class="card-title">🔐 Change Admin Credentials</div>
-          <div class="form-row">
-            <div class="form-group"><label>Current Password</label><input type="password" id="set-cur-pwd" placeholder="••••••••"></div>
-            <div class="form-group"><label>New Admin ID</label><input type="text" id="set-new-id" placeholder="New username"></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>New Password</label><input type="password" id="set-new-pwd" placeholder="••••••••"></div>
-            <div class="form-group"><label>Confirm New Password</label><input type="password" id="set-conf-pwd" placeholder="••••••••"></div>
-          </div>
-          <button class="btn btn-primary" onclick="changeCredentials()">🔒 Update Credentials</button>
-        </div>
-        <div class="card">
-          <div class="card-title">🗑️ Data Management</div>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;">
-            <button class="btn btn-danger" onclick="clearSection('gallery')">Clear Gallery Data</button>
-            <button class="btn btn-danger" onclick="clearSection('officers')">Clear Officers Data</button>
-            <button class="btn btn-danger" onclick="clearSection('rank')">Clear Rank Data</button>
-            <button class="btn btn-danger" onclick="clearSection('notices')">Clear Notices</button>
-            <button class="btn btn-danger" onclick="clearSection('resources')">Clear Resources</button>
-          </div>
-          <p style="font-size:.78rem;font-family:'Roboto Mono',monospace;color:var(--danger);margin-top:14px;">⚠ This cannot be undone. Export your data first.</p>
-        </div>
-        <div class="card">
-          <div class="card-title">ℹ System Info</div>
-          <table class="data-table">
-            <tr><td style="width:40%;font-family:'Roboto Mono',monospace;font-size:.8rem;">Storage Used</td><td id="sys-storage">—</td></tr>
-            <tr><td style="font-family:'Roboto Mono',monospace;font-size:.8rem;">Last Modified</td><td id="sys-lastmod">—</td></tr>
-            <tr><td style="font-family:'Roboto Mono',monospace;font-size:.8rem;">Admin ID</td><td id="sys-adminid">—</td></tr>
-            <tr><td style="font-family:'Roboto Mono',monospace;font-size:.8rem;">Portal Version</td><td>v1.1 — NCC NITAR 2026 (Live Sync)</td></tr>
-          </table>
-        </div>
-      </div>
-
-    </div>
-  </div>
+    </main>
 </div>
 
 <div id="toast"></div>
 
-<!-- Gallery Edit Modal -->
-<div class="modal-overlay" id="modal-gal">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-gal')">✕</button>
-    <div class="modal-title">EDIT GALLERY EVENT</div>
-    <input type="hidden" id="edit-gal-idx">
-    <div class="form-group" style="margin-bottom:12px;"><label>Event Title</label><input type="text" id="edit-gal-title"></div>
-    <div class="form-group" style="margin-bottom:12px;"><label>Folder Name</label><input type="text" id="edit-gal-folder"></div>
-    <div style="margin-bottom:12px;">
-      <button class="btn btn-ok btn-sm" onclick="refetchEditModal()">↻ Re-fetch files from this folder</button>
-      <div id="edit-fetch-status" style="font-family:'Roboto Mono',monospace;font-size:.72rem;margin-top:8px;color:var(--muted);"></div>
-      <div id="edit-fetch-tags" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;"></div>
-    </div>
-    <div class="form-group" style="margin-bottom:12px;"><label>Description</label><textarea id="edit-gal-desc"></textarea></div>
-    <div class="form-group" style="margin-bottom:12px;"><label>Thumbnail Path</label><input type="text" id="edit-gal-thumb"></div>
-    <div class="form-group" style="margin-bottom:12px;"><label>Card Label</label><input type="text" id="edit-gal-label"></div>
-    <div class="form-group" style="margin-bottom:16px;"><label>Media Files (one per line)</label><textarea id="edit-gal-files" style="min-height:100px;"></textarea></div>
-    <button class="btn btn-primary" onclick="saveGalleryEdit()">💾 SAVE CHANGES</button>
-  </div>
-</div>
-
-<!-- Officer Edit Modal -->
-<div class="modal-overlay" id="modal-off">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-off')">✕</button>
-    <div class="modal-title">EDIT OFFICER</div>
-    <input type="hidden" id="edit-off-idx">
-    <div class="form-group" style="margin-bottom:12px;">
-      <label>Role Badge</label>
-      <select id="edit-off-role"><option value="CO">CO</option><option value="AO">AO</option><option value="ANO-SD">ANO-SD</option><option value="ANO-SW">ANO-SW</option></select>
-    </div>
-    <div class="form-group" style="margin-bottom:12px;"><label>Full Name</label><input type="text" id="edit-off-name"></div>
-    <div class="form-group" style="margin-bottom:12px;"><label>Designation</label><input type="text" id="edit-off-designation"></div>
-    <div class="form-group" style="margin-bottom:12px;"><label>Photo Path</label><input type="text" id="edit-off-photo"></div>
-    <div class="form-group" style="margin-bottom:16px;"><label>Biography</label><textarea id="edit-off-bio"></textarea></div>
-    <button class="btn btn-primary" onclick="saveOfficerEdit()">💾 SAVE CHANGES</button>
-  </div>
-</div>
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-  import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBCLCGsYWA-PUhWvgW45cb-X9G1CjrtAcs",
-    authDomain: "ncc-nit-ap.firebaseapp.com",
-    projectId: "ncc-nit-ap",
-    storageBucket: "ncc-nit-ap.firebasestorage.app",
-    databaseURL: "https://ncc-nit-ap-default-rtdb.asia-southeast1.firebasedatabase.app/",
-    messagingSenderId: "311443142169",
-    appId: "1:311443142169:web:b274a34fb95fedd6465c88"
-  };
+    const firebaseConfig = {
+        apiKey: "AIzaSyBCLCGsYWA-PUhWvgW45cb-X9G1CjrtAcs",
+        authDomain: "ncc-nit-ap.firebaseapp.com",
+        projectId: "ncc-nit-ap",
+        databaseURL: "https://ncc-nit-ap-default-rtdb.asia-southeast1.firebasedatabase.app/",
+        appId: "1:311443142169:web:b274a34fb95fedd6465c88"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-  /* ═══════════════ GLOBAL DATA SAVING ═══════════════ */
-  window.save = async function(key, data) {
-    try {
-      await set(ref(db, 'ncc_unit/' + key), data);
-      localStorage.setItem('ncc_lastmod', new Date().toISOString());
-      toast(`Cloud Updated: ${key} is now global! ✓`);
-      renderAll(); 
-    } catch (e) {
-      toast("Sync Error: " + e.message, true);
+    window.save = async (key, data) => {
+        try {
+            await set(ref(db, 'ncc_unit/' + key), data);
+            toast(`Cloud Updated: ${key} ✓`);
+        } catch (e) { toast("Error: " + e.message, true); }
+    };
+
+    onValue(ref(db, 'ncc_unit'), (snapshot) => {
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            localStorage.setItem('ncc_gallery', JSON.stringify(data.gallery || []));
+            localStorage.setItem('ncc_officers', JSON.stringify(data.officers || []));
+            localStorage.setItem('ncc_rank', JSON.stringify(data.rank || []));
+            localStorage.setItem('ncc_notices', JSON.stringify(data.notices || []));
+            renderAll();
+        }
+    });
+
+    window.doLogin = function() {
+        const id = document.getElementById('inp-id').value, pwd = document.getElementById('inp-pwd').value;
+        if(id === 'nccaradmin' && pwd === 'NITAR@NCC2026') {
+            document.getElementById('login-screen').classList.add('out');
+            document.getElementById('app').classList.add('visible');
+            renderAll();
+        } else { document.getElementById('login-err').textContent = "✕ Invalid Credentials"; }
+    };
+
+    window.gotoPanel = function(name) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('panel-' + name).classList.add('active');
+    };
+
+    window.addNotice = function() {
+        const data = JSON.parse(localStorage.getItem('ncc_notices') || '[]');
+        data.push({ title: v('not-title'), body: v('not-body'), by: v('not-by'), created: new Date().toISOString() });
+        save('notices', data);
+    };
+
+    window.addRankEntry = function() {
+        const data = JSON.parse(localStorage.getItem('ncc_rank') || '[]');
+        data.push({ rank: v('rank-rank'), name: v('rank-name'), branch: v('rank-branch') });
+        save('rank', data);
+    };
+
+    window.addOfficer = function() {
+        const data = JSON.parse(localStorage.getItem('ncc_officers') || '[]');
+        data.push({ name: v('off-name'), role: v('off-role'), designation: v('off-designation'), photo: v('off-photo'), bio: v('off-bio') });
+        save('officers', data);
+    };
+
+    window.fetchFolderIndex = async function() {
+        const folder = v('gal-folder');
+        const url = `https://akhand-jaihind.github.io/ncc-nit-ap/${encodeURIComponent(folder)}/index.json`;
+        try {
+            const r = await fetch(url);
+            const files = await r.json();
+            document.getElementById('gal-files-hidden').value = JSON.stringify(files);
+            toast("Fetched " + files.length + " files!");
+        } catch(e) { toast("Error: Check if index.json exists on GitHub", true); }
+    };
+
+    window.addGalleryItem = function() {
+        const data = JSON.parse(localStorage.getItem('ncc_gallery') || '[]');
+        data.push({ title: v('gal-title'), folder: v('gal-folder'), thumb: v('gal-thumb'), files: JSON.parse(document.getElementById('gal-files-hidden').value || '[]') });
+        save('gallery', data);
+    };
+
+    window.deleteItem = function(key, idx) {
+        if(!confirm('Delete?')) return;
+        const data = JSON.parse(localStorage.getItem('ncc_' + key) || '[]');
+        data.splice(idx, 1);
+        save(key, data);
+    };
+
+    function renderAll() {
+        const n = JSON.parse(localStorage.getItem('ncc_notices') || '[]');
+        const r = JSON.parse(localStorage.getItem('ncc_rank') || '[]');
+        const o = JSON.parse(localStorage.getItem('ncc_officers') || '[]');
+        const g = JSON.parse(localStorage.getItem('ncc_gallery') || '[]');
+        
+        document.getElementById('stats-grid').innerHTML = `<div class="card"><b>${n.length}</b><br>Notices</div><div class="card"><b>${r.length}</b><br>Cadets</div>`;
+        document.getElementById('notices-list').innerHTML = n.map((x, i) => `<div class="card">${x.title} <button onclick="deleteItem('notices',${i})">✕</button></div>`).join('');
+        document.getElementById('rank-tbody').innerHTML = r.map((x, i) => `<tr><td>${x.name}</td><td><button onclick="deleteItem('rank',${i})">✕</button></td></tr>`).join('');
+        document.getElementById('officers-list').innerHTML = o.map((x, i) => `<div class="card">${x.name} <button onclick="deleteItem('officers',${i})">✕</button></div>`).join('');
+        document.getElementById('gallery-list').innerHTML = g.map((x, i) => `<div class="card">${x.title} <button onclick="deleteItem('gallery',${i})">✕</button></div>`).join('');
     }
-  };
 
-  /* ═══════════════ LIVE SYNC ═══════════════ */
-  onValue(ref(db, 'ncc_unit'), (snapshot) => {
-    if (snapshot.exists()) {
-      const cloudData = snapshot.val();
-      // Keep local storage synced so existing code works
-      localStorage.setItem('ncc_gallery', JSON.stringify(cloudData.gallery || []));
-      localStorage.setItem('ncc_officers', JSON.stringify(cloudData.officers || []));
-      localStorage.setItem('ncc_rank', JSON.stringify(cloudData.rank || []));
-      localStorage.setItem('ncc_notices', JSON.stringify(cloudData.notices || []));
-      localStorage.setItem('ncc_resources', JSON.stringify(cloudData.resources || []));
-      renderAll();
-    }
-  });
-
-  /* ═══════════════ UI LOGIC (ATTACHED TO WINDOW) ═══════════════ */
-  
-  window.doLogin = function() {
-    const id=document.getElementById('inp-id').value.trim(), pwd=document.getElementById('inp-pwd').value;
-    if(id==='nccaradmin' && pwd==='NITAR@NCC2026'){
-      document.getElementById('login-screen').classList.add('out');
-      setTimeout(()=>{
-        document.getElementById('login-screen').style.display='none';
-        document.getElementById('app').classList.add('visible');
-        initApp(id);
-      },420);
-    } else {
-      document.getElementById('login-err').textContent='✕ Invalid credentials.';
-    }
-  };
-
-  window.initApp = function(user){
-    document.getElementById('sidebar-user').textContent='▸ '+user;
-    renderAll();
-    setInterval(() => {
-        document.getElementById('topbar-time').textContent = new Date().toLocaleTimeString('en-IN') + ' IST';
-    }, 1000);
-  };
-
-  window.renderAll = function(){ 
-    renderDashboard();
-    renderNotices();
-    renderRank();
-    renderOfficers();
-    renderGallery(); // <--- ADD THIS LINE
-};
-
-
-
-  window.addNotice = function() {
-    const title = v('not-title'), body = v('not-body'), by = v('not-by'), priority = v('not-priority');
-    if(!title) return toast('Title required', true);
-    const data = JSON.parse(localStorage.getItem('ncc_notices') || '[]');
-    data.push({ id: Date.now(), title, body, by, priority, created: new Date().toISOString() });
-    save('notices', data);
-    ['not-title','not-body','not-by'].forEach(id => document.getElementById(id).value = '');
-  };
-
-  window.addRankEntry = function() {
-    const rank = v('rank-rank'), name = v('rank-name'), branch = v('rank-branch'), batch = v('rank-batch');
-    if(!name) return toast('Name required', true);
-    const data = JSON.parse(localStorage.getItem('ncc_rank') || '[]');
-    data.push({ id: Date.now(), rank, name, branch, batch });
-    save('rank', data);
-    ['rank-name','rank-branch','rank-batch'].forEach(id => document.getElementById(id).value = '');
-  };
-
-  /* ═══════════════ RENDERERS (DOM UPDATERS) ═══════════════ */
-
-  function renderDashboard() {
-    const n = JSON.parse(localStorage.getItem('ncc_notices') || '[]');
-    const r = JSON.parse(localStorage.getItem('ncc_rank') || '[]');
-    document.getElementById('stats-grid').innerHTML = `
-      <div class="stat-box"><div class="val">${n.length}</div><div class="lbl">Notices</div></div>
-      <div class="stat-box"><div class="val">${r.length}</div><div class="lbl">Cadets</div></div>
-    `;
-  }
-
-  function renderNotices() {
-    const data = JSON.parse(localStorage.getItem('ncc_notices') || '[]');
-    const el = document.getElementById('notices-list');
-    el.innerHTML = data.reverse().map((n, i) => `
-      <div class="notice-item">
-        <div class="notice-item-body"><strong>${esc(n.title)}</strong><p>${esc(n.body)}</p></div>
-        <button class="btn btn-danger btn-sm" onclick="deleteItem('notices', ${data.length-1-i})">✕</button>
-      </div>`).join('');
-  }
-
-  function renderRank() {
-    const data = JSON.parse(localStorage.getItem('ncc_rank') || '[]');
-    const tbody = document.getElementById('rank-tbody');
-    tbody.innerHTML = data.map((r, i) => `
-      <tr><td>${esc(r.rank)}</td><td>${esc(r.name)}</td><td>${esc(r.branch)}</td><td>${esc(r.batch)}</td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteItem('rank', ${i})">✕</button></td></tr>`).join('');
-  }
-
-  /* ═══════════════ UTILS ═══════════════ */
-  window.gotoPanel = function(name, el) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('panel-'+name).classList.add('active');
-    document.getElementById('topbar-bc').textContent = '// ' + name;
-  };
-
-  window.deleteItem = function(key, idx) {
-    if(!confirm('Delete?')) return;
-    const data = JSON.parse(localStorage.getItem('ncc_'+key) || '[]');
-    data.splice(idx, 1);
-    save(key, data);
-  };
-
-  const v = (id) => document.getElementById(id).value.trim();
-  const esc = (s) => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  window.toast = function(msg, isErr=false) {
-    const t=document.getElementById('toast'); t.textContent=msg;
-    t.className='show'+(isErr?' err':'');
-    setTimeout(()=>t.className='', 3000);
-  };
-  /* --- ADD THIS FOR GALLERY FETCHING --- */
-window.fetchFolderIndex = async function() {
-  const folder = document.getElementById('gal-folder').value.trim();
-  const SITE_BASE = 'https://akhand-jaihind.github.io/ncc-nit-ap';
-  const url = `${SITE_BASE}/${encodeURIComponent(folder)}/index.json`;
-  
-  toast("Fetching folder index...");
-  try {
-    const resp = await fetch(url, {cache: 'no-store'});
-    if(!resp.ok) throw new Error("index.json not found in " + folder);
-    const files = await resp.json();
-    document.getElementById('gal-files-hidden').value = JSON.stringify(files);
-    toast(`Success: Found ${files.length} files!`);
-  } catch(e) {
-    toast(e.message, true);
-  }
-};
-
-window.addGalleryItem = function() {
-  const title = v('gal-title'), folder = v('gal-folder');
-  const filesRaw = document.getElementById('gal-files-hidden').value;
-  if(!title || !folder) return toast("Title and Folder required", true);
-  
-  const data = JSON.parse(localStorage.getItem('ncc_gallery') || '[]');
-  data.push({
-    id: Date.now(),
-    title, folder,
-    thumb: v('gal-thumb'),
-    label: v('gal-label'),
-    files: filesRaw ? JSON.parse(filesRaw) : []
-  });
-  save('gallery', data);
-};
-
-// Add this to your renderAll function
-function renderOfficers() {
-  const data = JSON.parse(localStorage.getItem('ncc_officers') || '[]');
-  const el = document.getElementById('officers-list');
-  el.innerHTML = data.map((o, i) => `<div class="officer-admin-card"><strong>${esc(o.name)}</strong></div>`).join('');
-}
-  /* --- AND ADD THIS RENDERGALLERY FUNCTION BELOW RENDEROFFICERS --- */
-function renderGallery() {
-    const data = JSON.parse(localStorage.getItem('ncc_gallery') || '[]');
-    const el = document.getElementById('gallery-list');
-    if(!el) return;
-    el.innerHTML = data.map((g, i) => `
-      <div class="gallery-item-row">
-        <strong>${esc(g.title)}</strong> (📂 ${esc(g.folder)})
-        <button class="btn btn-danger btn-sm" onclick="deleteItem('gallery', ${i})">✕</button>
-      </div>`).join('');
-}
+    const v = (id) => document.getElementById(id).value.trim();
+    function toast(m, err) { const t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block'; t.style.background = err ? '#c0392b' : '#2d3436'; setTimeout(() => t.style.display = 'none', 3000); }
 </script>
 </body>
 </html>
