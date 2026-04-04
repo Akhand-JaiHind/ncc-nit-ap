@@ -6,562 +6,231 @@
     <title>NCC NIT Arunachal Pradesh | Official Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto:wght@400;700&family=Roboto+Mono&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --army-green: #2d3436;
-            --light-grey: #f0f2f5;
-            --nit-teal: #004d40;
-            --teal-lt: #00695c;
-            --accent: #00bfa5;
-            --white: #ffffff;
-        }
+        :root { --army-green: #2d3436; --light-grey: #f0f2f5; --nit-teal: #004d40; --teal-lt: #00695c; --accent: #00bfa5; --white: #ffffff; }
         *, *::before, *::after { box-sizing: border-box; }
         body { margin: 0; background-color: var(--light-grey); color: #333; font-family: 'Roboto', sans-serif; overflow-x: hidden; }
-
-        /* ─── LOADER ─── */
         #loader { position: fixed; inset: 0; background: var(--light-grey); display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease-out; }
-        #loader video { width: 500px; mix-blend-mode: multiply; filter: contrast(1.2); outline: none; }
-        .loader-fallback { display: none; flex-direction: column; align-items: center; gap: 20px; }
-        .loader-fallback .loader-logo { font-family: 'Oswald', sans-serif; font-size: 1.4rem; letter-spacing: 6px; color: var(--nit-teal); }
-        .loader-spinner { width: 48px; height: 48px; border: 4px solid #d0ddd8; border-top-color: var(--nit-teal); border-radius: 50%; animation: spin 0.9s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ─── HEADER ─── */
         header { background: var(--white); border-bottom: 4px solid var(--nit-teal); padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: relative; z-index: 10; }
-
-        /* ─── LIVE BADGE ─── */
-        #live-badge {
-            position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%);
-            background: var(--accent); color: #fff;
-            font-family: 'Roboto Mono', monospace; font-size: 0.6rem; letter-spacing: 2px;
-            padding: 2px 10px; display: none; align-items: center; gap: 5px;
-            border-radius: 0 0 4px 4px; white-space: nowrap; z-index: 5;
-        }
+        #live-badge { position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; font-family: 'Roboto Mono', monospace; font-size: 0.6rem; letter-spacing: 2px; padding: 2px 10px; display: none; align-items: center; gap: 5px; border-radius: 0 0 4px 4px; white-space: nowrap; z-index: 5; }
         #live-badge.show { display: flex; }
         .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: livePulse 1.4s ease-in-out infinite; }
         @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
-
-        /* ─── NOTICES TICKER ─── */
         .notices-bar { background: var(--nit-teal); color: white; padding: 9px 5%; display: none; align-items: center; gap: 16px; font-family: 'Roboto Mono', monospace; font-size: 0.8rem; overflow: hidden; }
         .notices-bar-label { background: white; color: var(--nit-teal); font-weight: 700; padding: 3px 10px; font-size: 0.7rem; letter-spacing: 2px; white-space: nowrap; flex-shrink: 0; }
         .notices-ticker-wrap { overflow: hidden; flex: 1; cursor: pointer; }
         .notices-ticker { display: flex; gap: 60px; animation: ticker 35s linear infinite; white-space: nowrap; }
-        .notices-ticker:hover { animation-play-state: paused; }
         @keyframes ticker { from { transform: translateX(100%); } to { transform: translateX(-200%); } }
         .notice-tick-item { display: inline-flex; align-items: center; gap: 8px; }
-        .notice-tick-dot { width: 6px; height: 6px; border-radius: 50%; background: #80cbc4; flex-shrink: 0; }
-
-        /* ─── NAV ─── */
-        .nav-tabs { background: var(--army-green); display: flex; justify-content: center; flex-wrap: wrap; padding: 0; position: sticky; top: 0; z-index: 100; overflow-x: auto; }
+        .nav-tabs { background: var(--army-green); display: flex; justify-content: center; flex-wrap: wrap; padding: 0; position: sticky; top: 0; z-index: 100; }
         .tab-btn { padding: 15px 20px; color: rgba(255,255,255,.8); cursor: pointer; border: none; background: none; font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 0.88rem; letter-spacing: 1px; transition: 0.25s; position: relative; }
-        .tab-btn::after { content: ''; position: absolute; bottom: 0; left: 50%; right: 50%; height: 3px; background: var(--accent); transition: left 0.25s, right 0.25s; }
-        .tab-btn:hover { color: #fff; background: rgba(255,255,255,.05); }
         .tab-btn.active { color: #fff; background: var(--nit-teal); }
-        .tab-btn.active::after { left: 0; right: 0; }
-
-        /* ─── CONTENT ─── */
         .tab-content { display: none; padding: 50px 10%; animation: fadeIn 0.45s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-        .clean-img { mix-blend-mode: multiply; filter: contrast(1.1); }
-
-        /* ─── HOME ─── */
-        .hero-box { text-align: center; background: white; padding: 50px 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); position: relative; overflow: hidden; }
-        .hero-box::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg,rgba(0,77,64,.03) 0%,transparent 60%); pointer-events: none; }
-        .main-logo { width: 280px; margin-bottom: 20px; animation: heroPop 0.8s cubic-bezier(.175,.885,.32,1.275) both; }
-        @keyframes heroPop { from { opacity:0; transform:scale(.8); } to { opacity:1; transform:scale(1); } }
-        .hero-box h1 { font-family: 'Oswald', sans-serif; letter-spacing: 3px; color: var(--nit-teal); margin: 0 0 12px; }
-        .hero-box p { color: #666; line-height: 1.7; max-width: 520px; margin: 0 auto 10px; }
-        .hero-stats { display: flex; justify-content: center; gap: 40px; margin-top: 30px; padding-top: 24px; border-top: 1px dashed #d0ddd8; flex-wrap: wrap; }
-        .hero-stat { text-align: center; }
-        .hero-stat-val { font-family: 'Oswald', sans-serif; font-size: 2rem; color: var(--nit-teal); display: block; }
-        .hero-stat-lbl { font-family: 'Roboto Mono', monospace; font-size: 0.68rem; color: #999; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
-
-        /* ─── ABOUT ─── */
+        .hero-box { text-align: center; background: white; padding: 50px 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+        .main-logo { width: 200px; margin-bottom: 20px; }
+        .hero-stats { display: flex; justify-content: center; gap: 40px; margin-top: 30px; border-top: 1px dashed #d0ddd8; padding-top: 20px; }
         .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 28px; }
-        .about-card { background: white; padding: 28px; border-left: 4px solid var(--nit-teal); box-shadow: 4px 4px 0 var(--army-green); transition: box-shadow .25s, transform .25s; }
-        .about-card:hover { transform: translateY(-4px); box-shadow: 6px 8px 0 var(--nit-teal); }
-        .about-card h3 { font-family: 'Oswald', sans-serif; color: var(--nit-teal); letter-spacing: 2px; margin: 0 0 10px; }
-        .about-card p { font-size: 0.9rem; line-height: 1.7; color: #555; margin: 0; }
-        @media (max-width: 640px) { .about-grid { grid-template-columns: 1fr; } }
-
-        /* ─── OFFICERS ─── */
-        .officers-header { text-align: center; margin-bottom: 50px; }
-        .officers-title { font-family: 'Oswald', sans-serif; font-size: 2.2rem; color: var(--nit-teal); margin: 0 0 6px; letter-spacing: 4px; }
-        .officers-sub { font-family: 'Roboto Mono', monospace; font-size: 0.85rem; color: #999; margin: 0; letter-spacing: 2px; }
-        .officers-stack { display: flex; flex-direction: column; gap: 30px; max-width: 960px; margin: 0 auto; }
-        .officer-card { background: white; display: flex; align-items: stretch; border: 1px solid #d0ddd8; box-shadow: 5px 5px 0px var(--army-green); position: relative; overflow: hidden; opacity: 0; transform: translateX(-40px); transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s ease; }
-        .officer-card.visible { opacity: 1; transform: translateX(0); }
-        .officer-card:hover { box-shadow: 8px 8px 0px var(--nit-teal); }
-        .officer-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--nit-teal); }
-        .officer-rank-badge { position: absolute; top: 16px; left: 16px; background: var(--army-green); color: white; font-family: 'Oswald', sans-serif; font-size: 0.7rem; letter-spacing: 2px; padding: 4px 10px; z-index: 2; }
-        .officer-photo-wrap { position: relative; width: 200px; min-height: 220px; flex-shrink: 0; background: #e8efec; overflow: hidden; }
-        .officer-photo-wrap.no-photo::after { content: '👤'; font-size: 4rem; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #ccc; }
-        .officer-photo { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; transition: transform 0.4s ease; }
-        .officer-card:hover .officer-photo { transform: scale(1.04); }
-        .officer-photo-frame { position: absolute; bottom: 10px; right: 10px; width: 30px; height: 30px; border-right: 2px solid var(--nit-teal); border-bottom: 2px solid var(--nit-teal); pointer-events: none; }
-        .officer-info { padding: 30px 30px 25px 30px; display: flex; flex-direction: column; justify-content: center; flex: 1; }
-        .officer-designation { font-family: 'Roboto Mono', monospace; font-size: 0.72rem; letter-spacing: 2px; color: var(--nit-teal); margin: 0 0 6px; text-transform: uppercase; }
-        .officer-name { font-family: 'Oswald', sans-serif; font-size: 1.6rem; color: var(--army-green); margin: 0 0 14px; letter-spacing: 1px; }
-        .officer-divider { width: 40px; height: 3px; background: var(--nit-teal); margin-bottom: 14px; transition: width 0.4s ease; }
-        .officer-card:hover .officer-divider { width: 80px; }
-        .officer-bio { font-size: 0.88rem; line-height: 1.7; color: #555; margin: 0; font-style: italic; }
-        @media (max-width: 640px) { .officer-card { flex-direction: column; } .officer-photo-wrap { width: 100%; height: 200px; min-height: unset; } .officer-info { padding: 20px; } }
-
-        /* ─── RANK ─── */
-        .rank-table { width: 100%; border-collapse: collapse; background: white; margin-top: 20px; box-shadow: 4px 4px 0 var(--army-green); }
-        .rank-table th, .rank-table td { border: 1px solid #ddd; padding: 15px; text-align: left; }
-        .rank-table th { background: var(--nit-teal); color: white; font-family: 'Oswald'; letter-spacing: 1px; }
-        .rank-table tbody tr { transition: background .2s; }
-        .rank-table tbody tr:hover td { background: #e8f5e9; }
-        .rank-table tr:nth-child(even) td { background: #f9f9f9; }
-        .rank-table tr:nth-child(even):hover td { background: #e8f5e9; }
-
-        /* ─── GALLERY ─── */
-        .gallery-header-box { text-align: center; margin-bottom: 40px; }
-        .gallery-heading { font-family: 'Oswald', sans-serif; font-size: 2.5rem; text-transform: uppercase; color: var(--nit-teal); margin-bottom: 5px; }
-        .gallery-subheading { font-family: 'Roboto Mono', monospace; font-size: 0.9rem; color: #666; text-transform: uppercase; }
-        .row-gallery-container { display: flex; flex-direction: row; justify-content: center; flex-wrap: wrap; gap: 30px; }
-        .techy-gallery-item { background: white; padding: 15px; border: 1px solid var(--nit-teal); width: 350px; box-shadow: 4px 4px 0px var(--army-green); transition: transform 0.25s ease, box-shadow 0.25s ease; cursor: pointer; position: relative; outline: none; user-select: none; opacity: 0; transform: translateY(20px); animation: cardReveal 0.5s ease forwards; }
-        @keyframes cardReveal { to { opacity: 1; transform: translateY(0); } }
-        .techy-gallery-item:hover { transform: translateY(-6px); box-shadow: 8px 8px 0px var(--nit-teal); }
-        .techy-gallery-item:active { transform: translateY(-2px) scale(0.98); }
-        .techy-gallery-item:focus-visible { outline: 3px solid var(--nit-teal); outline-offset: 3px; }
-        .card-overlay { position: absolute; inset: 0; background: rgba(0,77,64,0); display: flex; align-items: center; justify-content: center; transition: background 0.25s ease; }
-        .techy-gallery-item:hover .card-overlay { background: rgba(0,77,64,0.18); }
-        .card-overlay-icon { opacity: 0; transform: scale(0.7); transition: opacity 0.25s ease, transform 0.25s ease; background: rgba(0,77,64,0.85); color: white; font-family: 'Oswald', sans-serif; font-size: 0.85rem; letter-spacing: 2px; padding: 10px 20px; border: 1px solid white; text-transform: uppercase; }
-        .techy-gallery-item:hover .card-overlay-icon { opacity: 1; transform: scale(1); }
-        .techy-gallery-item img { width: 100%; height: 220px; object-fit: cover; border-radius: 2px; display: block; }
-        .techy-gallery-item figcaption { margin-top: 15px; font-size: 0.85rem; font-family: 'Roboto Mono', monospace; text-transform: uppercase; border-top: 1px dashed #ccc; padding-top: 10px; color: #333; }
-
-        /* ─── NOTICES PAGE ─── */
-        .sec-page-header { margin-bottom: 32px; }
-        .sec-page-header h2 { font-family: 'Oswald', sans-serif; font-size: 2rem; color: var(--nit-teal); letter-spacing: 3px; margin: 0 0 6px; }
-        .sec-page-header p { font-family: 'Roboto Mono', monospace; font-size: 0.78rem; color: #999; letter-spacing: 1px; margin: 0; }
-
-        .notice-card { background: white; border: 1px solid #d0ddd8; padding: 22px 24px; margin-bottom: 16px; display: flex; gap: 18px; align-items: flex-start; box-shadow: 3px 3px 0 var(--army-green); transition: box-shadow .2s, transform .2s; opacity: 0; animation: cardReveal 0.4s ease forwards; }
-        .notice-card:hover { box-shadow: 5px 5px 0 var(--nit-teal); transform: translateX(3px); }
-        .notice-priority-bar { width: 5px; min-height: 50px; border-radius: 3px; flex-shrink: 0; margin-top: 2px; }
-        .priority-high .notice-priority-bar { background: #e74c3c; }
-        .priority-med  .notice-priority-bar { background: #e67e22; }
-        .priority-low  .notice-priority-bar { background: #27ae60; }
-        .notice-card-body { flex: 1; }
-        .notice-card-title { font-family: 'Oswald', sans-serif; font-size: 1.15rem; color: var(--army-green); margin: 0 0 8px; letter-spacing: 1px; }
-        .notice-card-meta { font-family: 'Roboto Mono', monospace; font-size: 0.7rem; color: #aaa; letter-spacing: 1px; margin-bottom: 10px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-        .notice-badge { padding: 2px 8px; border-radius: 2px; font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; }
-        .badge-high { background: #fde8e8; color: #c0392b; }
-        .badge-med  { background: #fef3e2; color: #d35400; }
-        .badge-low  { background: #e8f8f0; color: #1e8449; }
-        .notice-card-text { font-size: 0.9rem; line-height: 1.7; color: #555; margin: 0 0 12px; white-space: pre-wrap; }
-        .notice-attachment { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1px solid var(--nit-teal); color: var(--nit-teal); font-family: 'Roboto Mono', monospace; font-size: 0.75rem; letter-spacing: 1px; text-decoration: none; transition: background .2s, color .2s; }
-        .notice-attachment:hover { background: var(--nit-teal); color: white; }
-        .notice-expiry { font-family: 'Roboto Mono', monospace; font-size: 0.68rem; color: #e74c3c; margin-top: 8px; }
-
-        /* ─── RESOURCES ─── */
-        .resources-filter { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
-        .filter-btn { padding: 8px 18px; border: 1px solid var(--nit-teal); background: white; color: var(--nit-teal); font-family: 'Oswald', sans-serif; font-size: 0.85rem; letter-spacing: 1px; cursor: pointer; transition: .2s; }
-        .filter-btn:hover, .filter-btn.active { background: var(--nit-teal); color: white; }
-        .resources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .resource-card { background: white; border: 1px solid #d0ddd8; padding: 20px; display: flex; align-items: flex-start; gap: 16px; box-shadow: 3px 3px 0 var(--army-green); transition: box-shadow .2s, transform .2s; opacity: 0; animation: cardReveal 0.4s ease forwards; }
-        .resource-card:hover { box-shadow: 5px 5px 0 var(--nit-teal); transform: translateY(-3px); }
-        .resource-icon { font-size: 2rem; flex-shrink: 0; width: 44px; text-align: center; }
-        .resource-info { flex: 1; min-width: 0; }
-        .resource-title { font-family: 'Oswald', sans-serif; font-size: 1rem; color: var(--army-green); margin: 0 0 4px; letter-spacing: 1px; word-break: break-word; }
-        .resource-desc { font-size: 0.82rem; color: #777; margin: 0 0 8px; line-height: 1.5; }
-        .resource-meta { font-family: 'Roboto Mono', monospace; font-size: 0.66rem; color: #bbb; letter-spacing: 1px; margin-bottom: 10px; }
-        .resource-tag { display: inline-block; padding: 2px 8px; background: #e8f5e9; color: var(--nit-teal); font-size: 0.65rem; font-family: 'Roboto Mono', monospace; letter-spacing: 1px; border-radius: 2px; }
-        .resource-dl { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; background: var(--nit-teal); color: white; font-family: 'Roboto Mono', monospace; font-size: 0.72rem; letter-spacing: 1px; text-decoration: none; transition: background .2s; }
-        .resource-dl:hover { background: var(--teal-lt); }
-
-        /* ─── LIGHTBOX ─── */
-        #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.93); z-index: 5000; flex-direction: column; align-items: stretch; }
+        .about-card { background: white; padding: 28px; border-left: 4px solid var(--nit-teal); box-shadow: 4px 4px 0 var(--army-green); }
+        .officers-stack { display: flex; flex-direction: column; gap: 30px; }
+        .officer-card { background: white; display: flex; border: 1px solid #d0ddd8; box-shadow: 5px 5px 0px var(--army-green); }
+        .officer-photo { width: 200px; height: 220px; object-fit: cover; background: #eee; }
+        .officer-info { padding: 30px; flex: 1; }
+        .rank-table { width: 100%; border-collapse: collapse; background: white; }
+        .rank-table th, .rank-table td { border: 1px solid #ddd; padding: 15px; }
+        .rank-table th { background: var(--nit-teal); color: white; }
+        .row-gallery-container { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; }
+        .techy-gallery-item { background: white; padding: 15px; border: 1px solid var(--nit-teal); width: 300px; cursor: pointer; box-shadow: 4px 4px 0 var(--army-green); }
+        .techy-gallery-item img { width: 100%; height: 200px; object-fit: cover; }
+        .notice-card { background: white; border: 1px solid #d0ddd8; padding: 20px; margin-bottom: 15px; border-left: 5px solid var(--nit-teal); box-shadow: 3px 3px 0 var(--army-green); }
+        #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; flex-direction: column; }
         #lightbox.open { display: flex; }
-        .lb-topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; background: var(--army-green); border-bottom: 2px solid var(--nit-teal); flex-shrink: 0; }
-        .lb-title { font-family: 'Oswald', sans-serif; font-size: 1.1rem; color: white; letter-spacing: 2px; text-transform: uppercase; }
-        .lb-close { background: none; border: 2px solid white; color: white; font-size: 1.2rem; width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; font-family: monospace; }
-        .lb-close:hover { background: #c0392b; border-color: #c0392b; }
-        .lb-viewer { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 20px 70px; box-sizing: border-box; }
-        .lb-media-wrap { max-width: 100%; max-height: 100%; display: flex; align-items: center; justify-content: center; }
-        .lb-media-wrap img, .lb-media-wrap video { max-width: 100%; max-height: calc(100vh - 230px); object-fit: contain; border: 2px solid var(--nit-teal); box-shadow: 0 0 40px rgba(0,77,64,0.5); border-radius: 2px; }
-        .lb-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,77,64,0.7); border: none; color: white; font-size: 1.8rem; width: 48px; height: 64px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; z-index: 10; }
-        .lb-arrow:hover { background: var(--nit-teal); }
-        .lb-arrow.prev { left: 10px; }
-        .lb-arrow.next { right: 10px; }
-        .lb-arrow:disabled { opacity: 0.2; cursor: default; }
-        .lb-counter { font-family: 'Roboto Mono', monospace; font-size: 0.8rem; color: #aaa; letter-spacing: 2px; }
-        .lb-thumbstrip { display: flex; gap: 8px; padding: 10px 20px; background: #111; overflow-x: auto; flex-shrink: 0; border-top: 1px solid #333; align-items: center; }
-        .lb-thumb { width: 64px; height: 64px; object-fit: cover; border: 2px solid transparent; border-radius: 2px; cursor: pointer; flex-shrink: 0; transition: border-color 0.2s, transform 0.2s; background: #222; }
-        .lb-thumb:hover { transform: scale(1.08); }
-        .lb-thumb.active { border-color: var(--nit-teal); }
-        .lb-thumb-video { width: 64px; height: 64px; border: 2px solid transparent; border-radius: 2px; cursor: pointer; flex-shrink: 0; background: #333; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.4rem; }
-        .lb-thumb-video.active { border-color: var(--nit-teal); }
-        .lb-thumb-video:hover { border-color: #aaa; }
-        .lb-loading { color: #aaa; font-family: 'Roboto Mono', monospace; font-size: 0.9rem; letter-spacing: 2px; animation: blink 1s infinite; }
-        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-        .lb-empty { color: #777; font-family: 'Roboto Mono', monospace; font-size: 0.9rem; text-align: center; padding: 40px; }
-
-        /* ─── SHARED ─── */
-        .loading-state { text-align: center; padding: 40px; font-family: 'Roboto Mono', monospace; font-size: 0.85rem; color: #bbb; letter-spacing: 2px; animation: blink 1.2s infinite; }
-        .empty-state { text-align: center; padding: 40px; font-family: 'Roboto Mono', monospace; font-size: 0.85rem; color: #bbb; border: 1px dashed #ddd; }
-        .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
-        .reveal.in { opacity: 1; transform: none; }
-
-        footer { text-align: center; padding: 30px; color: #999; font-size: 0.8rem; border-top: 1px solid #e0e0e0; margin-top: 20px; }
-        .lb-thumbstrip::-webkit-scrollbar { height: 4px; }
-        .lb-thumbstrip::-webkit-scrollbar-thumb { background: var(--nit-teal); border-radius: 2px; }
+        .lb-topbar { display: flex; justify-content: space-between; padding: 20px; color: white; background: var(--army-green); }
+        .lb-viewer { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+        .lb-arrow { position: absolute; top: 50%; color: white; background: rgba(0,0,0,0.5); border: none; padding: 20px; cursor: pointer; font-size: 2rem; }
+        .resources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .resource-card { background: white; padding: 20px; border: 1px solid #ddd; display: flex; align-items: center; gap: 15px; }
     </style>
 </head>
 <body>
 
-<!-- LOADER -->
-<div id="loader">
-    <video id="bufferVid" autoplay muted playsinline style="width:500px;mix-blend-mode:multiply;filter:contrast(1.2);outline:none;">
-        <source src="BUFFER VIDEO_WEB.mp4" type="video/mp4">
-    </video>
-    <div class="loader-fallback" id="loaderFallback">
-        <div class="loader-logo">NCC · NITAR</div>
-        <div class="loader-spinner"></div>
-    </div>
-</div>
+<div id="loader"><h2 style="font-family:'Oswald'; color:var(--nit-teal);">NCC NITAR</h2></div>
 
-<!-- HEADER -->
 <header>
-    <img src="LOGO_NIT.png" height="70" class="clean-img" alt="NIT Logo">
-    <div style="text-align:center;position:relative;">
-        <h2 style="margin:0;font-family:'Oswald';">NATIONAL CADET CORPS</h2>
+    <img src="LOGO_NIT.png" height="60">
+    <div style="text-align:center;">
+        <h2 style="margin:0; font-family:'Oswald';">NATIONAL CADET CORPS</h2>
         <small>NIT ARUNACHAL PRADESH</small>
-        <!-- Live data badge -->
-        <div id="live-badge">
-            <span class="live-dot"></span> LIVE DATA
-        </div>
+        <div id="live-badge"><span class="live-dot"></span> LIVE CLOUD DATA</div>
     </div>
-    <img src="LOGO_NCC.png" height="70" class="clean-img" alt="NCC Logo">
+    <img src="LOGO_NCC.png" height="60">
 </header>
 
-<!-- NOTICES TICKER -->
 <div class="notices-bar" id="notices-bar">
     <span class="notices-bar-label">📋 NOTICES</span>
-    <div class="notices-ticker-wrap" onclick="openTab('notices',document.querySelector('[data-tab=notices]'))">
-        <div class="notices-ticker" id="notices-ticker"></div>
-    </div>
+    <div class="notices-ticker-wrap"><div class="notices-ticker" id="notices-ticker"></div></div>
 </div>
 
-<!-- NAV -->
 <div class="nav-tabs">
-    <button class="tab-btn active"  data-tab="home"      onclick="openTab('home',this)">Home</button>
-    <button class="tab-btn"         data-tab="about"     onclick="openTab('about',this)">About Us</button>
-    <button class="tab-btn"         data-tab="ano"       onclick="openTab('ano',this)">Officer's Desk</button>
-    <button class="tab-btn"         data-tab="rank"      onclick="openTab('rank',this)">Rank Panel</button>
-    <button class="tab-btn"         data-tab="gallery"   onclick="openTab('gallery',this)">Gallery</button>
-    <button class="tab-btn"         data-tab="notices"   onclick="openTab('notices',this)">Notices</button>
-    <button class="tab-btn"         data-tab="resources" onclick="openTab('resources',this)">Resources</button>
+    <button class="tab-btn active" onclick="openTab('home',this)">Home</button>
+    <button class="tab-btn" onclick="openTab('about',this)">About</button>
+    <button class="tab-btn" onclick="openTab('ano',this)">Officers</button>
+    <button class="tab-btn" onclick="openTab('rank',this)">Rank Panel</button>
+    <button class="tab-btn" onclick="openTab('gallery',this)">Gallery</button>
+    <button class="tab-btn" onclick="openTab('notices',this)">Notices</button>
+    <button class="tab-btn" onclick="openTab('resources',this)">Resources</button>
 </div>
 
-<!-- ══ HOME ══ -->
 <div id="home" class="tab-content active">
     <div class="hero-box">
-        <img src="LOGO_SOCIAL MEDIA.png" class="main-logo clean-img" alt="NCC Logo">
-        <h1 style="font-family:'Oswald';">UNITY AND DISCIPLINE</h1>
-        <p>Welcome to the official portal of the NCC Unit, NIT Arunachal Pradesh. Shaping future leaders through discipline, service, and national pride.</p>
+        <img src="LOGO_SOCIAL MEDIA.png" class="main-logo">
+        <h1>UNITY AND DISCIPLINE</h1>
         <div class="hero-stats">
-            <div class="hero-stat"><span class="hero-stat-val" id="stat-cadets">—</span><div class="hero-stat-lbl">Ranked Cadets</div></div>
-            <div class="hero-stat"><span class="hero-stat-val" id="stat-events">—</span><div class="hero-stat-lbl">Gallery Events</div></div>
-            <div class="hero-stat"><span class="hero-stat-val" id="stat-notices">—</span><div class="hero-stat-lbl">Active Notices</div></div>
-            <div class="hero-stat"><span class="hero-stat-val" id="stat-resources">—</span><div class="hero-stat-lbl">Resources</div></div>
+            <div class="hero-stat"><span id="stat-cadets" style="font-size:2rem; color:var(--nit-teal);">0</span><br><small>CADETS</small></div>
+            <div class="hero-stat"><span id="stat-notices" style="font-size:2rem; color:var(--nit-teal);">0</span><br><small>NOTICES</small></div>
         </div>
     </div>
 </div>
 
-<!-- ══ ABOUT ══ -->
 <div id="about" class="tab-content">
-    <h2 class="reveal" style="font-family:'Oswald';color:var(--nit-teal);letter-spacing:3px;margin-bottom:8px;">ABOUT THE UNIT</h2>
-    <p class="reveal" style="color:#666;line-height:1.8;max-width:720px;">Established in 2010, the NCC unit at NIT Arunachal Pradesh aims to groom students into disciplined and patriotic citizens. We participate in various National Integration Camps, Republic Day Parades, and Social Service activities.</p>
     <div class="about-grid">
-        <div class="about-card reveal"><h3>🎯 MISSION</h3><p>To develop character, comradeship, discipline, leadership, secular outlook and spirit of adventure &amp; sportsmanship among our cadets.</p></div>
-        <div class="about-card reveal"><h3>🏆 VISION</h3><p>To be the premier youth organisation of India producing future leaders who are motivated, disciplined and technically sound.</p></div>
-        <div class="about-card reveal"><h3>📅 ESTABLISHED</h3><p>The NCC unit at NIT Arunachal Pradesh was established in 2010 and has since grown into a vibrant corps with representation at state and national levels.</p></div>
-        <div class="about-card reveal"><h3>🌏 ACTIVITIES</h3><p>Republic Day Parade, National Integration Camps, Adventure Activities, Social Service, Disaster Management, and Community Development.</p></div>
+        <div class="about-card"><h3>🎯 MISSION</h3><p>To develop character and leadership among our cadets.</p></div>
+        <div class="about-card"><h3>🏆 VISION</h3><p>Producing future leaders who are motivated and disciplined.</p></div>
     </div>
 </div>
 
-<!-- ══ OFFICERS ══ -->
-<div id="ano" class="tab-content">
-    <div class="officers-header">
-        <h2 class="officers-title">OFFICER'S DESK</h2>
-        <p class="officers-sub">// Leadership &amp; Command Structure</p>
-    </div>
-    <div class="officers-stack" id="officers-stack">
-        <div class="loading-state">LOADING OFFICERS...</div>
-    </div>
-</div>
+<div id="ano" class="tab-content"><div class="officers-stack" id="officers-stack"></div></div>
+<div id="rank" class="tab-content"><div id="rank-container"></div></div>
+<div id="gallery" class="tab-content"><div class="row-gallery-container" id="gallery-cards"></div></div>
+<div id="notices" class="tab-content"><div id="notices-list"></div></div>
+<div id="resources" class="tab-content"><div class="resources-grid" id="resources-grid"></div></div>
 
-<!-- ══ RANK ══ -->
-<div id="rank" class="tab-content">
-    <h2 class="reveal" style="font-family:'Oswald';color:var(--nit-teal);letter-spacing:3px;margin-bottom:4px;">UNIT COMMAND PANEL</h2>
-    <p class="reveal" style="font-family:'Roboto Mono',monospace;font-size:0.78rem;color:#999;letter-spacing:1px;margin-bottom:24px;">// Current rank holders of the NCC unit</p>
-    <div id="rank-container" class="reveal"><div class="loading-state">LOADING RANK PANEL...</div></div>
-</div>
-
-<!-- ══ GALLERY ══ -->
-<div id="gallery" class="tab-content">
-    <div class="gallery-header-box">
-        <h2 class="gallery-heading">Unit Honors &amp; Highlights</h2>
-        <p class="gallery-subheading">Tap any card to explore photos &amp; videos from each event.</p>
-    </div>
-    <div class="row-gallery-container" id="gallery-cards">
-        <div class="loading-state">LOADING GALLERY...</div>
-    </div>
-</div>
-
-<!-- ══ NOTICES ══ -->
-<div id="notices" class="tab-content">
-    <div class="sec-page-header">
-        <h2>NOTICES &amp; ANNOUNCEMENTS</h2>
-        <p>// Official circulars and updates from the NCC unit</p>
-    </div>
-    <div id="notices-list"><div class="loading-state">LOADING NOTICES...</div></div>
-</div>
-
-<!-- ══ RESOURCES ══ -->
-<div id="resources" class="tab-content">
-    <div class="sec-page-header">
-        <h2>RESOURCES</h2>
-        <p>// Documents, forms, circulars and study material</p>
-    </div>
-    <div class="resources-filter">
-        <button class="filter-btn active" onclick="filterResources('all',this)">All</button>
-        <button class="filter-btn" onclick="filterResources('pdf',this)">PDF</button>
-        <button class="filter-btn" onclick="filterResources('doc',this)">Word</button>
-        <button class="filter-btn" onclick="filterResources('ppt',this)">PPT</button>
-        <button class="filter-btn" onclick="filterResources('image',this)">Images</button>
-        <button class="filter-btn" onclick="filterResources('other',this)">Other</button>
-    </div>
-    <div class="resources-grid" id="resources-grid">
-        <div class="loading-state" style="grid-column:1/-1">LOADING RESOURCES...</div>
-    </div>
-</div>
-
-<footer>&copy; 2026 National Institute of Technology, Arunachal Pradesh | NCC Unit &nbsp;·&nbsp; <span style="font-family:'Roboto Mono',monospace;font-size:.75rem;">UNITY &amp; DISCIPLINE</span></footer>
-
-<!-- LIGHTBOX -->
-<div id="lightbox" role="dialog" aria-modal="true" aria-labelledby="lb-title-text">
-    <div class="lb-topbar">
-        <span class="lb-title" id="lb-title-text">Gallery</span>
-        <div style="display:flex;align-items:center;gap:16px;">
-            <span class="lb-counter" id="lb-counter"></span>
-            <button class="lb-close" onclick="closeLightbox()" title="Close (Esc)">✕</button>
-        </div>
-    </div>
+<div id="lightbox">
+    <div class="lb-topbar"><span id="lb-title-text">Gallery</span><button onclick="closeLightbox()" style="background:none; border:1px solid white; color:white; cursor:pointer;">✕ CLOSE</button></div>
     <div class="lb-viewer">
-        <button class="lb-arrow prev" id="lb-prev" onclick="navigate(-1)">&#8249;</button>
-        <div class="lb-media-wrap" id="lb-media-wrap"><span class="lb-loading">LOADING...</span></div>
-        <button class="lb-arrow next" id="lb-next" onclick="navigate(1)">&#8250;</button>
+        <button class="lb-arrow" style="left:10px;" onclick="navigate(-1)">❮</button>
+        <div id="lb-media-wrap"></div>
+        <button class="lb-arrow" style="right:10px;" onclick="navigate(1)">❯</button>
     </div>
-    <div class="lb-thumbstrip" id="lb-thumbstrip"></div>
+    <div id="lb-counter" style="text-align:center; color:white; padding:10px;"></div>
 </div>
+
 <script type="module">
-  // 1. Import Firebase Cloud Modules
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
 
-  // 2. Your Web App Configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyBCLCGsYWA-PUhWvgW45cb-X9G1CjrtAcs",
-    authDomain: "ncc-nit-ap.firebaseapp.com",
-    projectId: "ncc-nit-ap",
-    storageBucket: "ncc-nit-ap.firebasestorage.app",
-    databaseURL: "https://ncc-nit-ap-default-rtdb.asia-southeast1.firebasedatabase.app/",
-    appId: "1:311443142169:web:b274a34fb95fedd6465c88"
-  };
+    const firebaseConfig = {
+        apiKey: "AIzaSyBCLCGsYWA-PUhWvgW45cb-X9G1CjrtAcs",
+        authDomain: "ncc-nit-ap.firebaseapp.com",
+        projectId: "ncc-nit-ap",
+        databaseURL: "https://ncc-nit-ap-default-rtdb.asia-southeast1.firebasedatabase.app/",
+        appId: "1:311443142169:web:b274a34fb95fedd6465c88"
+    };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-  /* ═══════════════ GLOBAL STATE ═══════════════ */
-  let allResources = [];
-  let mediaList = [];
-  let currentIdx = 0;
+    let mediaList = [];
+    let currentIdx = 0;
 
-  /* ═══════════════ LIVE GLOBAL LISTENER ═══════════════ */
-  onValue(ref(db, 'ncc_unit'), (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-      document.getElementById('live-badge').classList.add('show');
-      
-      if(data.gallery)   renderGalleryUI(data.gallery);
-      if(data.officers)  renderOfficersUI(data.officers);
-      if(data.rank)      renderRankUI(data.rank);
-      if(data.notices)   renderNoticesUI(data.notices);
-      if(data.resources) {
-        allResources = data.resources; // update local cache
-        renderResourcesUI(data.resources);
-      }
-      console.log("Global Data Synced ✓");
+    onValue(ref(db, 'ncc_unit'), (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            document.getElementById('live-badge').style.display = 'flex';
+            if(data.gallery) renderGalleryUI(data.gallery);
+            if(data.officers) renderOfficersUI(data.officers);
+            if(data.rank) renderRankUI(data.rank);
+            if(data.notices) renderNoticesUI(data.notices);
+            if(data.resources) renderResourcesUI(data.resources);
+        }
+    });
+
+    function renderGalleryUI(ev) {
+        const c = document.getElementById('gallery-cards');
+        c.innerHTML = ev.map(e => `
+            <div class="techy-gallery-item" onclick="openGallery(this)" data-folder="${e.folder}" data-title="${e.title}" data-files='${JSON.stringify(e.files||[])}'>
+                <img src="${e.thumb}">
+                <div style="margin-top:10px; font-family:'Oswald';">${e.title}</div>
+            </div>`).join('');
     }
-  });
 
-  /* ═══════════════ RENDERING LOGIC ═══════════════ */
-  function renderGalleryUI(ev) {
-    const c = document.getElementById('gallery-cards');
-    c.innerHTML = ev.map((e, i) => `
-        <figure class="techy-gallery-item" tabindex="0" onclick="openGallery(this)" 
-                data-folder="${he(e.folder)}" data-title="${he(e.title)}" data-files='${JSON.stringify(e.files||[])}'>
-            <div class="card-overlay"><span class="card-overlay-icon">▶ View Gallery</span></div>
-            <img src="${he(e.thumb)}" onerror="this.src='LOGO_SOCIAL MEDIA.png'">
-            <figcaption>${he(e.label || e.title)}</figcaption>
-        </figure>`).join('');
-    document.getElementById('stat-events').textContent = ev.length;
-  }
+    function renderOfficersUI(off) {
+        document.getElementById('officers-stack').innerHTML = off.map(o => `
+            <div class="officer-card">
+                <img src="${o.photo}" class="officer-photo">
+                <div class="officer-info">
+                    <div style="color:var(--nit-teal); font-weight:bold;">${o.designation}</div>
+                    <h3 style="margin:5px 0; font-family:'Oswald';">${o.name}</h3>
+                    <p style="font-style:italic; font-size:0.9rem;">${o.bio}</p>
+                </div>
+            </div>`).join('');
+    }
 
-  function renderOfficersUI(off) {
-    const stack = document.getElementById('officers-stack');
-    stack.innerHTML = off.map(o => `
-        <div class="officer-card visible">
-            <div class="officer-rank-badge">${he(o.role)}</div>
-            <div class="officer-photo-wrap">
-                <img src="${he(o.photo)}" class="officer-photo" onerror="this.parentElement.classList.add('no-photo')">
-            </div>
-            <div class="officer-info">
-                <p class="officer-designation">${he(o.designation)}</p>
-                <h3 class="officer-name">${he(o.name)}</h3>
-                <div class="officer-divider"></div>
-                <p class="officer-bio">${he(o.bio)}</p>
-            </div>
-        </div>`).join('');
-  }
+    function renderRankUI(cadets) {
+        document.getElementById('rank-container').innerHTML = `<table class="rank-table">
+            <thead><tr><th>Rank</th><th>Name</th><th>Branch</th></tr></thead>
+            <tbody>${cadets.map(r => `<tr><td><b>${r.rank}</b></td><td>${r.name}</td><td>${r.branch}</td></tr>`).join('')}</tbody></table>`;
+        document.getElementById('stat-cadets').textContent = cadets.length;
+    }
 
-  function renderRankUI(cadets) {
-    const c = document.getElementById('rank-container');
-    c.innerHTML = `<table class="rank-table">
-        <thead><tr><th>Rank</th><th>Name of Cadet</th><th>Branch</th></tr></thead>
-        <tbody>${cadets.map(r => `<tr>
-            <td><strong>${he(r.rank)}</strong></td>
-            <td>${he(r.name)}</td>
-            <td>${he(r.branch)}</td>
-        </tr>`).join('')}</tbody></table>`;
-    document.getElementById('stat-cadets').textContent = cadets.length;
-  }
+    function renderNoticesUI(notices) {
+        const active = notices.filter(n => !n.expiry || new Date(n.expiry) >= new Date());
+        document.getElementById('notices-ticker').innerHTML = active.map(n => `<span class="notice-tick-item">● ${n.title}</span>`).join('');
+        document.getElementById('notices-bar').style.display = active.length ? 'flex' : 'none';
+        document.getElementById('notices-list').innerHTML = [...active].reverse().map(n => `
+            <div class="notice-card">
+                <div style="font-family:'Oswald'; font-size:1.2rem;">${n.title}</div>
+                <p>${n.body}</p>
+                <small>By: ${n.by || 'Admin'}</small>
+            </div>`).join('');
+        document.getElementById('stat-notices').textContent = active.length;
+    }
 
-  function renderNoticesUI(notices) {
-    const active = notices.filter(n => !n.expiry || new Date(n.expiry) >= new Date());
-    document.getElementById('stat-notices').textContent = active.length;
-    const ticker = document.getElementById('notices-ticker');
-    ticker.innerHTML = active.map(n => `<span class="notice-tick-item"><span class="notice-tick-dot"></span>${he(n.title)}</span>`).join('');
-    document.getElementById('notices-bar').style.display = active.length ? 'flex' : 'none';
+    function renderResourcesUI(res) {
+        document.getElementById('resources-grid').innerHTML = res.map(r => `
+            <div class="resource-card">
+                <div style="font-size:1.5rem;">📄</div>
+                <div>
+                    <div style="font-weight:bold;">${r.title}</div>
+                    <a href="${r.fileUrl}" target="_blank" style="color:var(--nit-teal); font-size:0.8rem;">Download</a>
+                </div>
+            </div>`).join('');
+    }
 
-    const el = document.getElementById('notices-list');
-    el.innerHTML = [...active].reverse().map(n => `
-        <div class="notice-card priority-med">
-            <div class="notice-priority-bar"></div>
-            <div class="notice-card-body">
-                <div class="notice-card-title">${he(n.title)}</div>
-                <p class="notice-card-text">${he(n.body)}</p>
-                <small>Posted by: ${he(n.by || 'Admin')}</small>
-            </div>
-        </div>`).join('');
-  }
+    window.openTab = function(name, btn) {
+        document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+        document.getElementById(name).classList.add('active');
+        btn.classList.add('active');
+    };
 
-  function renderResourcesUI(list) {
-    const g = document.getElementById('resources-grid');
-    if(!list.length){ g.innerHTML='<div class="empty-state">No resources.</div>'; return; }
-    g.innerHTML = list.map(r => `
-        <div class="resource-card">
-            <div class="resource-icon">📄</div>
-            <div class="resource-info">
-                <div class="resource-title">${he(r.title)}</div>
-                <a class="resource-dl" href="${he(r.fileUrl)}" target="_blank">↓ Download</a>
-            </div>
-        </div>`).join('');
-    document.getElementById('stat-resources').textContent = list.length;
-  }
+    window.openGallery = function(card) {
+        const folder = card.dataset.folder;
+        const files = JSON.parse(card.dataset.files || '[]');
+        mediaList = files.map(f => ({ src: `https://akhand-jaihind.github.io/ncc-nit-ap/${folder}/${f}` }));
+        document.getElementById('lb-title-text').textContent = card.dataset.title;
+        document.getElementById('lightbox').classList.add('open');
+        showMedia(0);
+    };
 
-  /* ═══════════════ NAVIGATION & UI INTERACTION ═══════════════ */
-  window.openTab = function(name, btn) {
-    document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
-    document.getElementById(name).classList.add('active');
-    if (btn) btn.classList.add('active');
-  };
+    function showMedia(idx) {
+        currentIdx = idx;
+        const m = mediaList[idx];
+        const isVideo = m.src.toLowerCase().endsWith('.mp4');
+        document.getElementById('lb-media-wrap').innerHTML = isVideo ? 
+            `<video controls autoplay style="max-height:70vh;"><source src="${m.src}"></video>` :
+            `<img src="${m.src}" style="max-height:70vh; max-width:90vw;">`;
+        document.getElementById('lb-counter').textContent = `${idx + 1} / ${mediaList.length}`;
+    }
 
-  window.filterResources = function(type, btn) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    // Simple filter logic - checking file extension in URL
-    const filtered = type === 'all' ? allResources : allResources.filter(r => r.fileUrl.toLowerCase().includes(type));
-    renderResourcesUI(filtered);
-  };
+    window.navigate = function(dir) {
+        let n = currentIdx + dir;
+        if(n >= 0 && n < mediaList.length) showMedia(n);
+    };
 
-  /* ═══════════════ LIGHTBOX LOGIC ═══════════════ */
-  window.openGallery = function(card) {
-    const folder = card.dataset.folder;
-    const files = JSON.parse(card.dataset.files || '[]');
-    if(!files.length) return alert("No files found in this folder.");
-    
-    mediaList = files.map(f => ({ src: `${folder}/${f}`, name: f }));
-    document.getElementById('lb-title-text').textContent = card.dataset.title;
-    document.getElementById('lightbox').classList.add('open');
-    showMedia(0);
-  };
+    window.closeLightbox = function() { document.getElementById('lightbox').classList.remove('open'); };
 
-  function showMedia(idx) {
-    currentIdx = idx;
-    const m = mediaList[idx];
-    const wrap = document.getElementById('lb-media-wrap');
-    wrap.innerHTML = `<img src="${m.src}" style="max-width:100%; max-height:80vh;">`;
-    document.getElementById('lb-counter').textContent = `${idx + 1} / ${mediaList.length}`;
-  }
-
-  window.navigate = function(dir) {
-    let next = currentIdx + dir;
-    if (next >= 0 && next < mediaList.length) showMedia(next);
-  };
-
-  window.closeLightbox = function() {
-    document.getElementById('lightbox').classList.remove('open');
-  };
-
-
-  /* ─── UTILITIES ─── */
-  function he(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  /* ═══════════════ COMPLETE LIGHTBOX LOGIC ═══════════════ */
-window.openGallery = function(card) {
-    const folder = card.dataset.folder;
-    const title = card.dataset.title;
-    const files = JSON.parse(card.dataset.files || '[]');
-    
-    if(!files.length) return alert("No media in this folder.");
-
-    // Setup the list for navigation
-    mediaList = files.map(f => ({
-        src: `https://akhand-jaihind.github.io/ncc-nit-ap/${folder}/${f}`,
-        name: f
-    }));
-    
-    document.getElementById('lb-title-text').textContent = title;
-    document.getElementById('lightbox').classList.add('open');
-    document.body.style.overflow = 'hidden'; // Stop scrolling
-    showMedia(0);
-};
-
-window.showMedia = function(idx) {
-    currentIdx = idx;
-    const m = mediaList[idx];
-    const wrap = document.getElementById('lb-media-wrap');
-    
-    // Support for both Images and Videos
-    const isVideo = m.src.toLowerCase().endsWith('.mp4');
-    wrap.innerHTML = isVideo ? 
-        `<video controls autoplay style="max-width:100%; max-height:75vh;"><source src="${m.src}"></video>` :
-        `<img src="${m.src}" style="max-width:100%; max-height:75vh; object-fit:contain;">`;
-    
-    document.getElementById('lb-counter').textContent = `${idx + 1} / ${mediaList.length}`;
-};
-
-window.closeLightbox = function() {
-    document.getElementById('lightbox').classList.remove('open');
-    document.body.style.overflow = ''; // Resume scrolling
-    document.getElementById('lb-media-wrap').innerHTML = ''; // Stop video audio
-};
+    window.addEventListener('load', () => { setTimeout(() => { document.getElementById('loader').style.opacity='0'; setTimeout(()=>document.getElementById('loader').style.display='none',500); }, 1500); });
 </script>
 </body>
 </html>
