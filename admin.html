@@ -858,6 +858,46 @@ body { font-family:'Roboto',sans-serif; background:var(--bg); color:var(--text);
     t.className='show'+(isErr?' err':'');
     setTimeout(()=>t.className='', 3000);
   };
+  /* --- ADD THIS FOR GALLERY FETCHING --- */
+window.fetchFolderIndex = async function() {
+  const folder = document.getElementById('gal-folder').value.trim();
+  const SITE_BASE = 'https://akhand-jaihind.github.io/ncc-nit-ap';
+  const url = `${SITE_BASE}/${encodeURIComponent(folder)}/index.json`;
+  
+  toast("Fetching folder index...");
+  try {
+    const resp = await fetch(url, {cache: 'no-store'});
+    if(!resp.ok) throw new Error("index.json not found in " + folder);
+    const files = await resp.json();
+    document.getElementById('gal-files-hidden').value = JSON.stringify(files);
+    toast(`Success: Found ${files.length} files!`);
+  } catch(e) {
+    toast(e.message, true);
+  }
+};
+
+window.addGalleryItem = function() {
+  const title = v('gal-title'), folder = v('gal-folder');
+  const filesRaw = document.getElementById('gal-files-hidden').value;
+  if(!title || !folder) return toast("Title and Folder required", true);
+  
+  const data = JSON.parse(localStorage.getItem('ncc_gallery') || '[]');
+  data.push({
+    id: Date.now(),
+    title, folder,
+    thumb: v('gal-thumb'),
+    label: v('gal-label'),
+    files: filesRaw ? JSON.parse(filesRaw) : []
+  });
+  save('gallery', data);
+};
+
+// Add this to your renderAll function
+function renderOfficers() {
+  const data = JSON.parse(localStorage.getItem('ncc_officers') || '[]');
+  const el = document.getElementById('officers-list');
+  el.innerHTML = data.map((o, i) => `<div class="officer-admin-card"><strong>${esc(o.name)}</strong></div>`).join('');
+}
 </script>
 </body>
 </html>
