@@ -3,100 +3,110 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NCC NITAR — Global Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+<title>NCC NITAR — Global Admin Command</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-    :root { --teal: #004d40; --army: #2d3436; --accent: #00bfa5; --bg: #f0f2f5; --card: #ffffff; --border: #d0ddd8; }
-    body { font-family: 'Roboto', sans-serif; background: var(--bg); margin: 0; }
-    #login-screen { position: fixed; inset: 0; background: #0d1117; display: flex; align-items: center; justify-content: center; z-index: 9999; }
-    #login-screen.out { display: none; }
-    .login-box { background: white; padding: 40px; border-top: 5px solid var(--accent); width: 350px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-    #app { display: none; min-height: 100vh; flex-direction: row; }
+    :root { --teal: #004d40; --army: #2d3436; --accent: #00bfa5; --bg: #f0f2f5; --border: #d0ddd8; }
+    body { font-family: 'Roboto', sans-serif; background: var(--bg); margin: 0; overflow-x: hidden; }
+
+    /* Elite Animated Login */
+    #login-screen { position: fixed; inset: 0; background: radial-gradient(ellipse at 20% 50%, #0a2e28 0%, #1a1a2e 40%, #0d1117 100%); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .login-orb { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.4; animation: float 10s infinite alternate; }
+    @keyframes float { from { transform: translate(0,0); } to { transform: translate(50px, 50px); } }
+    .login-box { background: rgba(255,255,255,0.06); backdrop-filter: blur(20px); padding: 40px; border-top: 4px solid var(--accent); width: 380px; box-shadow: 0 24px 60px rgba(0,0,0,0.6); position: relative; color: white; }
+
+    #app { display: none; min-height: 100vh; }
     #app.visible { display: flex; }
-    .sidebar { width: 250px; background: var(--army); color: white; padding: 20px; }
-    .main-area { flex: 1; padding: 30px; }
-    .panel { display: none; }
+    .sidebar { width: 260px; background: var(--army); color: white; padding: 30px 20px; display: flex; flex-direction: column; }
+    .nav-item { padding: 12px; cursor: pointer; color: #b2bec3; transition: 0.3s; font-family: 'Roboto Mono'; font-size: 0.85rem; }
+    .nav-item:hover { color: var(--accent); background: rgba(255,255,255,0.05); }
+
+    .main-area { flex: 1; padding: 40px; }
+    .panel { display: none; animation: fadeIn 0.4s ease; }
     .panel.active { display: block; }
-    .card { background: white; padding: 25px; border: 1px solid var(--border); margin-bottom: 20px; box-shadow: 4px 4px 0 var(--army); }
-    input, textarea, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; }
-    .btn { padding: 10px 20px; cursor: pointer; border: none; background: var(--teal); color: white; font-family: 'Oswald'; }
-    #toast { position: fixed; bottom: 20px; right: 20px; background: var(--army); color: white; padding: 15px; border-left: 5px solid var(--accent); display: none; z-index: 10000; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    .card { background: white; padding: 30px; border: 1px solid var(--border); margin-bottom: 25px; box-shadow: 4px 4px 0 var(--army); }
+    input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 2px; }
+    .btn { padding: 12px 25px; cursor: pointer; border: none; background: var(--teal); color: white; font-family: 'Oswald'; letter-spacing: 2px; text-transform: uppercase; }
+    #toast { position: fixed; bottom: 30px; right: 30px; background: var(--army); color: white; padding: 15px 25px; border-left: 5px solid var(--accent); display: none; z-index: 10000; font-family: 'Roboto Mono'; }
 </style>
 </head>
 <body>
 
 <div id="login-screen">
+    <div class="login-orb" style="width:300px; height:300px; background:var(--teal); top:-50px; left:-50px;"></div>
     <div class="login-box">
-        <h2 style="font-family:'Oswald';">ADMIN ACCESS</h2>
-        <input type="text" id="inp-id" placeholder="Admin ID">
-        <input type="password" id="inp-pwd" placeholder="Password">
-        <button class="btn" onclick="doLogin()">AUTHENTICATE</button>
-        <p id="login-err" style="color:red; font-size:0.8rem;"></p>
+        <h1 style="font-family:'Oswald'; letter-spacing: 5px; text-align: center;">NCC · NITAR</h1>
+        <p style="text-align:center; font-family:'Roboto Mono'; font-size:0.7rem; color:var(--accent);">// COMMAND CENTRE ACCESS</p>
+        <input type="text" id="inp-id" placeholder="ADMIN ID">
+        <input type="password" id="inp-pwd" placeholder="PASSWORD">
+        <button class="btn" style="width:100%; margin-top:10px;" onclick="doLogin()">AUTHENTICATE →</button>
+        <p id="login-err" style="color:#ff6b6b; text-align:center; font-size:0.8rem; margin-top:15px;"></p>
     </div>
 </div>
 
 <div id="app">
     <aside class="sidebar">
-        <h3 style="color:var(--accent);">COMMANDER</h3>
-        <p onclick="gotoPanel('dashboard')" style="cursor:pointer;">📊 Dashboard</p>
-        <p onclick="gotoPanel('notices')" style="cursor:pointer;">📋 Notices</p>
-        <p onclick="gotoPanel('rank')" style="cursor:pointer;">🏅 Rank Panel</p>
-        <p onclick="gotoPanel('gallery')" style="cursor:pointer;">🖼 Gallery</p>
-        <p onclick="gotoPanel('officers')" style="cursor:pointer;">🪖 Officers</p>
-        <br>
-        <button class="btn" onclick="location.reload()" style="background:#c0392b; width:100%;">LOGOUT</button>
+        <h2 style="font-family:'Oswald'; color:var(--accent); letter-spacing:3px;">ADMIN PANEL</h2>
+        <div class="nav-item" onclick="gotoPanel('dashboard')">📊 DASHBOARD</div>
+        <div class="nav-item" onclick="gotoPanel('notices')">📋 NOTICES</div>
+        <div class="nav-item" onclick="gotoPanel('rank')">🏅 RANK PANEL</div>
+        <div class="nav-item" onclick="gotoPanel('gallery')">🖼 GALLERY</div>
+        <div class="nav-item" onclick="gotoPanel('officers')">🪖 OFFICERS</div>
+        <button class="btn" onclick="location.reload()" style="background:#c0392b; margin-top:auto;">⬡ LOGOUT</button>
     </aside>
 
     <main class="main-area">
         <div id="panel-dashboard" class="panel active">
-            <h2 style="font-family:'Oswald';">DASHBOARD</h2>
+            <h2 style="font-family:'Oswald'; color:var(--teal);">OVERVIEW</h2>
             <div id="stats-grid" style="display:flex; gap:20px;"></div>
         </div>
 
         <div id="panel-notices" class="panel">
             <div class="card">
-                <h3>+ Post Notice</h3>
+                <h3>+ POST NEW NOTICE</h3>
                 <input type="text" id="not-title" placeholder="Notice Title">
-                <textarea id="not-body" placeholder="Notice Content"></textarea>
-                <input type="text" id="not-by" placeholder="Posted By (e.g. SUO)">
-                <button class="btn" onclick="addNotice()">BROADCAST GLOBALLY</button>
+                <textarea id="not-body" placeholder="Content..."></textarea>
+                <input type="text" id="not-by" placeholder="Posted By">
+                <button class="btn" onclick="addNotice()">BROADCAST TO LIVE SITE</button>
             </div>
             <div id="notices-list"></div>
         </div>
 
         <div id="panel-rank" class="panel">
             <div class="card">
-                <h3>+ Add Cadet</h3>
+                <h3>+ ADD CADET TO PANEL</h3>
                 <input type="text" id="rank-rank" placeholder="Rank (e.g. SUO)">
                 <input type="text" id="rank-name" placeholder="Full Name">
                 <input type="text" id="rank-branch" placeholder="Branch">
-                <button class="btn" onclick="addRankEntry()">ADD TO PANEL</button>
+                <button class="btn" onclick="addRankEntry()">ADD CADET</button>
             </div>
-            <table style="width:100%; background:white; border-collapse:collapse;" border="1"><tbody id="rank-tbody"></tbody></table>
+            <div id="rank-list"></div>
         </div>
 
         <div id="panel-gallery" class="panel">
             <div class="card">
-                <h3>+ Add Gallery Event</h3>
-                <input type="text" id="gal-folder" placeholder="Folder Name (exact)">
-                <button class="btn" style="background:var(--accent);" onclick="fetchFolderIndex()">1. FETCH FILES</button>
+                <h3>+ NEW GALLERY EVENT</h3>
+                <input type="text" id="gal-folder" placeholder="Folder Name (as it is on GitHub)">
+                <button class="btn" style="background:var(--accent);" onclick="fetchFolderIndex()">1. FETCH REPO FILES</button>
                 <input type="hidden" id="gal-files-hidden">
                 <input type="text" id="gal-title" placeholder="Event Title">
-                <input type="text" id="gal-thumb" placeholder="Thumbnail Path (e.g. photo.jpg)">
-                <button class="btn" onclick="addGalleryItem()">2. ADD EVENT</button>
+                <input type="text" id="gal-thumb" placeholder="Thumbnail Image (e.g. main.jpg)">
+                <button class="btn" onclick="addGalleryItem()">2. DEPLOY GLOBALLY</button>
             </div>
             <div id="gallery-list"></div>
         </div>
-        
+
         <div id="panel-officers" class="panel">
             <div class="card">
-                <h3>+ Add Officer</h3>
+                <h3>+ UPDATE OFFICER PROFILES</h3>
                 <input type="text" id="off-name" placeholder="Full Name">
                 <input type="text" id="off-role" placeholder="Role (CO/AO/ANO)">
-                <input type="text" id="off-designation" placeholder="Full Designation">
+                <input type="text" id="off-designation" placeholder="Full Title">
                 <input type="text" id="off-photo" placeholder="Photo Path">
-                <textarea id="off-bio" placeholder="Biography"></textarea>
-                <button class="btn" onclick="addOfficer()">SAVE OFFICER</button>
+                <textarea id="off-bio" placeholder="Bio..."></textarea>
+                <button class="btn" onclick="addOfficer()">SAVE PROFILE</button>
             </div>
             <div id="officers-list"></div>
         </div>
@@ -107,7 +117,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBCLCGsYWA-PUhWvgW45cb-X9G1CjrtAcs",
@@ -123,28 +133,23 @@
     window.save = async (key, data) => {
         try {
             await set(ref(db, 'ncc_unit/' + key), data);
-            toast(`Cloud Updated: ${key} ✓`);
-        } catch (e) { toast("Error: " + e.message, true); }
+            toast(`Cloud Synced: ${key.toUpperCase()} is now live! ✓`);
+        } catch (e) { toast("Sync Error: " + e.message, true); }
     };
 
     onValue(ref(db, 'ncc_unit'), (snapshot) => {
         if (snapshot.exists()) {
             const data = snapshot.val();
-            localStorage.setItem('ncc_gallery', JSON.stringify(data.gallery || []));
-            localStorage.setItem('ncc_officers', JSON.stringify(data.officers || []));
-            localStorage.setItem('ncc_rank', JSON.stringify(data.rank || []));
-            localStorage.setItem('ncc_notices', JSON.stringify(data.notices || []));
+            localStorage.setItem('data_cache', JSON.stringify(data));
             renderAll();
         }
     });
 
     window.doLogin = function() {
-        const id = document.getElementById('inp-id').value, pwd = document.getElementById('inp-pwd').value;
-        if(id === 'nccaradmin' && pwd === 'NITAR@NCC2026') {
-            document.getElementById('login-screen').classList.add('out');
+        if(v('inp-id') === 'nccaradmin' && v('inp-pwd') === 'NITAR@NCC2026') {
+            document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app').classList.add('visible');
-            renderAll();
-        } else { document.getElementById('login-err').textContent = "✕ Invalid Credentials"; }
+        } else { document.getElementById('login-err').textContent = "✕ ACCESS DENIED"; }
     };
 
     window.gotoPanel = function(name) {
@@ -152,62 +157,60 @@
         document.getElementById('panel-' + name).classList.add('active');
     };
 
-    window.addNotice = function() {
-        const data = JSON.parse(localStorage.getItem('ncc_notices') || '[]');
-        data.push({ title: v('not-title'), body: v('not-body'), by: v('not-by'), created: new Date().toISOString() });
-        save('notices', data);
+    window.addNotice = () => {
+        const d = cache('notices');
+        d.push({ title: v('not-title'), body: v('not-body'), by: v('not-by'), created: new Date().toISOString() });
+        save('notices', d);
     };
 
-    window.addRankEntry = function() {
-        const data = JSON.parse(localStorage.getItem('ncc_rank') || '[]');
-        data.push({ rank: v('rank-rank'), name: v('rank-name'), branch: v('rank-branch') });
-        save('rank', data);
+    window.addRankEntry = () => {
+        const d = cache('rank');
+        d.push({ rank: v('rank-rank'), name: v('rank-name'), branch: v('rank-branch') });
+        save('rank', d);
     };
 
-    window.addOfficer = function() {
-        const data = JSON.parse(localStorage.getItem('ncc_officers') || '[]');
-        data.push({ name: v('off-name'), role: v('off-role'), designation: v('off-designation'), photo: v('off-photo'), bio: v('off-bio') });
-        save('officers', data);
+    window.addOfficer = () => {
+        const d = cache('officers');
+        d.push({ name: v('off-name'), role: v('off-role'), designation: v('off-designation'), photo: v('off-photo'), bio: v('off-bio') });
+        save('officers', d);
     };
 
-    window.fetchFolderIndex = async function() {
-        const folder = v('gal-folder');
-        const url = `https://akhand-jaihind.github.io/ncc-nit-ap/${encodeURIComponent(folder)}/index.json`;
+    window.fetchFolderIndex = async () => {
+        const url = `https://akhand-jaihind.github.io/ncc-nit-ap/${encodeURIComponent(v('gal-folder'))}/index.json`;
         try {
             const r = await fetch(url);
             const files = await r.json();
             document.getElementById('gal-files-hidden').value = JSON.stringify(files);
-            toast("Fetched " + files.length + " files!");
-        } catch(e) { toast("Error: Check if index.json exists on GitHub", true); }
+            toast("Repo Sync: Found " + files.length + " files!");
+        } catch(e) { toast("Fetch Failed: Is index.json on GitHub?", true); }
     };
 
-    window.addGalleryItem = function() {
-        const data = JSON.parse(localStorage.getItem('ncc_gallery') || '[]');
-        data.push({ title: v('gal-title'), folder: v('gal-folder'), thumb: v('gal-thumb'), files: JSON.parse(document.getElementById('gal-files-hidden').value || '[]') });
-        save('gallery', data);
+    window.addGalleryItem = () => {
+        const d = cache('gallery');
+        d.push({ title: v('gal-title'), folder: v('gal-folder'), thumb: v('gal-thumb'), files: JSON.parse(document.getElementById('gal-files-hidden').value || '[]') });
+        save('gallery', d);
     };
 
-    window.deleteItem = function(key, idx) {
-        if(!confirm('Delete?')) return;
-        const data = JSON.parse(localStorage.getItem('ncc_' + key) || '[]');
-        data.splice(idx, 1);
-        save(key, data);
+    window.deleteItem = (key, idx) => {
+        if(!confirm('Delete permanently?')) return;
+        const d = cache(key);
+        d.splice(idx, 1);
+        save(key, d);
     };
 
     function renderAll() {
-        const n = JSON.parse(localStorage.getItem('ncc_notices') || '[]');
-        const r = JSON.parse(localStorage.getItem('ncc_rank') || '[]');
-        const o = JSON.parse(localStorage.getItem('ncc_officers') || '[]');
-        const g = JSON.parse(localStorage.getItem('ncc_gallery') || '[]');
+        const data = JSON.parse(localStorage.getItem('data_cache') || '{}');
+        const n = data.notices || [], r = data.rank || [], o = data.officers || [], g = data.gallery || [];
         
         document.getElementById('stats-grid').innerHTML = `<div class="card"><b>${n.length}</b><br>Notices</div><div class="card"><b>${r.length}</b><br>Cadets</div>`;
-        document.getElementById('notices-list').innerHTML = n.map((x, i) => `<div class="card">${x.title} <button onclick="deleteItem('notices',${i})">✕</button></div>`).join('');
-        document.getElementById('rank-tbody').innerHTML = r.map((x, i) => `<tr><td>${x.name}</td><td><button onclick="deleteItem('rank',${i})">✕</button></td></tr>`).join('');
-        document.getElementById('officers-list').innerHTML = o.map((x, i) => `<div class="card">${x.name} <button onclick="deleteItem('officers',${i})">✕</button></div>`).join('');
-        document.getElementById('gallery-list').innerHTML = g.map((x, i) => `<div class="card">${x.title} <button onclick="deleteItem('gallery',${i})">✕</button></div>`).join('');
+        document.getElementById('notices-list').innerHTML = n.map((x, i) => `<div class="card">${x.title} <button class="btn" style="background:red; padding:5px;" onclick="deleteItem('notices',${i})">✕</button></div>`).join('');
+        document.getElementById('rank-list').innerHTML = r.map((x, i) => `<div class="card">${x.name} <button class="btn" style="background:red; padding:5px;" onclick="deleteItem('rank',${i})">✕</button></div>`).join('');
+        document.getElementById('officers-list').innerHTML = o.map((x, i) => `<div class="card">${x.name} <button class="btn" style="background:red; padding:5px;" onclick="deleteItem('officers',${i})">✕</button></div>`).join('');
+        document.getElementById('gallery-list').innerHTML = g.map((x, i) => `<div class="card">${x.title} <button class="btn" style="background:red; padding:5px;" onclick="deleteItem('gallery',${i})">✕</button></div>`).join('');
     }
 
     const v = (id) => document.getElementById(id).value.trim();
+    const cache = (k) => JSON.parse(localStorage.getItem('data_cache') || '{}')[k] || [];
     function toast(m, err) { const t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block'; t.style.background = err ? '#c0392b' : '#2d3436'; setTimeout(() => t.style.display = 'none', 3000); }
 </script>
 </body>
