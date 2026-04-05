@@ -6,213 +6,160 @@
     <title>NCC NIT Arunachal Pradesh | Official Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto:wght@400;700&family=Roboto+Mono&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --army-green: #2d3436;
-            --light-grey: #f0f2f5;
-            --nit-teal: #004d40;
-            --teal-lt: #00695c;
-            --accent: #00bfa5;
-            --white: #ffffff;
-        }
-        *, *::before, *::after { box-sizing: border-box; }
-        body { margin: 0; background-color: var(--light-grey); color: #333; font-family: 'Roboto', sans-serif; overflow-x: hidden; }
-
-        /* ─── LOADER ─── */
-        #loader { position: fixed; inset: 0; background: var(--light-grey); display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease-out; }
-        #loader video { width: 500px; mix-blend-mode: multiply; filter: contrast(1.2); outline: none; }
-        .loader-fallback { display: none; flex-direction: column; align-items: center; gap: 20px; }
-        .loader-fallback .loader-logo { font-family: 'Oswald', sans-serif; font-size: 1.4rem; letter-spacing: 6px; color: var(--nit-teal); }
-        .loader-spinner { width: 48px; height: 48px; border: 4px solid #d0ddd8; border-top-color: var(--nit-teal); border-radius: 50%; animation: spin 0.9s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ─── HEADER ─── */
-        header { background: var(--white); border-bottom: 4px solid var(--nit-teal); padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: relative; z-index: 10; }
-
-        /* ─── LIVE BADGE ─── */
-        #live-badge {
-            position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%);
-            background: var(--accent); color: #fff;
-            font-family: 'Roboto Mono', monospace; font-size: 0.6rem; letter-spacing: 2px;
-            padding: 2px 10px; display: none; align-items: center; gap: 5px;
-            border-radius: 0 0 4px 4px; white-space: nowrap; z-index: 5;
-        }
-        #live-badge.show { display: flex; }
-        .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: livePulse 1.4s ease-in-out infinite; }
-        @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
-
-        /* ─── NOTICES TICKER ─── */
-        .notices-bar { background: var(--nit-teal); color: white; padding: 9px 5%; display: none; align-items: center; gap: 16px; font-family: 'Roboto Mono', monospace; font-size: 0.8rem; overflow: hidden; }
-        .notices-bar-label { background: white; color: var(--nit-teal); font-weight: 700; padding: 3px 10px; font-size: 0.7rem; letter-spacing: 2px; white-space: nowrap; flex-shrink: 0; }
-        .notices-ticker-wrap { overflow: hidden; flex: 1; cursor: pointer; }
-        .notices-ticker { display: flex; gap: 60px; animation: ticker 35s linear infinite; white-space: nowrap; }
-        .notices-ticker:hover { animation-play-state: paused; }
-        @keyframes ticker { from { transform: translateX(100%); } to { transform: translateX(-200%); } }
-        .notice-tick-item { display: inline-flex; align-items: center; gap: 8px; }
-        .notice-tick-dot { width: 6px; height: 6px; border-radius: 50%; background: #80cbc4; flex-shrink: 0; }
-
-        /* ─── NAV ─── */
-        .nav-tabs { background: var(--army-green); display: flex; justify-content: center; flex-wrap: wrap; padding: 0; position: sticky; top: 0; z-index: 100; overflow-x: auto; }
-        .tab-btn { padding: 15px 20px; color: rgba(255,255,255,.8); cursor: pointer; border: none; background: none; font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 0.88rem; letter-spacing: 1px; transition: 0.25s; position: relative; }
-        .tab-btn::after { content: ''; position: absolute; bottom: 0; left: 50%; right: 50%; height: 3px; background: var(--accent); transition: left 0.25s, right 0.25s; }
-        .tab-btn:hover { color: #fff; background: rgba(255,255,255,.05); }
-        .tab-btn.active { color: #fff; background: var(--nit-teal); }
-        .tab-btn.active::after { left: 0; right: 0; }
-
-        /* ─── CONTENT ─── */
-        .tab-content { display: none; padding: 50px 10%; animation: fadeIn 0.45s ease; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-        .clean-img { mix-blend-mode: multiply; filter: contrast(1.1); }
-
-        /* ─── HOME ─── */
-        .hero-box { text-align: center; background: white; padding: 50px 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); position: relative; overflow: hidden; }
-        .hero-box::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg,rgba(0,77,64,.03) 0%,transparent 60%); pointer-events: none; }
-        .main-logo { width: 280px; margin-bottom: 20px; animation: heroPop 0.8s cubic-bezier(.175,.885,.32,1.275) both; }
-        @keyframes heroPop { from { opacity:0; transform:scale(.8); } to { opacity:1; transform:scale(1); } }
-        .hero-box h1 { font-family: 'Oswald', sans-serif; letter-spacing: 3px; color: var(--nit-teal); margin: 0 0 12px; }
-        .hero-box p { color: #666; line-height: 1.7; max-width: 520px; margin: 0 auto 10px; }
-        .hero-stats { display: flex; justify-content: center; gap: 40px; margin-top: 30px; padding-top: 24px; border-top: 1px dashed #d0ddd8; flex-wrap: wrap; }
-        .hero-stat { text-align: center; }
-        .hero-stat-val { font-family: 'Oswald', sans-serif; font-size: 2rem; color: var(--nit-teal); display: block; }
-        .hero-stat-lbl { font-family: 'Roboto Mono', monospace; font-size: 0.68rem; color: #999; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
-
-        /* ─── ABOUT ─── */
-        .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 28px; }
-        .about-card { background: white; padding: 28px; border-left: 4px solid var(--nit-teal); box-shadow: 4px 4px 0 var(--army-green); transition: box-shadow .25s, transform .25s; }
-        .about-card:hover { transform: translateY(-4px); box-shadow: 6px 8px 0 var(--nit-teal); }
-        .about-card h3 { font-family: 'Oswald', sans-serif; color: var(--nit-teal); letter-spacing: 2px; margin: 0 0 10px; }
-        .about-card p { font-size: 0.9rem; line-height: 1.7; color: #555; margin: 0; }
-        @media (max-width: 640px) { .about-grid { grid-template-columns: 1fr; } }
-
-        /* ─── OFFICERS ─── */
-        .officers-header { text-align: center; margin-bottom: 50px; }
-        .officers-title { font-family: 'Oswald', sans-serif; font-size: 2.2rem; color: var(--nit-teal); margin: 0 0 6px; letter-spacing: 4px; }
-        .officers-sub { font-family: 'Roboto Mono', monospace; font-size: 0.85rem; color: #999; margin: 0; letter-spacing: 2px; }
-        .officers-stack { display: flex; flex-direction: column; gap: 30px; max-width: 960px; margin: 0 auto; }
-        .officer-card { background: white; display: flex; align-items: stretch; border: 1px solid #d0ddd8; box-shadow: 5px 5px 0px var(--army-green); position: relative; overflow: hidden; opacity: 0; transform: translateX(-40px); transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s ease; }
-        .officer-card.visible { opacity: 1; transform: translateX(0); }
-        .officer-card:hover { box-shadow: 8px 8px 0px var(--nit-teal); }
-        .officer-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--nit-teal); }
-        .officer-rank-badge { position: absolute; top: 16px; left: 16px; background: var(--army-green); color: white; font-family: 'Oswald', sans-serif; font-size: 0.7rem; letter-spacing: 2px; padding: 4px 10px; z-index: 2; }
-        .officer-photo-wrap { position: relative; width: 200px; min-height: 220px; flex-shrink: 0; background: #e8efec; overflow: hidden; }
-        .officer-photo-wrap.no-photo::after { content: '👤'; font-size: 4rem; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #ccc; }
-        .officer-photo { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; transition: transform 0.4s ease; }
-        .officer-card:hover .officer-photo { transform: scale(1.04); }
-        .officer-photo-frame { position: absolute; bottom: 10px; right: 10px; width: 30px; height: 30px; border-right: 2px solid var(--nit-teal); border-bottom: 2px solid var(--nit-teal); pointer-events: none; }
-        .officer-info { padding: 30px 30px 25px 30px; display: flex; flex-direction: column; justify-content: center; flex: 1; }
-        .officer-designation { font-family: 'Roboto Mono', monospace; font-size: 0.72rem; letter-spacing: 2px; color: var(--nit-teal); margin: 0 0 6px; text-transform: uppercase; }
-        .officer-name { font-family: 'Oswald', sans-serif; font-size: 1.6rem; color: var(--army-green); margin: 0 0 14px; letter-spacing: 1px; }
-        .officer-divider { width: 40px; height: 3px; background: var(--nit-teal); margin-bottom: 14px; transition: width 0.4s ease; }
-        .officer-card:hover .officer-divider { width: 80px; }
-        .officer-bio { font-size: 0.88rem; line-height: 1.7; color: #555; margin: 0; font-style: italic; }
-        @media (max-width: 640px) { .officer-card { flex-direction: column; } .officer-photo-wrap { width: 100%; height: 200px; min-height: unset; } .officer-info { padding: 20px; } }
-
-        /* ─── RANK ─── */
-        .rank-table { width: 100%; border-collapse: collapse; background: white; margin-top: 20px; box-shadow: 4px 4px 0 var(--army-green); }
-        .rank-table th, .rank-table td { border: 1px solid #ddd; padding: 15px; text-align: left; }
-        .rank-table th { background: var(--nit-teal); color: white; font-family: 'Oswald'; letter-spacing: 1px; }
-        .rank-table tbody tr { transition: background .2s; }
-        .rank-table tbody tr:hover td { background: #e8f5e9; }
-        .rank-table tr:nth-child(even) td { background: #f9f9f9; }
-        .rank-table tr:nth-child(even):hover td { background: #e8f5e9; }
-
-        /* ─── GALLERY ─── */
-        .gallery-header-box { text-align: center; margin-bottom: 40px; }
-        .gallery-heading { font-family: 'Oswald', sans-serif; font-size: 2.5rem; text-transform: uppercase; color: var(--nit-teal); margin-bottom: 5px; }
-        .gallery-subheading { font-family: 'Roboto Mono', monospace; font-size: 0.9rem; color: #666; text-transform: uppercase; }
-        .row-gallery-container { display: flex; flex-direction: row; justify-content: center; flex-wrap: wrap; gap: 30px; }
-        .techy-gallery-item { background: white; padding: 15px; border: 1px solid var(--nit-teal); width: 350px; box-shadow: 4px 4px 0px var(--army-green); transition: transform 0.25s ease, box-shadow 0.25s ease; cursor: pointer; position: relative; outline: none; user-select: none; opacity: 0; transform: translateY(20px); animation: cardReveal 0.5s ease forwards; }
-        @keyframes cardReveal { to { opacity: 1; transform: translateY(0); } }
-        .techy-gallery-item:hover { transform: translateY(-6px); box-shadow: 8px 8px 0px var(--nit-teal); }
-        .techy-gallery-item:active { transform: translateY(-2px) scale(0.98); }
-        .techy-gallery-item:focus-visible { outline: 3px solid var(--nit-teal); outline-offset: 3px; }
-        .card-overlay { position: absolute; inset: 0; background: rgba(0,77,64,0); display: flex; align-items: center; justify-content: center; transition: background 0.25s ease; }
-        .techy-gallery-item:hover .card-overlay { background: rgba(0,77,64,0.18); }
-        .card-overlay-icon { opacity: 0; transform: scale(0.7); transition: opacity 0.25s ease, transform 0.25s ease; background: rgba(0,77,64,0.85); color: white; font-family: 'Oswald', sans-serif; font-size: 0.85rem; letter-spacing: 2px; padding: 10px 20px; border: 1px solid white; text-transform: uppercase; }
-        .techy-gallery-item:hover .card-overlay-icon { opacity: 1; transform: scale(1); }
-        .techy-gallery-item img { width: 100%; height: 220px; object-fit: cover; border-radius: 2px; display: block; }
-        .techy-gallery-item figcaption { margin-top: 15px; font-size: 0.85rem; font-family: 'Roboto Mono', monospace; text-transform: uppercase; border-top: 1px dashed #ccc; padding-top: 10px; color: #333; }
-
-        /* ─── NOTICES PAGE ─── */
-        .sec-page-header { margin-bottom: 32px; }
-        .sec-page-header h2 { font-family: 'Oswald', sans-serif; font-size: 2rem; color: var(--nit-teal); letter-spacing: 3px; margin: 0 0 6px; }
-        .sec-page-header p { font-family: 'Roboto Mono', monospace; font-size: 0.78rem; color: #999; letter-spacing: 1px; margin: 0; }
-
-        .notice-card { background: white; border: 1px solid #d0ddd8; padding: 22px 24px; margin-bottom: 16px; display: flex; gap: 18px; align-items: flex-start; box-shadow: 3px 3px 0 var(--army-green); transition: box-shadow .2s, transform .2s; opacity: 0; animation: cardReveal 0.4s ease forwards; }
-        .notice-card:hover { box-shadow: 5px 5px 0 var(--nit-teal); transform: translateX(3px); }
-        .notice-priority-bar { width: 5px; min-height: 50px; border-radius: 3px; flex-shrink: 0; margin-top: 2px; }
-        .priority-high .notice-priority-bar { background: #e74c3c; }
-        .priority-med  .notice-priority-bar { background: #e67e22; }
-        .priority-low  .notice-priority-bar { background: #27ae60; }
-        .notice-card-body { flex: 1; }
-        .notice-card-title { font-family: 'Oswald', sans-serif; font-size: 1.15rem; color: var(--army-green); margin: 0 0 8px; letter-spacing: 1px; }
-        .notice-card-meta { font-family: 'Roboto Mono', monospace; font-size: 0.7rem; color: #aaa; letter-spacing: 1px; margin-bottom: 10px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-        .notice-badge { padding: 2px 8px; border-radius: 2px; font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; }
-        .badge-high { background: #fde8e8; color: #c0392b; }
-        .badge-med  { background: #fef3e2; color: #d35400; }
-        .badge-low  { background: #e8f8f0; color: #1e8449; }
-        .notice-card-text { font-size: 0.9rem; line-height: 1.7; color: #555; margin: 0 0 12px; white-space: pre-wrap; }
-        .notice-attachment { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1px solid var(--nit-teal); color: var(--nit-teal); font-family: 'Roboto Mono', monospace; font-size: 0.75rem; letter-spacing: 1px; text-decoration: none; transition: background .2s, color .2s; }
-        .notice-attachment:hover { background: var(--nit-teal); color: white; }
-        .notice-expiry { font-family: 'Roboto Mono', monospace; font-size: 0.68rem; color: #e74c3c; margin-top: 8px; }
-
-        /* ─── RESOURCES ─── */
-        .resources-filter { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
-        .filter-btn { padding: 8px 18px; border: 1px solid var(--nit-teal); background: white; color: var(--nit-teal); font-family: 'Oswald', sans-serif; font-size: 0.85rem; letter-spacing: 1px; cursor: pointer; transition: .2s; }
-        .filter-btn:hover, .filter-btn.active { background: var(--nit-teal); color: white; }
-        .resources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .resource-card { background: white; border: 1px solid #d0ddd8; padding: 20px; display: flex; align-items: flex-start; gap: 16px; box-shadow: 3px 3px 0 var(--army-green); transition: box-shadow .2s, transform .2s; opacity: 0; animation: cardReveal 0.4s ease forwards; }
-        .resource-card:hover { box-shadow: 5px 5px 0 var(--nit-teal); transform: translateY(-3px); }
-        .resource-icon { font-size: 2rem; flex-shrink: 0; width: 44px; text-align: center; }
-        .resource-info { flex: 1; min-width: 0; }
-        .resource-title { font-family: 'Oswald', sans-serif; font-size: 1rem; color: var(--army-green); margin: 0 0 4px; letter-spacing: 1px; word-break: break-word; }
-        .resource-desc { font-size: 0.82rem; color: #777; margin: 0 0 8px; line-height: 1.5; }
-        .resource-meta { font-family: 'Roboto Mono', monospace; font-size: 0.66rem; color: #bbb; letter-spacing: 1px; margin-bottom: 10px; }
-        .resource-tag { display: inline-block; padding: 2px 8px; background: #e8f5e9; color: var(--nit-teal); font-size: 0.65rem; font-family: 'Roboto Mono', monospace; letter-spacing: 1px; border-radius: 2px; }
-        .resource-dl { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; background: var(--nit-teal); color: white; font-family: 'Roboto Mono', monospace; font-size: 0.72rem; letter-spacing: 1px; text-decoration: none; transition: background .2s; }
-        .resource-dl:hover { background: var(--teal-lt); }
-
-        /* ─── LIGHTBOX ─── */
-        #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.93); z-index: 5000; flex-direction: column; align-items: stretch; }
-        #lightbox.open { display: flex; }
-        .lb-topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; background: var(--army-green); border-bottom: 2px solid var(--nit-teal); flex-shrink: 0; }
-        .lb-title { font-family: 'Oswald', sans-serif; font-size: 1.1rem; color: white; letter-spacing: 2px; text-transform: uppercase; }
-        .lb-close { background: none; border: 2px solid white; color: white; font-size: 1.2rem; width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; font-family: monospace; }
-        .lb-close:hover { background: #c0392b; border-color: #c0392b; }
-        .lb-viewer { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 20px 70px; box-sizing: border-box; }
-        .lb-media-wrap { max-width: 100%; max-height: 100%; display: flex; align-items: center; justify-content: center; }
-        .lb-media-wrap img, .lb-media-wrap video { max-width: 100%; max-height: calc(100vh - 230px); object-fit: contain; border: 2px solid var(--nit-teal); box-shadow: 0 0 40px rgba(0,77,64,0.5); border-radius: 2px; }
-        .lb-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,77,64,0.7); border: none; color: white; font-size: 1.8rem; width: 48px; height: 64px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; z-index: 10; }
-        .lb-arrow:hover { background: var(--nit-teal); }
-        .lb-arrow.prev { left: 10px; }
-        .lb-arrow.next { right: 10px; }
-        .lb-arrow:disabled { opacity: 0.2; cursor: default; }
-        .lb-counter { font-family: 'Roboto Mono', monospace; font-size: 0.8rem; color: #aaa; letter-spacing: 2px; }
-        .lb-thumbstrip { display: flex; gap: 8px; padding: 10px 20px; background: #111; overflow-x: auto; flex-shrink: 0; border-top: 1px solid #333; align-items: center; }
-        .lb-thumb { width: 64px; height: 64px; object-fit: cover; border: 2px solid transparent; border-radius: 2px; cursor: pointer; flex-shrink: 0; transition: border-color 0.2s, transform 0.2s; background: #222; }
-        .lb-thumb:hover { transform: scale(1.08); }
-        .lb-thumb.active { border-color: var(--nit-teal); }
-        .lb-thumb-video { width: 64px; height: 64px; border: 2px solid transparent; border-radius: 2px; cursor: pointer; flex-shrink: 0; background: #333; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.4rem; }
-        .lb-thumb-video.active { border-color: var(--nit-teal); }
-        .lb-thumb-video:hover { border-color: #aaa; }
-        .lb-loading { color: #aaa; font-family: 'Roboto Mono', monospace; font-size: 0.9rem; letter-spacing: 2px; animation: blink 1s infinite; }
-        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-        .lb-empty { color: #777; font-family: 'Roboto Mono', monospace; font-size: 0.9rem; text-align: center; padding: 40px; }
-
-        /* ─── SHARED ─── */
-        .loading-state { text-align: center; padding: 40px; font-family: 'Roboto Mono', monospace; font-size: 0.85rem; color: #bbb; letter-spacing: 2px; animation: blink 1.2s infinite; }
-        .empty-state { text-align: center; padding: 40px; font-family: 'Roboto Mono', monospace; font-size: 0.85rem; color: #bbb; border: 1px dashed #ddd; }
-        .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
-        .reveal.in { opacity: 1; transform: none; }
-
-        footer { text-align: center; padding: 30px; color: #999; font-size: 0.8rem; border-top: 1px solid #e0e0e0; margin-top: 20px; }
-        .lb-thumbstrip::-webkit-scrollbar { height: 4px; }
-        .lb-thumbstrip::-webkit-scrollbar-thumb { background: var(--nit-teal); border-radius: 2px; }
+        :root{--army-green:#2d3436;--light-grey:#f0f2f5;--nit-teal:#004d40;--teal-lt:#00695c;--accent:#00bfa5;--white:#ffffff;}
+        *,*::before,*::after{box-sizing:border-box;}
+        body{margin:0;background-color:var(--light-grey);color:#333;font-family:'Roboto',sans-serif;overflow-x:hidden;}
+        #loader{position:fixed;inset:0;background:var(--light-grey);display:flex;justify-content:center;align-items:center;z-index:9999;transition:opacity .5s ease-out;}
+        #loader video{width:500px;mix-blend-mode:multiply;filter:contrast(1.2);outline:none;}
+        .loader-fallback{display:none;flex-direction:column;align-items:center;gap:20px;}
+        .loader-fallback .loader-logo{font-family:'Oswald',sans-serif;font-size:1.4rem;letter-spacing:6px;color:var(--nit-teal);}
+        .loader-spinner{width:48px;height:48px;border:4px solid #d0ddd8;border-top-color:var(--nit-teal);border-radius:50%;animation:spin .9s linear infinite;}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        header{background:var(--white);border-bottom:4px solid var(--nit-teal);padding:10px 5%;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.1);position:relative;z-index:10;}
+        .notices-bar{background:var(--nit-teal);color:white;padding:9px 5%;display:none;align-items:center;gap:16px;font-family:'Roboto Mono',monospace;font-size:.8rem;overflow:hidden;}
+        .notices-bar-label{background:white;color:var(--nit-teal);font-weight:700;padding:3px 10px;font-size:.7rem;letter-spacing:2px;white-space:nowrap;flex-shrink:0;}
+        .notices-ticker-wrap{overflow:hidden;flex:1;cursor:pointer;}
+        .notices-ticker{display:flex;gap:60px;animation:ticker 35s linear infinite;white-space:nowrap;}
+        .notices-ticker:hover{animation-play-state:paused;}
+        @keyframes ticker{from{transform:translateX(100%)}to{transform:translateX(-200%)}}
+        .notice-tick-item{display:inline-flex;align-items:center;gap:8px;}
+        .notice-tick-dot{width:6px;height:6px;border-radius:50%;background:#80cbc4;flex-shrink:0;}
+        .nav-tabs{background:var(--army-green);display:flex;justify-content:center;flex-wrap:wrap;padding:0;position:sticky;top:0;z-index:100;overflow-x:auto;}
+        .tab-btn{padding:15px 20px;color:rgba(255,255,255,.8);cursor:pointer;border:none;background:none;font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:.88rem;letter-spacing:1px;transition:.25s;position:relative;}
+        .tab-btn::after{content:'';position:absolute;bottom:0;left:50%;right:50%;height:3px;background:var(--accent);transition:left .25s,right .25s;}
+        .tab-btn:hover{color:#fff;background:rgba(255,255,255,.05);}
+        .tab-btn.active{color:#fff;background:var(--nit-teal);}
+        .tab-btn.active::after{left:0;right:0;}
+        .tab-content{display:none;padding:50px 10%;animation:fadeIn .45s ease;}
+        .tab-content.active{display:block;}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+        .clean-img{mix-blend-mode:multiply;filter:contrast(1.1);}
+        .hero-box{text-align:center;background:white;padding:50px 40px;box-shadow:0 4px 20px rgba(0,0,0,.06);position:relative;overflow:hidden;}
+        .hero-box::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,77,64,.03) 0%,transparent 60%);pointer-events:none;}
+        .main-logo{width:280px;margin-bottom:20px;animation:heroPop .8s cubic-bezier(.175,.885,.32,1.275) both;}
+        @keyframes heroPop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+        .hero-box h1{font-family:'Oswald',sans-serif;letter-spacing:3px;color:var(--nit-teal);margin:0 0 12px;}
+        .hero-box p{color:#666;line-height:1.7;max-width:520px;margin:0 auto 10px;}
+        .hero-stats{display:flex;justify-content:center;gap:40px;margin-top:30px;padding-top:24px;border-top:1px dashed #d0ddd8;flex-wrap:wrap;}
+        .hero-stat{text-align:center;}
+        .hero-stat-val{font-family:'Oswald',sans-serif;font-size:2rem;color:var(--nit-teal);display:block;}
+        .hero-stat-lbl{font-family:'Roboto Mono',monospace;font-size:.68rem;color:#999;letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
+        .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:28px;}
+        .about-card{background:white;padding:28px;border-left:4px solid var(--nit-teal);box-shadow:4px 4px 0 var(--army-green);transition:box-shadow .25s,transform .25s;}
+        .about-card:hover{transform:translateY(-4px);box-shadow:6px 8px 0 var(--nit-teal);}
+        .about-card h3{font-family:'Oswald',sans-serif;color:var(--nit-teal);letter-spacing:2px;margin:0 0 10px;}
+        .about-card p{font-size:.9rem;line-height:1.7;color:#555;margin:0;}
+        @media(max-width:640px){.about-grid{grid-template-columns:1fr}}
+        .officers-header{text-align:center;margin-bottom:50px;}
+        .officers-title{font-family:'Oswald',sans-serif;font-size:2.2rem;color:var(--nit-teal);margin:0 0 6px;letter-spacing:4px;}
+        .officers-sub{font-family:'Roboto Mono',monospace;font-size:.85rem;color:#999;margin:0;letter-spacing:2px;}
+        .officers-stack{display:flex;flex-direction:column;gap:30px;max-width:960px;margin:0 auto;}
+        .officer-card{background:white;display:flex;align-items:stretch;border:1px solid #d0ddd8;box-shadow:5px 5px 0 var(--army-green);position:relative;overflow:hidden;opacity:0;transform:translateX(-40px);transition:opacity .6s ease,transform .6s ease,box-shadow .3s ease;}
+        .officer-card.visible{opacity:1;transform:translateX(0);}
+        .officer-card:hover{box-shadow:8px 8px 0 var(--nit-teal);}
+        .officer-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--nit-teal);}
+        .officer-rank-badge{position:absolute;top:16px;left:16px;background:var(--army-green);color:white;font-family:'Oswald',sans-serif;font-size:.7rem;letter-spacing:2px;padding:4px 10px;z-index:2;}
+        .officer-photo-wrap{position:relative;width:200px;min-height:220px;flex-shrink:0;background:#e8efec;overflow:hidden;}
+        .officer-photo-wrap.no-photo::after{content:'👤';font-size:4rem;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#ccc;}
+        .officer-photo{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;transition:transform .4s ease;}
+        .officer-card:hover .officer-photo{transform:scale(1.04);}
+        .officer-photo-frame{position:absolute;bottom:10px;right:10px;width:30px;height:30px;border-right:2px solid var(--nit-teal);border-bottom:2px solid var(--nit-teal);pointer-events:none;}
+        .officer-info{padding:30px;display:flex;flex-direction:column;justify-content:center;flex:1;}
+        .officer-designation{font-family:'Roboto Mono',monospace;font-size:.72rem;letter-spacing:2px;color:var(--nit-teal);margin:0 0 6px;text-transform:uppercase;}
+        .officer-name{font-family:'Oswald',sans-serif;font-size:1.6rem;color:var(--army-green);margin:0 0 14px;letter-spacing:1px;}
+        .officer-divider{width:40px;height:3px;background:var(--nit-teal);margin-bottom:14px;transition:width .4s ease;}
+        .officer-card:hover .officer-divider{width:80px;}
+        .officer-bio{font-size:.88rem;line-height:1.7;color:#555;margin:0;font-style:italic;}
+        @media(max-width:640px){.officer-card{flex-direction:column}.officer-photo-wrap{width:100%;height:200px;min-height:unset}.officer-info{padding:20px}}
+        .rank-table{width:100%;border-collapse:collapse;background:white;margin-top:20px;box-shadow:4px 4px 0 var(--army-green);}
+        .rank-table th,.rank-table td{border:1px solid #ddd;padding:15px;text-align:left;}
+        .rank-table th{background:var(--nit-teal);color:white;font-family:'Oswald';letter-spacing:1px;}
+        .rank-table tbody tr{transition:background .2s;}
+        .rank-table tbody tr:hover td{background:#e8f5e9;}
+        .rank-table tr:nth-child(even) td{background:#f9f9f9;}
+        .rank-table tr:nth-child(even):hover td{background:#e8f5e9;}
+        .gallery-header-box{text-align:center;margin-bottom:40px;}
+        .gallery-heading{font-family:'Oswald',sans-serif;font-size:2.5rem;text-transform:uppercase;color:var(--nit-teal);margin-bottom:5px;}
+        .gallery-subheading{font-family:'Roboto Mono',monospace;font-size:.9rem;color:#666;text-transform:uppercase;}
+        .row-gallery-container{display:flex;flex-direction:row;justify-content:center;flex-wrap:wrap;gap:30px;}
+        .techy-gallery-item{background:white;padding:15px;border:1px solid var(--nit-teal);width:350px;box-shadow:4px 4px 0 var(--army-green);transition:transform .25s ease,box-shadow .25s ease;cursor:pointer;position:relative;outline:none;user-select:none;opacity:0;transform:translateY(20px);animation:cardReveal .5s ease forwards;}
+        @keyframes cardReveal{to{opacity:1;transform:translateY(0)}}
+        .techy-gallery-item:hover{transform:translateY(-6px);box-shadow:8px 8px 0 var(--nit-teal);}
+        .card-overlay{position:absolute;inset:0;background:rgba(0,77,64,0);display:flex;align-items:center;justify-content:center;transition:background .25s ease;}
+        .techy-gallery-item:hover .card-overlay{background:rgba(0,77,64,.18);}
+        .card-overlay-icon{opacity:0;transform:scale(.7);transition:opacity .25s ease,transform .25s ease;background:rgba(0,77,64,.85);color:white;font-family:'Oswald',sans-serif;font-size:.85rem;letter-spacing:2px;padding:10px 20px;border:1px solid white;text-transform:uppercase;}
+        .techy-gallery-item:hover .card-overlay-icon{opacity:1;transform:scale(1);}
+        .techy-gallery-item img{width:100%;height:220px;object-fit:cover;border-radius:2px;display:block;}
+        .techy-gallery-item figcaption{margin-top:15px;font-size:.85rem;font-family:'Roboto Mono',monospace;text-transform:uppercase;border-top:1px dashed #ccc;padding-top:10px;color:#333;}
+        .sec-page-header{margin-bottom:32px;}
+        .sec-page-header h2{font-family:'Oswald',sans-serif;font-size:2rem;color:var(--nit-teal);letter-spacing:3px;margin:0 0 6px;}
+        .sec-page-header p{font-family:'Roboto Mono',monospace;font-size:.78rem;color:#999;letter-spacing:1px;margin:0;}
+        .notice-card{background:white;border:1px solid #d0ddd8;padding:22px 24px;margin-bottom:16px;display:flex;gap:18px;align-items:flex-start;box-shadow:3px 3px 0 var(--army-green);transition:box-shadow .2s,transform .2s;opacity:0;animation:cardReveal .4s ease forwards;}
+        .notice-card:hover{box-shadow:5px 5px 0 var(--nit-teal);transform:translateX(3px);}
+        .notice-priority-bar{width:5px;min-height:50px;border-radius:3px;flex-shrink:0;margin-top:2px;}
+        .priority-high .notice-priority-bar{background:#e74c3c;}
+        .priority-med .notice-priority-bar{background:#e67e22;}
+        .priority-low .notice-priority-bar{background:#27ae60;}
+        .notice-card-body{flex:1;}
+        .notice-card-title{font-family:'Oswald',sans-serif;font-size:1.15rem;color:var(--army-green);margin:0 0 8px;letter-spacing:1px;}
+        .notice-card-meta{font-family:'Roboto Mono',monospace;font-size:.7rem;color:#aaa;letter-spacing:1px;margin-bottom:10px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+        .notice-badge{padding:2px 8px;border-radius:2px;font-size:.65rem;font-weight:700;letter-spacing:1px;}
+        .badge-high{background:#fde8e8;color:#c0392b;}
+        .badge-med{background:#fef3e2;color:#d35400;}
+        .badge-low{background:#e8f8f0;color:#1e8449;}
+        .notice-card-text{font-size:.9rem;line-height:1.7;color:#555;margin:0 0 12px;white-space:pre-wrap;}
+        .notice-attachment{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--nit-teal);color:var(--nit-teal);font-family:'Roboto Mono',monospace;font-size:.75rem;letter-spacing:1px;text-decoration:none;transition:background .2s,color .2s;}
+        .notice-attachment:hover{background:var(--nit-teal);color:white;}
+        .notice-expiry{font-family:'Roboto Mono',monospace;font-size:.68rem;color:#e74c3c;margin-top:8px;}
+        .resources-filter{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px;}
+        .filter-btn{padding:8px 18px;border:1px solid var(--nit-teal);background:white;color:var(--nit-teal);font-family:'Oswald',sans-serif;font-size:.85rem;letter-spacing:1px;cursor:pointer;transition:.2s;}
+        .filter-btn:hover,.filter-btn.active{background:var(--nit-teal);color:white;}
+        .resources-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
+        .resource-card{background:white;border:1px solid #d0ddd8;padding:20px;display:flex;align-items:flex-start;gap:16px;box-shadow:3px 3px 0 var(--army-green);transition:box-shadow .2s,transform .2s;opacity:0;animation:cardReveal .4s ease forwards;}
+        .resource-card:hover{box-shadow:5px 5px 0 var(--nit-teal);transform:translateY(-3px);}
+        .resource-icon{font-size:2rem;flex-shrink:0;width:44px;text-align:center;}
+        .resource-info{flex:1;min-width:0;}
+        .resource-title{font-family:'Oswald',sans-serif;font-size:1rem;color:var(--army-green);margin:0 0 4px;letter-spacing:1px;word-break:break-word;}
+        .resource-desc{font-size:.82rem;color:#777;margin:0 0 8px;line-height:1.5;}
+        .resource-meta{font-family:'Roboto Mono',monospace;font-size:.66rem;color:#bbb;letter-spacing:1px;margin-bottom:10px;}
+        .resource-tag{display:inline-block;padding:2px 8px;background:#e8f5e9;color:var(--nit-teal);font-size:.65rem;font-family:'Roboto Mono',monospace;letter-spacing:1px;border-radius:2px;}
+        .resource-dl{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:var(--nit-teal);color:white;font-family:'Roboto Mono',monospace;font-size:.72rem;letter-spacing:1px;text-decoration:none;transition:background .2s;}
+        .resource-dl:hover{background:var(--teal-lt);}
+        #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:5000;flex-direction:column;align-items:stretch;}
+        #lightbox.open{display:flex;}
+        .lb-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:var(--army-green);border-bottom:2px solid var(--nit-teal);flex-shrink:0;}
+        .lb-title{font-family:'Oswald',sans-serif;font-size:1.1rem;color:white;letter-spacing:2px;text-transform:uppercase;}
+        .lb-close{background:none;border:2px solid white;color:white;font-size:1.2rem;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;font-family:monospace;}
+        .lb-close:hover{background:#c0392b;border-color:#c0392b;}
+        .lb-viewer{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:20px 70px;}
+        .lb-media-wrap{max-width:100%;max-height:100%;display:flex;align-items:center;justify-content:center;}
+        .lb-media-wrap img,.lb-media-wrap video{max-width:100%;max-height:calc(100vh - 230px);object-fit:contain;border:2px solid var(--nit-teal);box-shadow:0 0 40px rgba(0,77,64,.5);border-radius:2px;}
+        .lb-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,77,64,.7);border:none;color:white;font-size:1.8rem;width:48px;height:64px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;z-index:10;}
+        .lb-arrow:hover{background:var(--nit-teal);}
+        .lb-arrow.prev{left:10px;}
+        .lb-arrow.next{right:10px;}
+        .lb-arrow:disabled{opacity:.2;cursor:default;}
+        .lb-counter{font-family:'Roboto Mono',monospace;font-size:.8rem;color:#aaa;letter-spacing:2px;}
+        .lb-thumbstrip{display:flex;gap:8px;padding:10px 20px;background:#111;overflow-x:auto;flex-shrink:0;border-top:1px solid #333;align-items:center;}
+        .lb-thumb{width:64px;height:64px;object-fit:cover;border:2px solid transparent;border-radius:2px;cursor:pointer;flex-shrink:0;transition:border-color .2s,transform .2s;background:#222;}
+        .lb-thumb:hover{transform:scale(1.08);}
+        .lb-thumb.active{border-color:var(--nit-teal);}
+        .lb-thumb-video{width:64px;height:64px;border:2px solid transparent;border-radius:2px;cursor:pointer;flex-shrink:0;background:#333;display:flex;align-items:center;justify-content:center;color:white;font-size:1.4rem;}
+        .lb-thumb-video.active{border-color:var(--nit-teal);}
+        .lb-loading{color:#aaa;font-family:'Roboto Mono',monospace;font-size:.9rem;letter-spacing:2px;animation:blink 1s infinite;}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+        .lb-empty{color:#777;font-family:'Roboto Mono',monospace;font-size:.9rem;text-align:center;padding:40px;}
+        .loading-state{text-align:center;padding:40px;font-family:'Roboto Mono',monospace;font-size:.85rem;color:#bbb;letter-spacing:2px;animation:blink 1.2s infinite;}
+        .empty-state{text-align:center;padding:40px;font-family:'Roboto Mono',monospace;font-size:.85rem;color:#bbb;border:1px dashed #ddd;}
+        .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;}
+        .reveal.in{opacity:1;transform:none;}
+        footer{text-align:center;padding:30px;color:#999;font-size:.8rem;border-top:1px solid #e0e0e0;margin-top:20px;}
+        .lb-thumbstrip::-webkit-scrollbar{height:4px;}
+        .lb-thumbstrip::-webkit-scrollbar-thumb{background:var(--nit-teal);border-radius:2px;}
     </style>
 </head>
 <body>
 
-<!-- LOADER -->
 <div id="loader">
     <video id="bufferVid" autoplay muted playsinline style="width:500px;mix-blend-mode:multiply;filter:contrast(1.2);outline:none;">
         <source src="BUFFER VIDEO_WEB.mp4" type="video/mp4">
@@ -223,21 +170,15 @@
     </div>
 </div>
 
-<!-- HEADER -->
 <header>
     <img src="LOGO_NIT.png" height="70" class="clean-img" alt="NIT Logo">
-    <div style="text-align:center;position:relative;">
+    <div style="text-align:center;">
         <h2 style="margin:0;font-family:'Oswald';">NATIONAL CADET CORPS</h2>
         <small>NIT ARUNACHAL PRADESH</small>
-        <!-- Live data badge -->
-        <div id="live-badge">
-            <span class="live-dot"></span> LIVE DATA
-        </div>
     </div>
     <img src="LOGO_NCC.png" height="70" class="clean-img" alt="NCC Logo">
 </header>
 
-<!-- NOTICES TICKER -->
 <div class="notices-bar" id="notices-bar">
     <span class="notices-bar-label">📋 NOTICES</span>
     <div class="notices-ticker-wrap" onclick="openTab('notices',document.querySelector('[data-tab=notices]'))">
@@ -245,18 +186,16 @@
     </div>
 </div>
 
-<!-- NAV -->
 <div class="nav-tabs">
-    <button class="tab-btn active"  data-tab="home"      onclick="openTab('home',this)">Home</button>
-    <button class="tab-btn"         data-tab="about"     onclick="openTab('about',this)">About Us</button>
-    <button class="tab-btn"         data-tab="ano"       onclick="openTab('ano',this)">Officer's Desk</button>
-    <button class="tab-btn"         data-tab="rank"      onclick="openTab('rank',this)">Rank Panel</button>
-    <button class="tab-btn"         data-tab="gallery"   onclick="openTab('gallery',this)">Gallery</button>
-    <button class="tab-btn"         data-tab="notices"   onclick="openTab('notices',this)">Notices</button>
-    <button class="tab-btn"         data-tab="resources" onclick="openTab('resources',this)">Resources</button>
+    <button class="tab-btn active" data-tab="home"      onclick="openTab('home',this)">Home</button>
+    <button class="tab-btn"        data-tab="about"     onclick="openTab('about',this)">About Us</button>
+    <button class="tab-btn"        data-tab="ano"       onclick="openTab('ano',this)">Officer's Desk</button>
+    <button class="tab-btn"        data-tab="rank"      onclick="openTab('rank',this)">Rank Panel</button>
+    <button class="tab-btn"        data-tab="gallery"   onclick="openTab('gallery',this)">Gallery</button>
+    <button class="tab-btn"        data-tab="notices"   onclick="openTab('notices',this)">Notices</button>
+    <button class="tab-btn"        data-tab="resources" onclick="openTab('resources',this)">Resources</button>
 </div>
 
-<!-- ══ HOME ══ -->
 <div id="home" class="tab-content active">
     <div class="hero-box">
         <img src="LOGO_SOCIAL MEDIA.png" class="main-logo clean-img" alt="NCC Logo">
@@ -271,7 +210,6 @@
     </div>
 </div>
 
-<!-- ══ ABOUT ══ -->
 <div id="about" class="tab-content">
     <h2 class="reveal" style="font-family:'Oswald';color:var(--nit-teal);letter-spacing:3px;margin-bottom:8px;">ABOUT THE UNIT</h2>
     <p class="reveal" style="color:#666;line-height:1.8;max-width:720px;">Established in 2010, the NCC unit at NIT Arunachal Pradesh aims to groom students into disciplined and patriotic citizens. We participate in various National Integration Camps, Republic Day Parades, and Social Service activities.</p>
@@ -283,36 +221,28 @@
     </div>
 </div>
 
-<!-- ══ OFFICERS ══ -->
 <div id="ano" class="tab-content">
     <div class="officers-header">
         <h2 class="officers-title">OFFICER'S DESK</h2>
         <p class="officers-sub">// Leadership &amp; Command Structure</p>
     </div>
-    <div class="officers-stack" id="officers-stack">
-        <div class="loading-state">LOADING OFFICERS...</div>
-    </div>
+    <div class="officers-stack" id="officers-stack"><div class="loading-state">LOADING OFFICERS...</div></div>
 </div>
 
-<!-- ══ RANK ══ -->
 <div id="rank" class="tab-content">
     <h2 class="reveal" style="font-family:'Oswald';color:var(--nit-teal);letter-spacing:3px;margin-bottom:4px;">UNIT COMMAND PANEL</h2>
-    <p class="reveal" style="font-family:'Roboto Mono',monospace;font-size:0.78rem;color:#999;letter-spacing:1px;margin-bottom:24px;">// Current rank holders of the NCC unit</p>
+    <p class="reveal" style="font-family:'Roboto Mono',monospace;font-size:.78rem;color:#999;letter-spacing:1px;margin-bottom:24px;">// Current rank holders of the NCC unit</p>
     <div id="rank-container" class="reveal"><div class="loading-state">LOADING RANK PANEL...</div></div>
 </div>
 
-<!-- ══ GALLERY ══ -->
 <div id="gallery" class="tab-content">
     <div class="gallery-header-box">
         <h2 class="gallery-heading">Unit Honors &amp; Highlights</h2>
         <p class="gallery-subheading">Tap any card to explore photos &amp; videos from each event.</p>
     </div>
-    <div class="row-gallery-container" id="gallery-cards">
-        <div class="loading-state">LOADING GALLERY...</div>
-    </div>
+    <div class="row-gallery-container" id="gallery-cards"><div class="loading-state">LOADING GALLERY...</div></div>
 </div>
 
-<!-- ══ NOTICES ══ -->
 <div id="notices" class="tab-content">
     <div class="sec-page-header">
         <h2>NOTICES &amp; ANNOUNCEMENTS</h2>
@@ -321,7 +251,6 @@
     <div id="notices-list"><div class="loading-state">LOADING NOTICES...</div></div>
 </div>
 
-<!-- ══ RESOURCES ══ -->
 <div id="resources" class="tab-content">
     <div class="sec-page-header">
         <h2>RESOURCES</h2>
@@ -335,20 +264,17 @@
         <button class="filter-btn" onclick="filterResources('image',this)">Images</button>
         <button class="filter-btn" onclick="filterResources('other',this)">Other</button>
     </div>
-    <div class="resources-grid" id="resources-grid">
-        <div class="loading-state" style="grid-column:1/-1">LOADING RESOURCES...</div>
-    </div>
+    <div class="resources-grid" id="resources-grid"><div class="loading-state" style="grid-column:1/-1">LOADING RESOURCES...</div></div>
 </div>
 
 <footer>&copy; 2026 National Institute of Technology, Arunachal Pradesh | NCC Unit &nbsp;·&nbsp; <span style="font-family:'Roboto Mono',monospace;font-size:.75rem;">UNITY &amp; DISCIPLINE</span></footer>
 
-<!-- LIGHTBOX -->
-<div id="lightbox" role="dialog" aria-modal="true" aria-labelledby="lb-title-text">
+<div id="lightbox" role="dialog" aria-modal="true">
     <div class="lb-topbar">
         <span class="lb-title" id="lb-title-text">Gallery</span>
         <div style="display:flex;align-items:center;gap:16px;">
             <span class="lb-counter" id="lb-counter"></span>
-            <button class="lb-close" onclick="closeLightbox()" title="Close (Esc)">✕</button>
+            <button class="lb-close" onclick="closeLightbox()">✕</button>
         </div>
     </div>
     <div class="lb-viewer">
@@ -359,7 +285,22 @@
     <div class="lb-thumbstrip" id="lb-thumbstrip"></div>
 </div>
 
-<script>
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp }  from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey:            "AIzaSyBCLCGsYWA-PUhWvgW45cb-X9G1CjrtAcs",
+    authDomain:        "ncc-nit-ap.firebaseapp.com",
+    projectId:         "ncc-nit-ap",
+    storageBucket:     "ncc-nit-ap.firebasestorage.app",
+    messagingSenderId: "311443142169",
+    appId:             "1:311443142169:web:b274a34fb95fedd6465c88"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
 /* ─── LOADER ─── */
 (function(){
     const loader=document.getElementById('loader'),vid=document.getElementById('bufferVid'),fb=document.getElementById('loaderFallback');
@@ -372,119 +313,39 @@
 })();
 
 /* ─── TABS ─── */
-function openTab(name,btn){
+window.openTab=(name,btn)=>{
     document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active'));
     document.getElementById(name).classList.add('active');
     if(btn)btn.classList.add('active');
-    else{const b=document.querySelector('[data-tab="'+name+'"]');if(b)b.classList.add('active');}
+    else{const b=document.querySelector(`[data-tab="${name}"]`);if(b)b.classList.add('active');}
     if(name==='ano')setTimeout(revealOfficers,60);
     setTimeout(initReveal,100);
-}
+};
 
-/* ─── SCROLL REVEAL ─── */
 function initReveal(){
-    const obs=new IntersectionObserver(entries=>{
-        entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);}});
-    },{threshold:0.1});
+    const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);}});},{threshold:.1});
     document.querySelectorAll('.reveal:not(.in)').forEach(el=>obs.observe(el));
 }
 window.addEventListener('load',()=>setTimeout(initReveal,300));
 
-/* ══════════════════════════════════════════════
-   DATA LAYER — localStorage first, JSON fallback
-   ══════════════════════════════════════════════ */
+function he(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-// LocalStorage keys — must match admin panel exactly
-const LS_KEYS = {
-    gallery:   'ncc_gallery',
-    officers:  'ncc_officers',
-    rank:      'ncc_rank',
-    notices:   'ncc_notices',
-    resources: 'ncc_resources'
-};
+/* ══════════════════════════════════
+   REAL-TIME FIRESTORE LISTENERS
+   These fire for EVERY visitor on earth
+   the moment admin saves anything
+══════════════════════════════════ */
 
-// Fallback JSON files (same as before)
-const JSON_FILES = {
-    gallery:   'gallery.json',
-    officers:  'officers.json',
-    rank:      'rank.json',
-    notices:   'notices.json',
-    resources: 'resources.json'
-};
-
-// Fallback static data (used when both localStorage and JSON files are unavailable)
-const FALLBACKS = {
-    gallery: [
-        {title:'Republic Day 2026',folder:'REPUBLIC DAY',thumb:'REPUBLIC DAY.png',label:'NIT AR CELEBRATES REPUBLIC DAY 2026',files:[]},
-        {title:'150 Years of Vande Mataram',folder:'VANDE MATARAM',thumb:'PPT_150 Years of VANDE MATRAM.jpg',label:'NIT AR OBSERVES 150 YEARS OF VANDE MATRAM',files:[]},
-        {title:'NER NCC Idea & Innovation Camp 2025',folder:'IDEA AND INNOVATION',thumb:'IDEA AND INNOVATION.jpeg',label:'NIT AR HOSTS & WINS NER NCC IDEA AND INNOVATION CAMP 2025',files:[]},
-        {title:'Swachhta Hi Seva 2025',folder:'UNNAT BHARAT ABHIYAAN',thumb:'UNNAT BHARAT ABHIYAAN.jpeg',label:'SWACHHTA HI SEVA 2025: CLEAN INDIA DRIVE',files:[]},
-    ],
-    officers: [
-        {role:'CO',designation:'COMMANDING OFFICER',name:'Col. Samudra Vijay Sarma',photo:'PHOTOS_OFFICIAL/PHOTO_CO_SIR.png',bio:'A decorated officer with decades of distinguished service to the nation.'},
-        {role:'AO',designation:'ADMINISTRATIVE OFFICER',name:'Lt. Col. Surjit Rai',photo:'PHOTOS_OFFICIAL/PHOTO_AO_SIR.png',bio:'Overseeing the administrative backbone of the unit.'},
-        {role:'ANO-SD',designation:'ASSOCIATE NCC OFFICER — SENIOR DIVISION (SD)',name:'Capt. Dr. Achyut Sarkar',photo:'PHOTOS_OFFICIAL/PHOTO_ANO_SIR.png',bio:'"Discipline is the bridge between goals and accomplishment."'},
-        {role:'ANO-SW',designation:'ASSOCIATE NCC OFFICER — SENIOR WING (SW)',name:'Lt. Dr. Preetisudha Meher',photo:'PHOTOS_OFFICIAL/PHOTO_ANO_MAAM.png',bio:'Leading the Senior Wing with dedication and commitment.'},
-    ],
-    rank: [
-        {rank:'SENIOR UNDER OFFICER (SUO)',name:'ABHIJEET',branch:'COMPUTER SCIENCE & ENGINEERING'},
-        {rank:'UNDER OFFICER (UO)',name:'AKHAND UPADHYAY',branch:'MECHANICAL ENGINEERING'},
-        {rank:'SERGEANT',name:'ROSHNI YADAV',branch:'ELECTRICAL ENGINEERING'},
-    ],
-    notices: [],
-    resources: []
-};
-
-let usingLiveData = false; // tracks if localStorage is supplying data
-
-/**
- * Smart data loader:
- * 1. Check localStorage (admin-written data) — instant, no network
- * 2. Try fetching the JSON file from the server
- * 3. Fall back to hardcoded defaults
- */
-async function getData(section) {
-    // 1. Try localStorage first
-    try {
-        const raw = localStorage.getItem(LS_KEYS[section]);
-        if (raw) {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-                usingLiveData = true;
-                return parsed;
-            }
-        }
-    } catch(e) {}
-
-    // 2. Try JSON file fetch
-    try {
-        const r = await fetch(JSON_FILES[section] + '?v=' + Date.now());
-        if (r.ok) {
-            const data = await r.json();
-            if (Array.isArray(data)) return data;
-        }
-    } catch(e) {}
-
-    // 3. Use hardcoded fallback
-    return FALLBACKS[section] || [];
-}
-
-// Show LIVE badge if any data came from localStorage
-function checkLiveBadge() {
-    if (usingLiveData) {
-        document.getElementById('live-badge').classList.add('show');
-    }
-}
-
-/* ─── GALLERY ─── */
-async function loadGallery(){
-    const ev = await getData('gallery');
-    const c = document.getElementById('gallery-cards');
+// ── GALLERY ──
+onSnapshot(collection(db,'gallery'), snap=>{
+    const ev=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>new Date(b.created||0)-new Date(a.created||0));
+    const c=document.getElementById('gallery-cards');
     if(!ev.length){c.innerHTML='<div class="empty-state">No gallery events yet.</div>';return;}
     c.innerHTML=ev.map((e,i)=>`
-        <figure class="techy-gallery-item" style="animation-delay:${i*0.08}s"
-                tabindex="0" role="button" data-folder="${he(e.folder)}" data-title="${he(e.title)}"
+        <figure class="techy-gallery-item" style="animation-delay:${i*.08}s"
+                tabindex="0" role="button"
+                data-folder="${he(e.folder)}" data-title="${he(e.title)}"
                 data-files="${he(JSON.stringify(e.files||[]))}"
                 onclick="openGallery(this)" onkeydown="if(event.key==='Enter'||event.key===' ')openGallery(this)">
             <div class="card-overlay"><span class="card-overlay-icon">▶ View Gallery</span></div>
@@ -492,18 +353,18 @@ async function loadGallery(){
             <figcaption>${he(e.label||e.title)}</figcaption>
         </figure>`).join('');
     document.getElementById('stat-events').textContent=ev.length;
-    checkLiveBadge();
-}
+});
 
-/* ─── OFFICERS ─── */
-function roleBadge(r){return r==='CO'?'CO':r==='AO'?'AO':'ANO';}
-async function loadOfficers(){
-    const off = await getData('officers');
+// ── OFFICERS ──
+function revealOfficers(){document.querySelectorAll('.officer-card:not(.visible)').forEach((c,i)=>setTimeout(()=>c.classList.add('visible'),i*140));}
+onSnapshot(collection(db,'officers'), snap=>{
+    const order=['CO','AO','ANO-SD','ANO-SW'];
+    const off=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>order.indexOf(a.role)-order.indexOf(b.role));
     const stack=document.getElementById('officers-stack');
     if(!off.length){stack.innerHTML='<div class="empty-state">No officer data.</div>';return;}
     stack.innerHTML=off.map(o=>`
         <div class="officer-card">
-            <div class="officer-rank-badge">${he(roleBadge(o.role))}</div>
+            <div class="officer-rank-badge">${he(o.role==='CO'?'CO':o.role==='AO'?'AO':'ANO')}</div>
             <div class="officer-photo-wrap">
                 <img src="${he(o.photo||'')}" alt="${he(o.name)}" class="officer-photo clean-img"
                      onerror="this.src='';this.parentElement.classList.add('no-photo');">
@@ -517,13 +378,11 @@ async function loadOfficers(){
             </div>
         </div>`).join('');
     revealOfficers();
-    checkLiveBadge();
-}
-function revealOfficers(){document.querySelectorAll('.officer-card:not(.visible)').forEach((c,i)=>{setTimeout(()=>c.classList.add('visible'),i*140);});}
+});
 
-/* ─── RANK ─── */
-async function loadRank(){
-    const cadets = await getData('rank');
+// ── RANK ──
+onSnapshot(collection(db,'rank'), snap=>{
+    const cadets=snap.docs.map(d=>({...d.data(),id:d.id}));
     const c=document.getElementById('rank-container');
     if(!cadets.length){c.innerHTML='<div class="empty-state">No rank data.</div>';return;}
     c.innerHTML=`<table class="rank-table">
@@ -534,34 +393,30 @@ async function loadRank(){
             <td>${he(r.branch)}</td>
         </tr>`).join('')}</tbody></table>`;
     document.getElementById('stat-cadets').textContent=cadets.length;
-    checkLiveBadge();
-}
+});
 
-/* ─── NOTICES ─── */
+// ── NOTICES ──
 let allNotices=[];
 function isActive(n){if(!n.expiry)return true;return new Date(n.expiry)>=new Date();}
 function priClass(p){return p==='high'?'priority-high':p==='low'?'priority-low':'priority-med';}
 function bClass(p){return p==='high'?'badge-high':p==='low'?'badge-low':'badge-med';}
 function priLabel(p){return p==='high'?'🔴 URGENT':p==='low'?'🟢 GENERAL':'🟡 IMPORTANT';}
-function attachIcon(url){if(!url)return '📎';const e=(url.split('.').pop()||'').toLowerCase();if(e==='pdf')return'📄';if(['doc','docx'].includes(e))return'📝';if(['ppt','pptx'].includes(e))return'📊';if(['jpg','jpeg','png','gif','webp'].includes(e))return'🖼️';return'📎';}
+function attachIcon(url){if(!url)return'📎';const e=(url.split('.').pop()||'').toLowerCase();if(e==='pdf')return'📄';if(['doc','docx'].includes(e))return'📝';if(['ppt','pptx'].includes(e))return'📊';if(['jpg','jpeg','png','gif','webp'].includes(e))return'🖼️';return'📎';}
 
-async function loadNotices(){
-    allNotices = await getData('notices');
+onSnapshot(collection(db,'notices'), snap=>{
+    allNotices=snap.docs.map(d=>({...d.data(),id:d.id}));
     const active=allNotices.filter(isActive);
     document.getElementById('stat-notices').textContent=active.length;
+    const bar=document.getElementById('notices-bar'),ticker=document.getElementById('notices-ticker');
     if(active.length){
-        const bar=document.getElementById('notices-bar'),ticker=document.getElementById('notices-ticker');
         ticker.innerHTML=[...active,...active].map(n=>`<span class="notice-tick-item"><span class="notice-tick-dot"></span>${he(n.title)}${n.by?' — '+he(n.by):''}</span>`).join('');
         bar.style.display='flex';
-    }
-    renderNoticesPage(active);
-    checkLiveBadge();
-}
-function renderNoticesPage(list){
+    } else {bar.style.display='none';}
     const el=document.getElementById('notices-list');
-    if(!list.length){el.innerHTML='<div class="empty-state">No notices at this time.</div>';return;}
-    el.innerHTML=[...list].reverse().map((n,i)=>`
-        <div class="notice-card ${priClass(n.priority||'med')}" style="animation-delay:${i*0.06}s">
+    if(!active.length){el.innerHTML='<div class="empty-state">No notices at this time.</div>';return;}
+    const sorted=[...active].sort((a,b)=>new Date(b.created)-new Date(a.created));
+    el.innerHTML=sorted.map((n,i)=>`
+        <div class="notice-card ${priClass(n.priority||'med')}" style="animation-delay:${i*.06}s">
             <div class="notice-priority-bar"></div>
             <div class="notice-card-body">
                 <div class="notice-card-meta">
@@ -575,28 +430,23 @@ function renderNoticesPage(list){
                 ${n.expiry?`<div class="notice-expiry">⏳ Expires: ${n.expiry}</div>`:''}
             </div>
         </div>`).join('');
-}
+});
 
-/* ─── RESOURCES ─── */
+// ── RESOURCES ──
 let allResources=[];
 function resType(url){if(!url)return'other';const e=(url.split('.').pop()||'').toLowerCase();if(e==='pdf')return'pdf';if(['doc','docx'].includes(e))return'doc';if(['ppt','pptx'].includes(e))return'ppt';if(['jpg','jpeg','png','gif','webp','svg'].includes(e))return'image';return'other';}
 function resIcon(url){const t=resType(url);return t==='pdf'?'📄':t==='doc'?'📝':t==='ppt'?'📊':t==='image'?'🖼️':'📎';}
 
-async function loadResources(){
-    allResources = await getData('resources');
+onSnapshot(collection(db,'resources'), snap=>{
+    allResources=snap.docs.map(d=>({...d.data(),id:d.id}));
     document.getElementById('stat-resources').textContent=allResources.length;
-    renderResources(allResources);
-    checkLiveBadge();
-}
-function filterResources(type,btn){
-    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
-    renderResources(type==='all'?allResources:allResources.filter(r=>resType(r.fileUrl)===type));
-}
-function renderResources(list){
+    renderRes(allResources);
+});
+function renderRes(list){
     const g=document.getElementById('resources-grid');
     if(!list.length){g.innerHTML='<div class="empty-state" style="grid-column:1/-1">No resources found.</div>';return;}
     g.innerHTML=list.map((r,i)=>`
-        <div class="resource-card" style="animation-delay:${i*0.05}s">
+        <div class="resource-card" style="animation-delay:${i*.05}s">
             <div class="resource-icon">${resIcon(r.fileUrl)}</div>
             <div class="resource-info">
                 <div class="resource-title">${he(r.title)}</div>
@@ -606,85 +456,38 @@ function renderResources(list){
             </div>
         </div>`).join('');
 }
-
-/* ─── INIT ─── */
-async function loadAll() {
-    await Promise.all([
-        loadGallery(),
-        loadOfficers(),
-        loadRank(),
-        loadNotices(),
-        loadResources()
-    ]);
-    setTimeout(initReveal, 400);
-}
-window.addEventListener('load', loadAll);
-
-/* ─── LIVE SYNC: auto-refresh when admin panel updates data ─── */
-window.addEventListener('storage', function(e) {
-    const watched = Object.values(LS_KEYS);
-    if (!watched.includes(e.key)) return;
-
-    // Determine which section changed and reload just that section
-    if (e.key === LS_KEYS.gallery)   loadGallery();
-    if (e.key === LS_KEYS.officers)  loadOfficers();
-    if (e.key === LS_KEYS.rank)      loadRank();
-    if (e.key === LS_KEYS.notices)   loadNotices();
-    if (e.key === LS_KEYS.resources) loadResources();
-});
+window.filterResources=(type,btn)=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+    renderRes(type==='all'?allResources:allResources.filter(r=>resType(r.fileUrl)===type));
+};
 
 /* ─── LIGHTBOX ─── */
 let mediaList=[],currentIdx=0;
 const IE=['jpg','jpeg','png','gif','webp','bmp','svg'],VE=['mp4','webm','ogg','mov'];
 function gType(f){const e=f.split('.').pop().toLowerCase();return IE.includes(e)?'image':VE.includes(e)?'video':'unknown';}
 
-async function openGallery(card){
-    const folder = card.dataset.folder;
-    const title  = card.dataset.title || folder;
-    const cachedFilesRaw = card.dataset.files;
-
-    document.getElementById('lb-title-text').textContent = title;
-    document.getElementById('lb-counter').textContent    = '';
-    document.getElementById('lb-media-wrap').innerHTML   = '<span class="lb-loading">LOADING MEDIA...</span>';
-    document.getElementById('lb-thumbstrip').innerHTML   = '';
+window.openGallery=async(card)=>{
+    const folder=card.dataset.folder,title=card.dataset.title||folder;
+    document.getElementById('lb-title-text').textContent=title;
+    document.getElementById('lb-counter').textContent='';
+    document.getElementById('lb-media-wrap').innerHTML='<span class="lb-loading">LOADING MEDIA...</span>';
+    document.getElementById('lb-thumbstrip').innerHTML='';
     document.getElementById('lightbox').classList.add('open');
-    document.body.style.overflow = 'hidden';
-
-    let files = [];
-
-    // 1. Try cached files from localStorage (admin-stored)
-    try {
-        if (cachedFilesRaw) {
-            const cached = JSON.parse(cachedFilesRaw);
-            if (Array.isArray(cached) && cached.length > 0) {
-                files = cached;
-            }
-        }
-    } catch(e) {}
-
-    // 2. If no cached files, try fetching index.json from the folder
-    if (!files.length) {
-        try {
-            const r = await fetch(`${encodeURIComponent(folder)}/index.json`);
-            if (!r.ok) throw new Error('HTTP '+r.status);
-            files = await r.json();
-        } catch(e) {
-            document.getElementById('lb-media-wrap').innerHTML =
-                `<div class="lb-empty"><p>📂 No media found.</p>
-                 <p style="font-size:.75rem;margin-top:10px;">Add <strong>index.json</strong> inside <strong>${folder}</strong> folder.</p></div>`;
-            return;
-        }
+    document.body.style.overflow='hidden';
+    let files=[];
+    try{const cached=JSON.parse(card.dataset.files||'[]');if(cached.length)files=cached;}catch(e){}
+    if(!files.length){
+        try{const r=await fetch(`${encodeURIComponent(folder)}/index.json`);if(!r.ok)throw new Error();files=await r.json();}
+        catch(e){document.getElementById('lb-media-wrap').innerHTML=`<div class="lb-empty"><p>📂 No media found.</p><p style="font-size:.75rem;margin-top:10px;">Add <strong>index.json</strong> inside <strong>${folder}</strong> folder.</p></div>`;return;}
     }
-
-    mediaList = files.map(f=>({src:`${folder}/${f}`,type:gType(f),name:f})).filter(m=>m.type!=='unknown');
+    mediaList=files.map(f=>({src:`${folder}/${f}`,type:gType(f),name:f})).filter(m=>m.type!=='unknown');
     if(!mediaList.length){document.getElementById('lb-media-wrap').innerHTML='<div class="lb-empty">No supported media.</div>';return;}
     buildThumbs();showMedia(0);
-}
-
+};
 function buildThumbs(){
     const strip=document.getElementById('lb-thumbstrip');strip.innerHTML='';
     mediaList.forEach((m,i)=>{
-        if(m.type==='image'){const img=document.createElement('img');img.src=m.src;img.className='lb-thumb'+(i===0?' active':'');img.title=m.name;img.onclick=()=>showMedia(i);strip.appendChild(img);}
+        if(m.type==='image'){const img=document.createElement('img');img.src=m.src;img.className='lb-thumb'+(i===0?' active':'');img.onclick=()=>showMedia(i);strip.appendChild(img);}
         else{const d=document.createElement('div');d.className='lb-thumb-video'+(i===0?' active':'');d.innerHTML='▶';d.onclick=()=>showMedia(i);strip.appendChild(d);}
     });
 }
@@ -693,17 +496,16 @@ function showMedia(idx){
     const v=wrap.querySelector('video');if(v)v.pause();
     wrap.innerHTML=m.type==='image'?`<img src="${m.src}" alt="${m.name}" loading="lazy">`:`<video controls autoplay><source src="${m.src}">Unsupported.</video>`;
     document.getElementById('lb-counter').textContent=`${idx+1} / ${mediaList.length}`;
-    document.getElementById('lb-prev').disabled=(idx===0);document.getElementById('lb-next').disabled=(idx===mediaList.length-1);
+    document.getElementById('lb-prev').disabled=(idx===0);
+    document.getElementById('lb-next').disabled=(idx===mediaList.length-1);
     document.querySelectorAll('#lb-thumbstrip .lb-thumb,#lb-thumbstrip .lb-thumb-video').forEach((t,i)=>t.classList.toggle('active',i===idx));
     const th=document.querySelectorAll('#lb-thumbstrip .lb-thumb,#lb-thumbstrip .lb-thumb-video');
     if(th[idx])th[idx].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
 }
-function navigate(dir){const n=currentIdx+dir;if(n>=0&&n<mediaList.length)showMedia(n);}
-function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';const v=document.getElementById('lightbox').querySelector('video');if(v)v.pause();}
-document.addEventListener('keydown',e=>{if(!document.getElementById('lightbox').classList.contains('open'))return;if(e.key==='Escape')closeLightbox();if(e.key==='ArrowRight')navigate(1);if(e.key==='ArrowLeft')navigate(-1);});
-document.getElementById('lightbox').addEventListener('click',e=>{if(e.target===document.getElementById('lightbox'))closeLightbox();});
-
-function he(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+window.navigate=dir=>{const n=currentIdx+dir;if(n>=0&&n<mediaList.length)showMedia(n);};
+window.closeLightbox=()=>{document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';const v=document.getElementById('lightbox').querySelector('video');if(v)v.pause();};
+document.addEventListener('keydown',e=>{if(!document.getElementById('lightbox').classList.contains('open'))return;if(e.key==='Escape')window.closeLightbox();if(e.key==='ArrowRight')window.navigate(1);if(e.key==='ArrowLeft')window.navigate(-1);});
+document.getElementById('lightbox').addEventListener('click',e=>{if(e.target===document.getElementById('lightbox'))window.closeLightbox();});
 </script>
 </body>
 </html>
