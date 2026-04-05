@@ -125,6 +125,8 @@
         .resource-tag{display:inline-block;padding:2px 8px;background:#e8f5e9;color:var(--nit-teal);font-size:.65rem;font-family:'Roboto Mono',monospace;letter-spacing:1px;border-radius:2px;}
         .resource-dl{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:var(--nit-teal);color:white;font-family:'Roboto Mono',monospace;font-size:.72rem;letter-spacing:1px;text-decoration:none;transition:background .2s;}
         .resource-dl:hover{background:var(--teal-lt);}
+
+        /* ─── LIGHTBOX ─── */
         #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:5000;flex-direction:column;align-items:stretch;}
         #lightbox.open{display:flex;}
         .lb-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:var(--army-green);border-bottom:2px solid var(--nit-teal);flex-shrink:0;}
@@ -132,8 +134,14 @@
         .lb-close{background:none;border:2px solid white;color:white;font-size:1.2rem;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;font-family:monospace;}
         .lb-close:hover{background:#c0392b;border-color:#c0392b;}
         .lb-viewer{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:20px 70px;}
-        .lb-media-wrap{max-width:100%;max-height:100%;display:flex;align-items:center;justify-content:center;}
+        .lb-media-wrap{max-width:100%;max-height:100%;display:flex;align-items:center;justify-content:center;width:100%;}
         .lb-media-wrap img,.lb-media-wrap video{max-width:100%;max-height:calc(100vh - 230px);object-fit:contain;border:2px solid var(--nit-teal);box-shadow:0 0 40px rgba(0,77,64,.5);border-radius:2px;}
+        /* Drive iframe */
+        .lb-drive-wrap{width:100%;height:calc(100vh - 230px);display:flex;flex-direction:column;align-items:center;gap:12px;}
+        .lb-drive-wrap iframe{width:100%;height:100%;border:2px solid var(--nit-teal);border-radius:2px;box-shadow:0 0 40px rgba(0,77,64,.5);background:#000;}
+        .lb-drive-badge{font-family:'Roboto Mono',monospace;font-size:.7rem;color:#80cbc4;letter-spacing:2px;display:flex;align-items:center;gap:6px;}
+        .lb-drive-badge a{color:var(--accent);text-decoration:none;}
+        .lb-drive-badge a:hover{text-decoration:underline;}
         .lb-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,77,64,.7);border:none;color:white;font-size:1.8rem;width:48px;height:64px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;z-index:10;}
         .lb-arrow:hover{background:var(--nit-teal);}
         .lb-arrow.prev{left:10px;}
@@ -144,8 +152,13 @@
         .lb-thumb{width:64px;height:64px;object-fit:cover;border:2px solid transparent;border-radius:2px;cursor:pointer;flex-shrink:0;transition:border-color .2s,transform .2s;background:#222;}
         .lb-thumb:hover{transform:scale(1.08);}
         .lb-thumb.active{border-color:var(--nit-teal);}
-        .lb-thumb-video{width:64px;height:64px;border:2px solid transparent;border-radius:2px;cursor:pointer;flex-shrink:0;background:#333;display:flex;align-items:center;justify-content:center;color:white;font-size:1.4rem;}
+        .lb-thumb-video{width:64px;height:64px;border:2px solid transparent;border-radius:2px;cursor:pointer;flex-shrink:0;background:#333;display:flex;align-items:center;justify-content:center;color:white;font-size:1.4rem;flex-direction:column;gap:2px;}
+        .lb-thumb-video span{font-size:.45rem;font-family:'Roboto Mono',monospace;letter-spacing:1px;color:#aaa;}
         .lb-thumb-video.active{border-color:var(--nit-teal);}
+        .lb-thumb-drive{width:64px;height:64px;border:2px solid transparent;border-radius:2px;cursor:pointer;flex-shrink:0;background:linear-gradient(135deg,#1a73e8,#0d47a1);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;}
+        .lb-thumb-drive span.di{font-size:1.3rem;}
+        .lb-thumb-drive span.dl{font-size:.42rem;font-family:'Roboto Mono',monospace;letter-spacing:1px;color:#90caf9;}
+        .lb-thumb-drive.active{border-color:var(--accent);}
         .lb-loading{color:#aaa;font-family:'Roboto Mono',monospace;font-size:.9rem;letter-spacing:2px;animation:blink 1s infinite;}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
         .lb-empty{color:#777;font-family:'Roboto Mono',monospace;font-size:.9rem;text-align:center;padding:40px;}
@@ -269,6 +282,7 @@
 
 <footer>&copy; 2026 National Institute of Technology, Arunachal Pradesh | NCC Unit &nbsp;·&nbsp; <span style="font-family:'Roboto Mono',monospace;font-size:.75rem;">UNITY &amp; DISCIPLINE</span></footer>
 
+<!-- LIGHTBOX -->
 <div id="lightbox" role="dialog" aria-modal="true">
     <div class="lb-topbar">
         <span class="lb-title" id="lb-title-text">Gallery</span>
@@ -285,7 +299,6 @@
     <div class="lb-thumbstrip" id="lb-thumbstrip"></div>
 </div>
 
-<!-- Firebase SDK -->
 <script type="module">
 import { initializeApp }  from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
 import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
@@ -322,23 +335,15 @@ window.openTab=(name,btn)=>{
     if(name==='ano')setTimeout(revealOfficers,60);
     setTimeout(initReveal,100);
 };
-
 function initReveal(){
     const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);}});},{threshold:.1});
     document.querySelectorAll('.reveal:not(.in)').forEach(el=>obs.observe(el));
 }
 window.addEventListener('load',()=>setTimeout(initReveal,300));
-
 function he(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-/* ══════════════════════════════════
-   REAL-TIME FIRESTORE LISTENERS
-   These fire for EVERY visitor on earth
-   the moment admin saves anything
-══════════════════════════════════ */
-
-// ── GALLERY ──
-onSnapshot(collection(db,'gallery'), snap=>{
+/* ─── FIRESTORE LISTENERS ─── */
+onSnapshot(collection(db,'gallery'),snap=>{
     const ev=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>new Date(b.created||0)-new Date(a.created||0));
     const c=document.getElementById('gallery-cards');
     if(!ev.length){c.innerHTML='<div class="empty-state">No gallery events yet.</div>';return;}
@@ -355,9 +360,8 @@ onSnapshot(collection(db,'gallery'), snap=>{
     document.getElementById('stat-events').textContent=ev.length;
 });
 
-// ── OFFICERS ──
 function revealOfficers(){document.querySelectorAll('.officer-card:not(.visible)').forEach((c,i)=>setTimeout(()=>c.classList.add('visible'),i*140));}
-onSnapshot(collection(db,'officers'), snap=>{
+onSnapshot(collection(db,'officers'),snap=>{
     const order=['CO','AO','ANO-SD','ANO-SW'];
     const off=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>order.indexOf(a.role)-order.indexOf(b.role));
     const stack=document.getElementById('officers-stack');
@@ -366,8 +370,7 @@ onSnapshot(collection(db,'officers'), snap=>{
         <div class="officer-card">
             <div class="officer-rank-badge">${he(o.role==='CO'?'CO':o.role==='AO'?'AO':'ANO')}</div>
             <div class="officer-photo-wrap">
-                <img src="${he(o.photo||'')}" alt="${he(o.name)}" class="officer-photo clean-img"
-                     onerror="this.src='';this.parentElement.classList.add('no-photo');">
+                <img src="${he(o.photo||'')}" alt="${he(o.name)}" class="officer-photo clean-img" onerror="this.src='';this.parentElement.classList.add('no-photo');">
                 <div class="officer-photo-frame"></div>
             </div>
             <div class="officer-info">
@@ -380,8 +383,7 @@ onSnapshot(collection(db,'officers'), snap=>{
     revealOfficers();
 });
 
-// ── RANK ──
-onSnapshot(collection(db,'rank'), snap=>{
+onSnapshot(collection(db,'rank'),snap=>{
     const cadets=snap.docs.map(d=>({...d.data(),id:d.id}));
     const c=document.getElementById('rank-container');
     if(!cadets.length){c.innerHTML='<div class="empty-state">No rank data.</div>';return;}
@@ -395,15 +397,13 @@ onSnapshot(collection(db,'rank'), snap=>{
     document.getElementById('stat-cadets').textContent=cadets.length;
 });
 
-// ── NOTICES ──
 let allNotices=[];
 function isActive(n){if(!n.expiry)return true;return new Date(n.expiry)>=new Date();}
 function priClass(p){return p==='high'?'priority-high':p==='low'?'priority-low':'priority-med';}
 function bClass(p){return p==='high'?'badge-high':p==='low'?'badge-low':'badge-med';}
 function priLabel(p){return p==='high'?'🔴 URGENT':p==='low'?'🟢 GENERAL':'🟡 IMPORTANT';}
 function attachIcon(url){if(!url)return'📎';const e=(url.split('.').pop()||'').toLowerCase();if(e==='pdf')return'📄';if(['doc','docx'].includes(e))return'📝';if(['ppt','pptx'].includes(e))return'📊';if(['jpg','jpeg','png','gif','webp'].includes(e))return'🖼️';return'📎';}
-
-onSnapshot(collection(db,'notices'), snap=>{
+onSnapshot(collection(db,'notices'),snap=>{
     allNotices=snap.docs.map(d=>({...d.data(),id:d.id}));
     const active=allNotices.filter(isActive);
     document.getElementById('stat-notices').textContent=active.length;
@@ -411,11 +411,10 @@ onSnapshot(collection(db,'notices'), snap=>{
     if(active.length){
         ticker.innerHTML=[...active,...active].map(n=>`<span class="notice-tick-item"><span class="notice-tick-dot"></span>${he(n.title)}${n.by?' — '+he(n.by):''}</span>`).join('');
         bar.style.display='flex';
-    } else {bar.style.display='none';}
+    }else{bar.style.display='none';}
     const el=document.getElementById('notices-list');
     if(!active.length){el.innerHTML='<div class="empty-state">No notices at this time.</div>';return;}
-    const sorted=[...active].sort((a,b)=>new Date(b.created)-new Date(a.created));
-    el.innerHTML=sorted.map((n,i)=>`
+    el.innerHTML=[...active].sort((a,b)=>new Date(b.created)-new Date(a.created)).map((n,i)=>`
         <div class="notice-card ${priClass(n.priority||'med')}" style="animation-delay:${i*.06}s">
             <div class="notice-priority-bar"></div>
             <div class="notice-card-body">
@@ -432,12 +431,10 @@ onSnapshot(collection(db,'notices'), snap=>{
         </div>`).join('');
 });
 
-// ── RESOURCES ──
 let allResources=[];
 function resType(url){if(!url)return'other';const e=(url.split('.').pop()||'').toLowerCase();if(e==='pdf')return'pdf';if(['doc','docx'].includes(e))return'doc';if(['ppt','pptx'].includes(e))return'ppt';if(['jpg','jpeg','png','gif','webp','svg'].includes(e))return'image';return'other';}
 function resIcon(url){const t=resType(url);return t==='pdf'?'📄':t==='doc'?'📝':t==='ppt'?'📊':t==='image'?'🖼️':'📎';}
-
-onSnapshot(collection(db,'resources'), snap=>{
+onSnapshot(collection(db,'resources'),snap=>{
     allResources=snap.docs.map(d=>({...d.data(),id:d.id}));
     document.getElementById('stat-resources').textContent=allResources.length;
     renderRes(allResources);
@@ -461,10 +458,56 @@ window.filterResources=(type,btn)=>{
     renderRes(type==='all'?allResources:allResources.filter(r=>resType(r.fileUrl)===type));
 };
 
-/* ─── LIGHTBOX ─── */
+/* ══════════════════════════════════════════
+   LIGHTBOX — supports images, videos, AND
+   Google Drive links via .txt files
+══════════════════════════════════════════ */
 let mediaList=[],currentIdx=0;
-const IE=['jpg','jpeg','png','gif','webp','bmp','svg'],VE=['mp4','webm','ogg','mov'];
-function gType(f){const e=f.split('.').pop().toLowerCase();return IE.includes(e)?'image':VE.includes(e)?'video':'unknown';}
+const IE=['jpg','jpeg','png','gif','webp','bmp','svg'];
+const VE=['mp4','webm','ogg','mov'];
+
+// Determine file type
+function gType(filename){
+    const ext=filename.split('.').pop().toLowerCase();
+    if(IE.includes(ext)) return 'image';
+    if(VE.includes(ext)) return 'video';
+    if(ext==='txt')      return 'drive'; // Google Drive link file
+    return 'unknown';
+}
+
+// Extract Google Drive file ID from any Drive URL format
+function driveIdFromUrl(url){
+    url=url.trim();
+    // formats: /file/d/ID/view  or  /file/d/ID/preview  or  id=ID
+    let m=url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if(m)return m[1];
+    m=url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if(m)return m[1];
+    return null;
+}
+
+function drivePreviewUrl(rawUrl){
+    const id=driveIdFromUrl(rawUrl);
+    if(id) return`https://drive.google.com/file/d/${id}/preview`;
+    // If already a preview/embed URL, return as-is
+    return rawUrl.trim();
+}
+
+function driveOpenUrl(rawUrl){
+    const id=driveIdFromUrl(rawUrl);
+    if(id) return`https://drive.google.com/file/d/${id}/view`;
+    return rawUrl.trim();
+}
+
+// Fetch the URL stored inside a .txt file on GitHub
+async function fetchDriveUrl(txtSrc){
+    try{
+        const r=await fetch(txtSrc,{cache:'no-store'});
+        if(!r.ok)throw new Error();
+        const text=await r.text();
+        return text.trim();
+    }catch(e){return null;}
+}
 
 window.openGallery=async(card)=>{
     const folder=card.dataset.folder,title=card.dataset.title||folder;
@@ -480,31 +523,113 @@ window.openGallery=async(card)=>{
         try{const r=await fetch(`${encodeURIComponent(folder)}/index.json`);if(!r.ok)throw new Error();files=await r.json();}
         catch(e){document.getElementById('lb-media-wrap').innerHTML=`<div class="lb-empty"><p>📂 No media found.</p><p style="font-size:.75rem;margin-top:10px;">Add <strong>index.json</strong> inside <strong>${folder}</strong> folder.</p></div>`;return;}
     }
-    mediaList=files.map(f=>({src:`${folder}/${f}`,type:gType(f),name:f})).filter(m=>m.type!=='unknown');
+
+    // Build media list — for .txt files we store the src path and resolve the Drive URL lazily
+    mediaList=files
+        .map(f=>({src:`${folder}/${f}`,type:gType(f),name:f,driveUrl:null}))
+        .filter(m=>m.type!=='unknown');
+
     if(!mediaList.length){document.getElementById('lb-media-wrap').innerHTML='<div class="lb-empty">No supported media.</div>';return;}
-    buildThumbs();showMedia(0);
+    await buildThumbs();
+    showMedia(0);
 };
-function buildThumbs(){
-    const strip=document.getElementById('lb-thumbstrip');strip.innerHTML='';
-    mediaList.forEach((m,i)=>{
-        if(m.type==='image'){const img=document.createElement('img');img.src=m.src;img.className='lb-thumb'+(i===0?' active':'');img.onclick=()=>showMedia(i);strip.appendChild(img);}
-        else{const d=document.createElement('div');d.className='lb-thumb-video'+(i===0?' active':'');d.innerHTML='▶';d.onclick=()=>showMedia(i);strip.appendChild(d);}
-    });
+
+async function buildThumbs(){
+    const strip=document.getElementById('lb-thumbstrip');
+    strip.innerHTML='';
+    for(let i=0;i<mediaList.length;i++){
+        const m=mediaList[i];
+        if(m.type==='image'){
+            const img=document.createElement('img');
+            img.src=m.src;img.className='lb-thumb'+(i===0?' active':'');
+            img.onclick=()=>showMedia(i);strip.appendChild(img);
+        } else if(m.type==='video'){
+            const d=document.createElement('div');
+            d.className='lb-thumb-video'+(i===0?' active':'');
+            d.innerHTML='▶<span>VIDEO</span>';
+            d.onclick=()=>showMedia(i);strip.appendChild(d);
+        } else if(m.type==='drive'){
+            const d=document.createElement('div');
+            d.className='lb-thumb-drive'+(i===0?' active':'');
+            d.innerHTML='<span class="di">▶</span><span class="dl">DRIVE</span>';
+            d.onclick=()=>showMedia(i);strip.appendChild(d);
+        }
+    }
 }
-function showMedia(idx){
-    currentIdx=idx;const m=mediaList[idx],wrap=document.getElementById('lb-media-wrap');
-    const v=wrap.querySelector('video');if(v)v.pause();
-    wrap.innerHTML=m.type==='image'?`<img src="${m.src}" alt="${m.name}" loading="lazy">`:`<video controls autoplay><source src="${m.src}">Unsupported.</video>`;
+
+async function showMedia(idx){
+    currentIdx=idx;
+    const m=mediaList[idx];
+    const wrap=document.getElementById('lb-media-wrap');
+
+    // Pause any playing video
+    const oldVid=wrap.querySelector('video');if(oldVid)oldVid.pause();
+    // Remove any old iframe to stop Drive video
+    const oldFrame=wrap.querySelector('iframe');if(oldFrame)oldFrame.src='';
+
     document.getElementById('lb-counter').textContent=`${idx+1} / ${mediaList.length}`;
     document.getElementById('lb-prev').disabled=(idx===0);
     document.getElementById('lb-next').disabled=(idx===mediaList.length-1);
-    document.querySelectorAll('#lb-thumbstrip .lb-thumb,#lb-thumbstrip .lb-thumb-video').forEach((t,i)=>t.classList.toggle('active',i===idx));
-    const th=document.querySelectorAll('#lb-thumbstrip .lb-thumb,#lb-thumbstrip .lb-thumb-video');
+
+    // Highlight active thumb
+    document.querySelectorAll('#lb-thumbstrip .lb-thumb,#lb-thumbstrip .lb-thumb-video,#lb-thumbstrip .lb-thumb-drive')
+        .forEach((t,i)=>t.classList.toggle('active',i===idx));
+    const th=document.querySelectorAll('#lb-thumbstrip .lb-thumb,#lb-thumbstrip .lb-thumb-video,#lb-thumbstrip .lb-thumb-drive');
     if(th[idx])th[idx].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+
+    if(m.type==='image'){
+        wrap.innerHTML=`<img src="${m.src}" alt="${m.name}" loading="lazy">`;
+
+    } else if(m.type==='video'){
+        wrap.innerHTML=`<video controls autoplay><source src="${m.src}">Unsupported.</video>`;
+
+    } else if(m.type==='drive'){
+        // Show loading while fetching .txt
+        wrap.innerHTML='<span class="lb-loading">LOADING DRIVE VIDEO...</span>';
+
+        // Fetch URL from .txt if not already cached
+        if(!m.driveUrl){
+            const rawUrl=await fetchDriveUrl(m.src);
+            if(!rawUrl){
+                wrap.innerHTML='<div class="lb-empty">⚠ Could not load Drive link.<br><small>Check that the .txt file contains a valid Google Drive URL.</small></div>';
+                return;
+            }
+            m.driveUrl=rawUrl; // cache it
+        }
+
+        const previewUrl=drivePreviewUrl(m.driveUrl);
+        const openUrl=driveOpenUrl(m.driveUrl);
+
+        wrap.innerHTML=`
+            <div class="lb-drive-wrap">
+                <iframe src="${he(previewUrl)}"
+                    allow="autoplay; encrypted-media"
+                    allowfullscreen
+                    frameborder="0">
+                </iframe>
+                <div class="lb-drive-badge">
+                    ▶ Google Drive Video &nbsp;·&nbsp;
+                    <a href="${he(openUrl)}" target="_blank" rel="noopener">Open in Drive ↗</a>
+                </div>
+            </div>`;
+    }
 }
+
 window.navigate=dir=>{const n=currentIdx+dir;if(n>=0&&n<mediaList.length)showMedia(n);};
-window.closeLightbox=()=>{document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';const v=document.getElementById('lightbox').querySelector('video');if(v)v.pause();};
-document.addEventListener('keydown',e=>{if(!document.getElementById('lightbox').classList.contains('open'))return;if(e.key==='Escape')window.closeLightbox();if(e.key==='ArrowRight')window.navigate(1);if(e.key==='ArrowLeft')window.navigate(-1);});
+window.closeLightbox=()=>{
+    // Stop iframe / video on close
+    const wrap=document.getElementById('lb-media-wrap');
+    const frame=wrap.querySelector('iframe');if(frame)frame.src='';
+    const vid=wrap.querySelector('video');if(vid)vid.pause();
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow='';
+};
+document.addEventListener('keydown',e=>{
+    if(!document.getElementById('lightbox').classList.contains('open'))return;
+    if(e.key==='Escape')window.closeLightbox();
+    if(e.key==='ArrowRight')window.navigate(1);
+    if(e.key==='ArrowLeft')window.navigate(-1);
+});
 document.getElementById('lightbox').addEventListener('click',e=>{if(e.target===document.getElementById('lightbox'))window.closeLightbox();});
 </script>
 </body>
