@@ -38,7 +38,9 @@ body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);min-
 .btn-login{width:100%;padding:13px;background:linear-gradient(135deg,var(--teal),var(--teal-lt));color:#fff;border:none;cursor:pointer;font-family:'Oswald',sans-serif;font-size:1rem;letter-spacing:3px;text-transform:uppercase;transition:opacity .2s,transform .1s;margin-top:4px;}
 .btn-login:hover{opacity:.88;}
 .btn-login:active{transform:scale(.98);}
+.btn-login:disabled{opacity:.5;cursor:not-allowed;}
 #login-err{color:#ff6b6b;font-size:.78rem;font-family:'Roboto Mono',monospace;text-align:center;margin-top:12px;min-height:18px;letter-spacing:1px;}
+#login-status{color:rgba(0,191,165,.7);font-size:.72rem;font-family:'Roboto Mono',monospace;text-align:center;margin-top:8px;min-height:16px;letter-spacing:1px;}
 .login-badge{position:absolute;top:14px;right:14px;background:rgba(0,191,165,.15);color:rgba(0,191,165,.8);border:1px solid rgba(0,191,165,.25);font-family:'Roboto Mono',monospace;font-size:.6rem;padding:3px 10px;letter-spacing:2px;}
 #app{display:none;min-height:100vh;}
 #app.visible{display:flex;}
@@ -74,7 +76,6 @@ body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);min-
 .sec-header p{font-family:'Roboto Mono',monospace;font-size:.75rem;color:var(--muted);margin-top:4px;letter-spacing:1px;}
 .card{background:var(--card);border:1px solid var(--border);padding:28px;margin-bottom:24px;box-shadow:4px 4px 0 var(--army);position:relative;}
 .card-title{font-family:'Oswald',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--teal);text-transform:uppercase;margin-bottom:20px;padding-bottom:10px;border-bottom:1px dashed var(--border);}
-/* Firebase status banner */
 .fb-banner{padding:12px 18px;font-family:'Roboto Mono',monospace;font-size:.72rem;letter-spacing:1px;display:flex;align-items:center;gap:10px;margin-bottom:24px;border-radius:2px;}
 .fb-banner.ok{background:#e8f5e9;border:1px solid #a5d6a7;color:#1b5e20;}
 .fb-banner.err{background:#fde8e8;border:1px solid #ef9a9a;color:#b71c1c;}
@@ -142,6 +143,9 @@ body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);min-
 .modal-close:hover{color:var(--danger);}
 .modal-title{font-family:'Oswald',sans-serif;font-size:1.3rem;letter-spacing:3px;color:var(--teal);margin-bottom:20px;}
 .file-tag{display:inline-flex;align-items:center;gap:6px;background:#f0f7f5;border:1px solid var(--border);padding:4px 10px;font-size:.78rem;font-family:'Roboto Mono',monospace;margin:3px;color:var(--teal);border-radius:2px;}
+/* Drive instruction box */
+.drive-tip{background:#e8f0fe;border:1px solid #a8c7fa;border-left:4px solid #1a73e8;padding:14px 18px;font-family:'Roboto Mono',monospace;font-size:.72rem;line-height:1.8;color:#1a1a2e;margin-bottom:16px;}
+.drive-tip code{background:rgba(26,115,232,.12);padding:1px 6px;border-radius:3px;}
 ::-webkit-scrollbar{width:6px;height:6px;}
 ::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px;}
 ::-webkit-scrollbar-track{background:transparent;}
@@ -173,7 +177,8 @@ body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);min-
       <label>Password</label>
       <input type="password" id="inp-pwd" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <button class="btn-login" onclick="doLogin()">AUTHENTICATE →</button>
+    <button class="btn-login" id="btn-login" onclick="doLogin()">AUTHENTICATE →</button>
+    <div id="login-status"></div>
     <div id="login-err"></div>
   </div>
 </div>
@@ -242,7 +247,19 @@ body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);min-
 
       <!-- GALLERY -->
       <div id="panel-gallery" class="panel">
-        <div class="sec-header"><h2>Gallery Manager</h2><p>// Add and manage gallery events</p></div>
+        <div class="sec-header"><h2>Gallery Manager</h2><p>// Add events with photos and Google Drive videos</p></div>
+
+        <!-- Drive tip -->
+        <div class="drive-tip">
+          <strong>🎬 For large videos (&gt;25MB) — use Google Drive:</strong><br>
+          1. Upload video to Google Drive → Share → Anyone with link → Viewer<br>
+          2. Create a <code>.txt</code> file containing only the Drive share URL<br>
+          3. Upload the <code>.txt</code> file to your GitHub gallery folder<br>
+          4. Add the <code>.txt</code> filename to your folder's <code>index.json</code><br>
+          Example: <code>index.json</code> → <code>["photo1.jpg", "parade.txt", "photo2.jpg"]</code><br>
+          Inside <code>parade.txt</code> → <code>https://drive.google.com/file/d/YOUR_FILE_ID/view</code>
+        </div>
+
         <div class="card">
           <div class="card-title">+ Add New Gallery Event</div>
           <div style="background:#f7faf9;border:1px solid var(--border);padding:16px 20px;margin-bottom:20px;border-left:4px solid var(--accent);">
@@ -251,7 +268,6 @@ body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);min-
               <div class="form-group" style="flex:1;min-width:220px;">
                 <label>Folder Name (exact, as on GitHub)</label>
                 <input type="text" id="gal-folder" placeholder="e.g. REPUBLIC DAY" oninput="onFolderInput()">
-                <small style="font-family:'Roboto Mono',monospace;font-size:.65rem;color:var(--muted);margin-top:4px;">Spaces are fine — match exactly with your repo folder name</small>
               </div>
               <button class="btn btn-primary" onclick="fetchFolderIndex()" id="btn-fetch" style="white-space:nowrap;height:42px;">🔍 FETCH index.json</button>
             </div>
@@ -286,7 +302,7 @@ body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);min-
           <button class="btn btn-primary" id="btn-add-gallery" onclick="addGalleryItem()">⊕ ADD TO GALLERY</button>
           <span id="gal-add-warn" style="font-family:'Roboto Mono',monospace;font-size:.72rem;color:var(--danger);margin-left:14px;"></span>
         </div>
-        <div class="card"><div class="card-title">📂 Gallery Events</div><div id="gallery-list"><p style="color:var(--muted);font-size:.85rem;">Loading...</p></div></div>
+        <div class="card"><div class="card-title">📂 Gallery Events</div><div id="gallery-list"></div></div>
       </div>
 
       <!-- OFFICERS -->
@@ -317,7 +333,7 @@ body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);min-
           </div>
           <button class="btn btn-primary" id="btn-add-officer" onclick="addOfficer()">⊕ SAVE OFFICER</button>
         </div>
-        <div class="card"><div class="card-title">🪖 Current Officers</div><div id="officers-list"><p style="color:var(--muted);font-size:.85rem;">Loading...</p></div></div>
+        <div class="card"><div class="card-title">🪖 Current Officers</div><div id="officers-list"></div></div>
       </div>
 
       <!-- RANK -->
@@ -350,7 +366,7 @@ body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);min-
           <div class="card-title">🏅 Current Rank Panel</div>
           <table class="data-table">
             <thead><tr><th>Rank</th><th>Name</th><th>Branch</th><th>Batch</th><th>Actions</th></tr></thead>
-            <tbody id="rank-tbody"><tr><td colspan="5" style="color:var(--muted);text-align:center;">Loading...</td></tr></tbody>
+            <tbody id="rank-tbody"></tbody>
           </table>
         </div>
       </div>
@@ -381,7 +397,7 @@ body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);min-
           </div>
           <button class="btn btn-primary" id="btn-add-notice" onclick="addNotice()">⊕ POST NOTICE</button>
         </div>
-        <div class="card"><div class="card-title">📋 Active Notices</div><div id="notices-list"><p style="color:var(--muted);font-size:.85rem;">Loading...</p></div></div>
+        <div class="card"><div class="card-title">📋 Active Notices</div><div id="notices-list"></div></div>
       </div>
 
       <!-- RESOURCES -->
@@ -408,14 +424,17 @@ body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);min-
           <div class="form-row full"><div class="form-group"><label>File Path</label><input type="text" id="res-fileurl" placeholder="e.g. RESOURCES/training_schedule.pdf"></div></div>
           <button class="btn btn-primary" id="btn-add-resource" onclick="addResource()">⊕ ADD RESOURCE</button>
         </div>
-        <div class="card"><div class="card-title">📁 All Resources</div><div id="resources-list"><p style="color:var(--muted);font-size:.85rem;">Loading...</p></div></div>
+        <div class="card"><div class="card-title">📁 All Resources</div><div id="resources-list"></div></div>
       </div>
 
       <!-- SETTINGS -->
       <div id="panel-settings" class="panel">
-        <div class="sec-header"><h2>Settings</h2><p>// Account configuration</p></div>
+        <div class="sec-header"><h2>Settings</h2><p>// Account configuration — stored on Firebase cloud</p></div>
         <div class="card">
           <div class="card-title">🔐 Change Admin Credentials</div>
+          <p style="font-size:.85rem;color:#555;margin-bottom:20px;line-height:1.7;">
+            Credentials are stored in <strong>Firebase Firestore</strong> — changes apply across all devices instantly.
+          </p>
           <div class="form-row">
             <div class="form-group"><label>Current Password</label><input type="password" id="set-cur-pwd" placeholder="••••••••"></div>
             <div class="form-group"><label>New Admin ID</label><input type="text" id="set-new-id" placeholder="New username"></div>
@@ -424,15 +443,17 @@ body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);min-
             <div class="form-group"><label>New Password</label><input type="password" id="set-new-pwd" placeholder="••••••••"></div>
             <div class="form-group"><label>Confirm New Password</label><input type="password" id="set-conf-pwd" placeholder="••••••••"></div>
           </div>
-          <button class="btn btn-primary" onclick="changeCredentials()">🔒 Update Credentials</button>
+          <button class="btn btn-primary" id="btn-change-creds" onclick="changeCredentials()">🔒 Update Credentials</button>
         </div>
         <div class="card">
           <div class="card-title">ℹ System Info</div>
           <table class="data-table">
-            <tr><td style="width:40%;font-family:'Roboto Mono',monospace;font-size:.8rem;">Admin ID</td><td id="sys-adminid">—</td></tr>
+            <tr><td style="width:40%;font-family:'Roboto Mono',monospace;font-size:.8rem;">Logged in as</td><td id="sys-adminid">—</td></tr>
+            <tr><td style="font-family:'Roboto Mono',monospace;font-size:.8rem;">Credentials</td><td style="color:var(--ok);">☁ Stored in Firebase (works on all devices)</td></tr>
             <tr><td style="font-family:'Roboto Mono',monospace;font-size:.8rem;">Database</td><td>Firebase Firestore — ncc-nit-ap (asia-south1 / Mumbai)</td></tr>
-            <tr><td style="font-family:'Roboto Mono',monospace;font-size:.8rem;">Sync Mode</td><td style="color:var(--ok);font-weight:600;">🌐 Global Real-time — all visitors see changes instantly</td></tr>
-            <tr><td style="font-family:'Roboto Mono',monospace;font-size:.8rem;">Portal Version</td><td>v2.0 — Firebase Live Sync</td></tr>
+            <tr><td style="font-family:'Roboto Mono',monospace;font-size:.8rem;">Sync Mode</td><td style="color:var(--ok);font-weight:600;">🌐 Global Real-time</td></tr>
+            <tr><td style="font-family:'Roboto Mono',monospace;font-size:.8rem;">Drive Video</td><td style="color:var(--ok);">✓ Supported via .txt files in gallery folders</td></tr>
+            <tr><td style="font-family:'Roboto Mono',monospace;font-size:.8rem;">Version</td><td>v3.0 — Firebase + Drive + Cloud Auth</td></tr>
           </table>
         </div>
       </div>
@@ -472,15 +493,17 @@ body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);min-
     <div class="form-group" style="margin-bottom:12px;"><label>Description</label><textarea id="edit-gal-desc"></textarea></div>
     <div class="form-group" style="margin-bottom:12px;"><label>Thumbnail Path</label><input type="text" id="edit-gal-thumb"></div>
     <div class="form-group" style="margin-bottom:12px;"><label>Card Label</label><input type="text" id="edit-gal-label"></div>
-    <div class="form-group" style="margin-bottom:16px;"><label>Media Files (one per line)</label><textarea id="edit-gal-files" style="min-height:100px;"></textarea></div>
+    <div class="form-group" style="margin-bottom:16px;">
+      <label>Media Files (one per line — use .txt for Drive videos)</label>
+      <textarea id="edit-gal-files" style="min-height:100px;"></textarea>
+    </div>
     <button class="btn btn-primary" onclick="saveGalleryEdit()">💾 SAVE CHANGES</button>
   </div>
 </div>
 
-<!-- Firebase SDK -->
 <script type="module">
 import { initializeApp }  from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-import { getFirestore, collection, doc, addDoc, setDoc, deleteDoc, onSnapshot }
+import { getFirestore, collection, doc, addDoc, setDoc, getDoc, deleteDoc, onSnapshot }
     from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -494,36 +517,97 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
-/* ═══ AUTH (stored in localStorage — admin only) ═══ */
-const DEFAULT_ID='nccaradmin', DEFAULT_PWD='NITAR@NCC2026';
-function getCreds(){return{id:localStorage.getItem('ncc_admin_id')||DEFAULT_ID,pwd:localStorage.getItem('ncc_admin_pwd')||DEFAULT_PWD};}
+/* ═══════════════════════════════════════════
+   CLOUD AUTH — credentials stored in Firestore
+   collection: "config" / document: "admin"
+   fields: { id: "...", pwd: "..." }
 
-window.doLogin=()=>{
-    const id=document.getElementById('inp-id').value.trim(),pwd=document.getElementById('inp-pwd').value,c=getCreds();
-    if(id===c.id&&pwd===c.pwd){
-        document.getElementById('login-err').textContent='';
-        document.getElementById('login-screen').classList.add('out');
-        setTimeout(()=>{document.getElementById('login-screen').style.display='none';document.getElementById('app').classList.add('visible');initApp(id);},420);
-    }else{
-        document.getElementById('login-err').textContent='✕ Invalid credentials. Access denied.';
-        document.getElementById('inp-pwd').value='';document.getElementById('inp-pwd').focus();
+   Default on first run: nccaradmin / NITAR@NCC2026
+   Change via Settings panel → saved to Firestore
+═══════════════════════════════════════════ */
+
+const CRED_DOC = doc(db, 'config', 'admin');
+
+// Default credentials written to Firestore on first run
+const DEFAULT_ID  = 'nccaradmin';
+const DEFAULT_PWD = 'NITAR@NCC2026';
+
+async function getCloudCreds(){
+    try{
+        const snap=await getDoc(CRED_DOC);
+        if(snap.exists()) return snap.data();
+        // First run — seed defaults into Firestore
+        await setDoc(CRED_DOC,{id:DEFAULT_ID,pwd:DEFAULT_PWD});
+        return {id:DEFAULT_ID,pwd:DEFAULT_PWD};
+    }catch(e){
+        // Fallback if offline
+        return {id:DEFAULT_ID,pwd:DEFAULT_PWD};
+    }
+}
+
+window.doLogin=async()=>{
+    const id=document.getElementById('inp-id').value.trim();
+    const pwd=document.getElementById('inp-pwd').value;
+    const btn=document.getElementById('btn-login');
+    const status=document.getElementById('login-status');
+    const err=document.getElementById('login-err');
+    btn.disabled=true; btn.textContent='Verifying...';
+    status.textContent='⏳ Checking credentials...';
+    err.textContent='';
+    try{
+        const creds=await getCloudCreds();
+        if(id===creds.id && pwd===creds.pwd){
+            status.textContent='✓ Authenticated!';
+            setTimeout(()=>{
+                document.getElementById('login-screen').classList.add('out');
+                setTimeout(()=>{
+                    document.getElementById('login-screen').style.display='none';
+                    document.getElementById('app').classList.add('visible');
+                    initApp(id);
+                },420);
+            },300);
+        }else{
+            err.textContent='✕ Invalid credentials. Access denied.';
+            status.textContent='';
+            document.getElementById('inp-pwd').value='';
+            document.getElementById('inp-pwd').focus();
+        }
+    }catch(e){
+        err.textContent='⚠ Could not connect to server. Check your internet.';
+        status.textContent='';
+    }finally{
+        btn.disabled=false; btn.textContent='AUTHENTICATE →';
     }
 };
+
 window.doLogout=()=>{
     document.getElementById('app').classList.remove('visible');
     document.getElementById('login-screen').style.display='flex';
     document.getElementById('login-screen').classList.remove('out');
-    document.getElementById('inp-id').value='';document.getElementById('inp-pwd').value='';
+    document.getElementById('inp-id').value='';
+    document.getElementById('inp-pwd').value='';
     document.getElementById('login-err').textContent='';
+    document.getElementById('login-status').textContent='';
 };
-window.changeCredentials=()=>{
-    const cur=v('set-cur-pwd'),newId=v('set-new-id'),newPwd=document.getElementById('set-new-pwd').value,conf=document.getElementById('set-conf-pwd').value,c=getCreds();
-    if(cur!==c.pwd)return toast('Current password incorrect.',true);
-    if(!newId)return toast('New ID cannot be empty.',true);
-    if(newPwd!==conf)return toast('Passwords do not match.',true);
-    if(newPwd.length<6)return toast('Password must be at least 6 characters.',true);
-    localStorage.setItem('ncc_admin_id',newId);localStorage.setItem('ncc_admin_pwd',newPwd);
-    toast('Credentials updated! Please log in again.');setTimeout(window.doLogout,1500);
+
+window.changeCredentials=async()=>{
+    const cur=v('set-cur-pwd');
+    const newId=v('set-new-id');
+    const newPwd=document.getElementById('set-new-pwd').value;
+    const conf=document.getElementById('set-conf-pwd').value;
+    if(!newId)    return toast('New ID cannot be empty.',true);
+    if(newPwd!==conf) return toast('Passwords do not match.',true);
+    if(newPwd.length<6) return toast('Password must be at least 6 characters.',true);
+    const btn=document.getElementById('btn-change-creds');
+    btn.disabled=true; btn.textContent='Saving...';
+    try{
+        const creds=await getCloudCreds();
+        if(cur!==creds.pwd) return toast('Current password incorrect.',true);
+        await setDoc(CRED_DOC,{id:newId,pwd:newPwd});
+        toast('✓ Credentials updated in cloud! Please log in again.');
+        setTimeout(window.doLogout,1800);
+    }catch(e){ toast('Firebase error: '+e.message,true); }
+    finally{ btn.disabled=false; btn.textContent='🔒 Update Credentials'; }
 };
 
 /* ═══ APP INIT ═══ */
@@ -532,7 +616,7 @@ let liveData={gallery:[],officers:[],rank:[],notices:[],resources:[]};
 function initApp(user){
     document.getElementById('sidebar-user').textContent='▸ '+user;
     document.getElementById('sys-adminid').textContent=user;
-    updateTime();setInterval(updateTime,1000);
+    updateTime(); setInterval(updateTime,1000);
     setupListeners();
 }
 function updateTime(){document.getElementById('topbar-time').textContent=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+' IST';}
@@ -547,44 +631,32 @@ window.gotoPanel=(name,el)=>{
     document.getElementById('topbar-bc').textContent='// '+name;
 };
 
-/* ═══════════════════════════════════════
-   REAL-TIME LISTENERS — updates admin UI
-   instantly when anyone changes Firestore
-═══════════════════════════════════════ */
+/* ═══ REAL-TIME LISTENERS ═══ */
 function setupListeners(){
     const banner=document.getElementById('fb-banner'),msg=document.getElementById('fb-msg');
-
-    // Gallery
     onSnapshot(collection(db,'gallery'),snap=>{
         liveData.gallery=snap.docs.map(d=>({...d.data(),id:d.id}));
         document.getElementById('ds-gallery').textContent=liveData.gallery.length;
         renderGalleryList(liveData.gallery);
-        banner.className='fb-banner ok';msg.textContent='✓ Firebase connected — all changes go live globally in real-time';
+        banner.className='fb-banner ok';
+        msg.textContent='✓ Firebase connected — all changes go live globally in real-time';
     },err=>{banner.className='fb-banner err';msg.textContent='⚠ Firebase error: '+err.message;});
-
-    // Officers
     onSnapshot(collection(db,'officers'),snap=>{
         liveData.officers=snap.docs.map(d=>({...d.data(),id:d.id}));
         document.getElementById('ds-officers').textContent=liveData.officers.length;
         renderOfficersList(liveData.officers);
     });
-
-    // Rank
     onSnapshot(collection(db,'rank'),snap=>{
         liveData.rank=snap.docs.map(d=>({...d.data(),id:d.id}));
         document.getElementById('ds-rank').textContent=liveData.rank.length;
         renderRankTable(liveData.rank);
     });
-
-    // Notices
     onSnapshot(collection(db,'notices'),snap=>{
         liveData.notices=snap.docs.map(d=>({...d.data(),id:d.id}));
         document.getElementById('ds-notices').textContent=liveData.notices.length;
         renderNoticesList(liveData.notices);
         renderDashNotices(liveData.notices);
     });
-
-    // Resources
     onSnapshot(collection(db,'resources'),snap=>{
         liveData.resources=snap.docs.map(d=>({...d.data(),id:d.id}));
         document.getElementById('ds-resources').textContent=liveData.resources.length;
@@ -597,7 +669,8 @@ const SITE_BASE='https://akhand-jaihind.github.io/ncc-nit-ap';
 let fetchedFiles=[];
 
 window.onFolderInput=()=>{
-    fetchedFiles=[];document.getElementById('gal-files-hidden').value='';
+    fetchedFiles=[];
+    document.getElementById('gal-files-hidden').value='';
     document.getElementById('fetch-status').style.display='none';
     document.getElementById('gal-add-warn').textContent='';
 };
@@ -610,26 +683,33 @@ window.fetchFolderIndex=async()=>{
     const fileList=document.getElementById('fetch-file-list'),tagsEl=document.getElementById('fetch-tags');
     const btn=document.getElementById('btn-fetch');
     const url=`${SITE_BASE}/${encodeURIComponent(folder)}/index.json`;
-    statusBox.style.display='block';fileList.style.display='none';
-    icon.textContent='⏳';msg.textContent='Fetching…';urlEl.textContent=url;
-    btn.disabled=true;btn.textContent='⏳ Fetching…';
+    statusBox.style.display='block'; fileList.style.display='none';
+    icon.textContent='⏳'; msg.textContent='Fetching…'; urlEl.textContent=url;
+    btn.disabled=true; btn.textContent='⏳ Fetching…';
     try{
         const resp=await fetch(url,{cache:'no-store'});
-        if(!resp.ok)throw new Error(`HTTP ${resp.status} — index.json not found in "${folder}"`);
+        if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
         const json=await resp.json();
         if(!Array.isArray(json))throw new Error('index.json must be a JSON array.');
         fetchedFiles=json.filter(f=>typeof f==='string'&&f.trim());
         document.getElementById('gal-files-hidden').value=JSON.stringify(fetchedFiles);
-        icon.textContent='✅';msg.innerHTML=`<span style="color:var(--ok);">Found ${fetchedFiles.length} file(s)</span>`;
-        const IE2=['jpg','jpeg','png','gif','webp','bmp','svg'],VE2=['mp4','webm','ogg','mov'];
-        tagsEl.innerHTML=fetchedFiles.map(f=>{const ext=f.split('.').pop().toLowerCase();const ic=VE2.includes(ext)?'🎬':IE2.includes(ext)?'🖼':'📄';return`<span class="file-tag">${ic} ${esc(f)}</span>`;}).join('');
-        fileList.style.display='block';toast(`✓ Loaded ${fetchedFiles.length} files`);
+        icon.textContent='✅';
+        msg.innerHTML=`<span style="color:var(--ok);">Found ${fetchedFiles.length} file(s)</span>`;
+        // Show tags with Drive indicator for .txt files
+        tagsEl.innerHTML=fetchedFiles.map(f=>{
+            const ext=f.split('.').pop().toLowerCase();
+            const ic=ext==='txt'?'🎬 DRIVE':['mp4','webm','mov'].includes(ext)?'🎬':['jpg','jpeg','png','gif','webp'].includes(ext)?'🖼':'📄';
+            const style=ext==='txt'?'background:#e8f0fe;color:#1a73e8;border-color:#a8c7fa;':'';
+            return`<span class="file-tag" style="${style}">${ic} ${esc(f)}</span>`;
+        }).join('');
+        fileList.style.display='block';
+        toast(`✓ Loaded ${fetchedFiles.length} files`);
     }catch(e){
-        fetchedFiles=[];document.getElementById('gal-files-hidden').value='';
-        icon.textContent='❌';msg.innerHTML=`<span style="color:var(--danger);">${esc(e.message)}</span>`;
+        fetchedFiles=[]; document.getElementById('gal-files-hidden').value='';
+        icon.textContent='❌'; msg.innerHTML=`<span style="color:var(--danger);">${esc(e.message)}</span>`;
         document.getElementById('gal-add-warn').textContent='⚠ Fix folder/index.json first.';
         toast(e.message,true);
-    }finally{btn.disabled=false;btn.textContent='🔍 FETCH index.json';}
+    }finally{btn.disabled=false; btn.textContent='🔍 FETCH index.json';}
 };
 
 window.addGalleryItem=async()=>{
@@ -637,14 +717,14 @@ window.addGalleryItem=async()=>{
     const desc=v('gal-desc'),thumb=v('gal-thumb'),label=v('gal-label');
     if(!title||!folder)return toast('Title and Folder Name are required.',true);
     const files=fetchedFiles.length?fetchedFiles:(document.getElementById('gal-files-hidden').value?JSON.parse(document.getElementById('gal-files-hidden').value):[]);
-    const btn=document.getElementById('btn-add-gallery');btn.disabled=true;btn.textContent='Saving to Firebase…';
+    const btn=document.getElementById('btn-add-gallery');btn.disabled=true;btn.textContent='Saving…';
     try{
         await addDoc(collection(db,'gallery'),{title,folder,desc,thumb,label,files,created:new Date().toISOString()});
         ['gal-title','gal-folder','gal-desc','gal-thumb','gal-label','gal-files-hidden'].forEach(id=>document.getElementById(id).value='');
         document.getElementById('gal-thumb-preview').innerHTML='';
         document.getElementById('fetch-status').style.display='none';
         fetchedFiles=[];
-        toast('✓ Gallery event saved! Live on site for all visitors now.');
+        toast('✓ Gallery event saved! Live for all visitors now.');
     }catch(e){toast('Firebase error: '+e.message,true);}
     finally{btn.disabled=false;btn.textContent='⊕ ADD TO GALLERY';}
 };
@@ -652,18 +732,22 @@ window.addGalleryItem=async()=>{
 function renderGalleryList(data){
     const el=document.getElementById('gallery-list');
     if(!data.length){el.innerHTML='<p style="color:var(--muted);font-size:.85rem;">No gallery events yet.</p>';return;}
-    el.innerHTML=data.sort((a,b)=>new Date(b.created||0)-new Date(a.created||0)).map(g=>`
-        <div class="gallery-item-row">
+    el.innerHTML=data.sort((a,b)=>new Date(b.created||0)-new Date(a.created||0)).map(g=>{
+        const driveCount=(g.files||[]).filter(f=>f.endsWith('.txt')).length;
+        const mediaCount=(g.files||[]).length;
+        return`<div class="gallery-item-row">
             ${g.thumb?`<img class="gallery-thumb" src="${esc(g.thumb)}" alt="" onerror="this.style.display='none'">`:`<div class="gallery-thumb-placeholder">📁</div>`}
             <div class="gallery-item-info">
                 <strong>${esc(g.title)}</strong>
-                <small>📂 ${esc(g.folder)} · ${g.files&&g.files.length?g.files.length+' files':'no files cached'}</small>
+                <small>📂 ${esc(g.folder)} · ${mediaCount} file(s)${driveCount?` · <span style="color:#1a73e8;">▶ ${driveCount} Drive video(s)</span>`:''}
+                </small>
             </div>
             <div class="gallery-item-actions">
                 <button class="btn btn-warn btn-sm" onclick="editGallery('${esc(g.id)}')">✏ Edit</button>
                 <button class="btn btn-danger btn-sm" onclick="deleteEntry('gallery','${esc(g.id)}')">✕</button>
             </div>
-        </div>`).join('');
+        </div>`;
+    }).join('');
 }
 
 window.editGallery=id=>{
@@ -689,7 +773,7 @@ window.saveGalleryEdit=async()=>{
             files:document.getElementById('edit-gal-files').value.split('\n').map(s=>s.trim()).filter(Boolean),
             created:liveData.gallery.find(x=>x.id===id)?.created||new Date().toISOString()
         },{merge:true});
-        closeModal('modal-gal');toast('✓ Gallery event updated! Live now.');
+        closeModal('modal-gal');toast('✓ Gallery updated! Live now.');
     }catch(e){toast('Firebase error: '+e.message,true);}
 };
 
@@ -702,11 +786,10 @@ window.addOfficer=async()=>{
         await addDoc(collection(db,'officers'),{role,name,designation,photo,bio,created:new Date().toISOString()});
         ['off-name','off-designation','off-photo','off-bio'].forEach(id=>document.getElementById(id).value='');
         document.getElementById('off-photo-preview').innerHTML='';
-        toast('✓ Officer saved! Live for all visitors now.');
+        toast('✓ Officer saved!');
     }catch(e){toast('Firebase error: '+e.message,true);}
     finally{btn.disabled=false;btn.textContent='⊕ SAVE OFFICER';}
 };
-
 function renderOfficersList(data){
     const el=document.getElementById('officers-list');
     if(!data.length){el.innerHTML='<p style="color:var(--muted);font-size:.85rem;">No officers yet.</p>';return;}
@@ -721,7 +804,6 @@ function renderOfficersList(data){
             </div>
         </div>`).join('');
 }
-
 window.editOfficer=id=>{
     const o=liveData.officers.find(x=>x.id===id);if(!o)return;
     document.getElementById('edit-off-id').value=id;
@@ -742,7 +824,7 @@ window.saveOfficerEdit=async()=>{
             photo:document.getElementById('edit-off-photo').value,
             bio:document.getElementById('edit-off-bio').value,
         },{merge:true});
-        closeModal('modal-off');toast('✓ Officer updated! Live now.');
+        closeModal('modal-off');toast('✓ Officer updated!');
     }catch(e){toast('Firebase error: '+e.message,true);}
 };
 window.previewOfficerPhoto=()=>{
@@ -758,11 +840,10 @@ window.addRankEntry=async()=>{
     try{
         await addDoc(collection(db,'rank'),{rank,name,branch,batch,roll,created:new Date().toISOString()});
         ['rank-name','rank-branch','rank-batch','rank-roll'].forEach(id=>document.getElementById(id).value='');
-        toast('✓ Cadet added! Live for all visitors now.');
+        toast('✓ Cadet added!');
     }catch(e){toast('Firebase error: '+e.message,true);}
     finally{btn.disabled=false;btn.textContent='⊕ ADD CADET';}
 };
-
 function renderRankTable(data){
     const tbody=document.getElementById('rank-tbody');
     if(!data.length){tbody.innerHTML='<tr><td colspan="5" style="color:var(--muted);text-align:center;">No cadets yet.</td></tr>';return;}
@@ -782,11 +863,10 @@ window.addNotice=async()=>{
     try{
         await addDoc(collection(db,'notices'),{title,priority,body,by,expiry,fileUrl,created:new Date().toISOString()});
         ['not-title','not-body','not-by','not-expiry','not-fileurl'].forEach(id=>document.getElementById(id).value='');
-        toast('✓ Notice posted! Live for all visitors now.');
+        toast('✓ Notice posted!');
     }catch(e){toast('Firebase error: '+e.message,true);}
     finally{btn.disabled=false;btn.textContent='⊕ POST NOTICE';}
 };
-
 function renderNoticesList(data){
     const el=document.getElementById('notices-list');
     if(!data.length){el.innerHTML='<p style="color:var(--muted);font-size:.85rem;">No notices yet.</p>';return;}
@@ -801,7 +881,6 @@ function renderNoticesList(data){
             <button class="btn btn-danger btn-sm" onclick="deleteEntry('notices','${esc(n.id)}')">✕</button>
         </div>`).join('');
 }
-
 function renderDashNotices(data){
     const nl=document.getElementById('dash-notices');
     if(!data.length){nl.innerHTML='<p style="color:var(--muted);font-size:.85rem;">No notices yet.</p>';return;}
@@ -820,11 +899,10 @@ window.addResource=async()=>{
     try{
         await addDoc(collection(db,'resources'),{title,category,desc,fileUrl,created:new Date().toISOString()});
         ['res-title','res-desc','res-fileurl'].forEach(id=>document.getElementById(id).value='');
-        toast('✓ Resource added! Live for all visitors now.');
+        toast('✓ Resource added!');
     }catch(e){toast('Firebase error: '+e.message,true);}
     finally{btn.disabled=false;btn.textContent='⊕ ADD RESOURCE';}
 };
-
 function renderResourcesList(data){
     const el=document.getElementById('resources-list');
     if(!data.length){el.innerHTML='<p style="color:var(--muted);font-size:.85rem;">No resources yet.</p>';return;}
